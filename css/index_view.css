@@ -137,6 +137,14 @@ html:not([data-scale]) .am-list-body::after {
     -ms-flex-align: center;
     align-items: center;
 }
+.am-card-header-content{
+	font-size: 18px; color: rgb(51, 51, 51); font-weight: bold;
+}
+.am-flexbox .am-flexbox-item,.am-card-header-content{
+	white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
 .am-flexbox .am-flexbox-item:first-child {
     margin-left: 0;
 }
@@ -147,4 +155,8 @@ html:not([data-scale]) .am-list-body::after {
     flex: 1 1;
     margin-left: 8px;
     min-width: 10px;
+}
+.font-danger{
+	color: red;
+	font-size: 12px;
 }

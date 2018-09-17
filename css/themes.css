@@ -20,6 +20,9 @@
     font-size: 14px;
 	
 }
+.theme_font_danger{
+	color: red ;
+}
 /*tab页切里面的文字颜色*/
 /*tab被选中的当前横线颜色*/
 .themes_tab .mui-segmented-control.mui-segmented-control-inverted~.mui-slider-progress-bar{
@@ -35,7 +38,16 @@
 .mui-slider-indicator.mui-segmented-control{
 	background: #fff;
 }
-
+.search_head{
+	padding:10px;
+}
+.search_head input[type="search"]{
+	margin-bottom: 0 !important;
+	background: #fff;
+}
+.search_head .mui-placeholder{
+	top: 10px;
+}
 
 /*通用的上拉刷新加载的样式*/
 html,body{
@@ -107,6 +119,36 @@ html,body{
 .mui-pull-top-canvas canvas {
 	width: 40px;
 }
-.mui-slider-indicator.mui-segmented-control {
-	background-color: #efeff4;
+
+
+/* 详情 通用 */
+.detailRow .mui-input-group .mui-input-row{
+	min-height:40px;
+	height:auto;
+}
+.detailRow_label{
+	width:25%;
+	min-height:40px;
+	float: left;
+	padding:10px 0;
+    word-break: break-all;	
+}
+.detailRow_content{
+	width:55%;
+	min-height:40px;
+	float: left;
+	padding:10px 0;
+    word-break: break-all;	
+}
+.detailRow_right{
+	width:10%;
+	min-height:40px;
+	float: left;
+	padding:10px 0;
+	text-align: right;
+	font-size: 12px;
+}
+.head_minheight{
+	min-height:auto;
+	padding:0;
 }
