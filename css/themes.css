@@ -9,3 +9,29 @@
 .themes_nav_right {
 	
 }
+
+/*返回文字样式*/
+.theme_back a{
+	color: #f2a11c !important;
+}
+.theme_back_font{
+	color: #f2a11c ;
+	margin-top: 12px;
+    font-size: 14px;
+	
+}
+/*tab页切里面的文字颜色*/
+/*tab被选中的当前横线颜色*/
+.themes_tab .mui-segmented-control.mui-segmented-control-inverted~.mui-slider-progress-bar{
+	background-color: #f2a11c !important;
+}
+.themes_font_color_tab.mui-active{
+	color: #f2a11c !important;
+}
+/*tab 页切内容高度 */
+.mui-slider .mui-slider-group{
+	height:80vh;
+}
+.mui-slider-indicator.mui-segmented-control{
+	background: #fff;
+}

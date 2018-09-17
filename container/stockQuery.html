@@ -7,22 +7,24 @@
 		<title></title>
 		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
 		<link href="../css/mui.min.css" rel="stylesheet" />
+		<link href="../css/themes.css" rel="stylesheet" />
 	</head>
 
 	<body>
 		
-		<header class="mui-bar mui-bar-nav">
-		    <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+		<header class="mui-bar mui-bar-nav theme_back">
+		   	<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+		   	<a class="mui-pull-left theme_back_font">返回</a>
 		    <h1 class="mui-title">库存查询</h1>
 		</header>
 		<div class="mui-content">
 		    <div class="mui-input-row mui-search">
 				<input type="search" class="mui-input-clear" placeholder="通用名/商品名/生产厂家">
 			</div>
-			<div id="slider" class="mui-slider">
+			<div id="slider" class="mui-slider themes_tab">
 				<div id="sliderSegmentedControl" class="mui-slider-indicator mui-segmented-control mui-segmented-control-inverted">
-					<a class="mui-control-item" href="#item1mobile">全部</a>
-					<a class="mui-control-item" href="#item2mobile">更多筛选</a>
+					<a class="mui-control-item themes_font_color_tab" href="#item1mobile">全部</a>
+					<a class="mui-control-item themes_font_color_tab" href="#item2mobile">更多筛选</a>
 				</div>
 				<div id="sliderProgressBar" class="mui-slider-progress-bar mui-col-xs-6"></div>
 				<div class="mui-slider-group">
@@ -112,9 +114,12 @@
 		
 		<script src="../js/mui.min.js"></script>
 		<script type="text/javascript">
-			mui.init()
+			
 
 			(function($) {
+				
+			$.init()
+				
 			$('.mui-scroll-wrapper').scroll({
 				indicators: true //是否显示滚动条
 			});
