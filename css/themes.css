@@ -14,7 +14,7 @@
 .theme_back a{
 	color: #f2a11c !important;
 }
-.theme_back_font{
+.theme_back_font,.theme_next_font{
 	color: #f2a11c ;
 	margin-top: 13px;
     font-size: 14px;

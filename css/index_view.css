@@ -129,6 +129,20 @@ html:not([data-scale]) .am-list-body::after {
     min-height: 30px;
     line-height: 30px;
 }
+.detail-header-flex{
+	display: flex;
+	position: relative;
+	-ms-flex-align: center;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 10px 0;
+}
+.detail-header-flex .am-action{
+	align-items: center;
+}
+.detail-header-flex .am-action a{
+	color: #f2a11c !important;
+}
 .am-flexbox {
     text-align: left;
     overflow: hidden;
