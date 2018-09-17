@@ -1,0 +1,159 @@
+<!--盘点  - 列表页 - yuweI-->
+<!doctype html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="../../css/mui.min.css" rel="stylesheet" />
+		<link href="../../css/themes.css" rel="stylesheet" />
+		<link href="../../css/index_view.css" rel="stylesheet" />
+		<link rel="import" href="../../tpl/check_card.html" id="card_view"/>
+	</head>
+
+	<body>
+		
+		<header class="mui-bar mui-bar-nav theme_back">
+		   	<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+		   	<a class="mui-pull-left theme_back_font">返回</a>
+		    <h1 class="mui-title">盘点</h1>
+		    <a class="mui-pull-right" style="height: 45px;padding-top: 12px;">新建盘点</a>
+		</header>
+		<div class="mui-content">
+			<div class="mui-scroll-wrapper">
+				<h4 class="title_h3">盘点记录</h4>
+				<div class="mui-scroll" id='scroll'>
+					<!--此处填充template-->
+				</div>
+			</div>
+		</div>
+		
+		<script src="../../js/mui.js"></script>
+		<script src="../../js/template-web.js" type="text/javascript" charset="utf-8"></script>
+		<script src="../../js/utils.js" type="text/javascript" charset="utf-8"></script>
+		<script src="../../js/common.js" type="text/javascript" charset="utf-8"></script>
+
+		<script type="text/javascript">
+			(function($){
+				$.init({
+					pullRefresh :{
+						container:"#scroll",
+						down : {
+					      style:'circle',//必选，下拉刷新样式，目前支持原生5+ ‘circle’ 样式
+					      color:'#2BD009', //可选，默认“#2BD009” 下拉刷新控件颜色
+					      height:'50px',//可选,默认50px.下拉刷新控件的高度,
+					      range:'100px', //可选 默认100px,控件可下拉拖拽的范围
+					      offset:'0px', //可选 默认0px,下拉刷新控件的起始位置
+					      auto: true,//可选,默认false.首次加载自动上拉刷新一次
+					      callback :function(){
+					      	console.log(123)
+					      	$('#scroll').pullRefresh().endPulldown();
+
+					      } //必选，刷新函数，根据具体业务来编写，比如通过ajax从服务器获取新数据；
+					    },
+					    up : {
+					      height:50,//可选.默认50.触发上拉加载拖动距离
+					      auto:true,//可选,默认false.自动上拉加载一次
+					      contentrefresh : "正在加载...",//可选，正在加载状态时，上拉加载控件上显示的标题内容
+					      contentnomore:'没有更多数据了',//可选，请求完毕若没有更多数据时显示的提醒内容；
+					      callback :function(){
+					      	this.endPullupToRefresh(true);
+					      } //必选，刷新函数，根据具体业务来编写，比如通过ajax从服务器获取新数据；
+					    }
+				    }	
+				});
+					
+				$.ready(function(){
+					
+					var data = {
+						list: [{
+							"id":"1",
+							"supplierName": "静注人免疫球蛋白",
+							"drugName": "西咪替丁",
+							"producter": "北京汉典制药有限公司",
+							"distributionNo": "AADKSF1OOSKDF2",
+							"num": "323",
+							"date": "2018-08-08"
+						},{
+							"id":"2",
+							"supplierName": "注射用复方甘草酸苷",
+							"drugName": "头孢克肟颗粒",
+							"distributionNo": "AADKSF1OOSKDF2",
+							"num": "666",
+							"limitNum":"20",
+							"planNo": "2",
+							"date": "2018-01-19"
+						},{
+							"id":"2",
+							"supplierName": "注射用复方甘草酸苷",
+							"drugName": "头孢克肟颗粒",
+							"producter": "北京北大药业有限公司",
+							"distributionNo": "AADKSF1OOSKDF2",
+							"num": "666",
+							"limitNum":"20",
+							"planNo": "2",
+							"date": "2018-01-19"
+						},{
+							"id":"2",
+							"supplierName": "注射用复方甘草酸苷",
+							"drugName": "头孢克肟颗粒",
+							"producter": "北京北大药业有限公司",
+							"distributionNo": "AADKSF1OOSKDF2",
+							"num": "666",
+							"limitNum":"20",
+							"planNo": "2",
+							"date": "2018-01-19"
+						},{
+							"id":"2",
+							"supplierName": "注射用复方甘草酸苷",
+							"drugName": "头孢克肟颗粒",
+							"producter": "北京北大药业有限公司",
+							"distributionNo": "AADKSF1OOSKDF2",
+							"num": "666",
+							"limitNum":"20",
+							"planNo": "2",
+							"date": "2018-01-19"
+						},{
+							"id":"3",
+							"supplierName": "阿司匹林",
+							"drugName": "阿司匹林",
+							"producter": "湖北省益康制药厂",
+							"num": "888",
+							"planNo": "plan332342sdfa123",
+							"distributionNo": "AADKSF1OOSKDF2",
+							"date": "2018-04-19"
+						},{
+							"id":"4",
+							"supplierName": "阿司匹林",
+							"drugName": "阿司匹林",
+							"producter": "湖北省益康制药厂",
+							"num": "888",
+							"planNo": "plan332342sdfa123",
+							"distributionNo": "AADKSF1OOSKDF2",
+							"date": "2018-05-19"
+						},{
+							"id":"5",
+							"supplierName": "阿司匹林",
+							"drugName": "阿司匹林",
+							"producter": "湖北省益康制药厂",
+							"num": "888",
+							"planNo": "plan332342sdfa123",
+							"distributionNo": "AADKSF1OOSKDF2",
+							"date": "2018-05-29"
+						}]
+					};
+					var utils = new Utils();
+					utils.appendModule('#card_view');
+					var html = template('index_list_view', data);
+					document.getElementById('scroll').innerHTML = html;
+				 
+				})
+			
+			
+		})(mui);
+		
+		</script>
+	
+	</body>
+
+</html>
