@@ -112,38 +112,71 @@
 
 		</div>
 		
-		<script src="../js/mui.min.js"></script>
+		<script src="../js/mui.js"></script>
+		<script src="../js/mui.pullToRefresh.js"></script>
+		<script src="../js/mui.pullToRefresh.material.js"></script>
 		<script type="text/javascript">
 			
 
 			(function($) {
+			$.init();
 				
-			$.init()
-				
+
+			var deceleration = mui.os.ios?0.003:0.0009;
 			$('.mui-scroll-wrapper').scroll({
-				indicators: true //是否显示滚动条
-			});
-			var html2 = '<ul class="mui-table-view"><li class="mui-table-view-cell">第二个选项卡子项-1</li><li class="mui-table-view-cell">第二个选项卡子项-2</li><li class="mui-table-view-cell">第二个选项卡子项-3</li><li class="mui-table-view-cell">第二个选项卡子项-4</li><li class="mui-table-view-cell">第二个选项卡子项-5</li></ul>';
-			var item2 = document.getElementById('item2mobile');
-			document.getElementById('slider').addEventListener('slide', function(e) {
-				if (e.detail.slideNumber === 1) {
-					if (item2.querySelector('.mui-loading')) {
-						setTimeout(function() {
-							item2.querySelector('.mui-scroll').innerHTML = html2;
-						}, 500);
-					}
-				}
+				bounce: false,
+				indicators: true, //是否显示滚动条
+				deceleration:deceleration
 			});
 			
-			//tab页切的点击事件
-			var sliderSegmentedControl = document.getElementById('sliderSegmentedControl');
-			$('.mui-input-group').on('change', 'input', function() {
-				if (this.checked) {
-					sliderSegmentedControl.className = 'mui-slider-indicator mui-segmented-control mui-segmented-control-inverted mui-segmented-control-' + this.value;
-					//force repaint
-					sliderProgressBar.setAttribute('style', sliderProgressBar.getAttribute('style'));
-				}
-			});
+			$.ready(function(){
+
+				var html2 = '<ul class="mui-table-view"><li class="mui-table-view-cell">第二个选项卡子项-1</li><li class="mui-table-view-cell">第二个选项卡子项-2</li><li class="mui-table-view-cell">第二个选项卡子项-3</li><li class="mui-table-view-cell">第二个选项卡子项-4</li><li class="mui-table-view-cell">第二个选项卡子项-5</li></ul>';
+				var item2 = document.getElementById('item2mobile');
+				document.getElementById('slider').addEventListener('slide', function(e) {
+					if (e.detail.slideNumber === 1) {
+						if (item2.querySelector('.mui-loading')) {
+							setTimeout(function() {
+								item2.querySelector('.mui-scroll').innerHTML = html2;
+							}, 500);
+						}
+					}
+				});
+				
+				//tab页切的点击事件
+				var sliderSegmentedControl = document.getElementById('sliderSegmentedControl');
+				$('.mui-input-group').on('change', 'input', function() {
+					if (this.checked) {
+						sliderSegmentedControl.className = 'mui-slider-indicator mui-segmented-control mui-segmented-control-inverted mui-segmented-control-' + this.value;
+						//force repaint
+						sliderProgressBar.setAttribute('style', sliderProgressBar.getAttribute('style'));
+					}
+				});
+				
+					//循环初始化所有下拉刷新，上拉加载。
+				$.each(document.querySelectorAll('.mui-slider-group .mui-scroll'), function(index, pullRefreshEl) {
+					$(pullRefreshEl).pullToRefresh({
+						down: {
+							callback: function() {
+								console.log('down')
+								var self = this;
+								self.endPullDownToRefresh();
+							}
+						},
+						up: {
+							contentrefresh : "正在加载...",//可选，正在加载状态时，上拉加载控件上显示的标题内容
+      						contentnomore:'没有更多数据了',
+							callback: function() {
+								console.log('up')
+								var self = this;
+								self.endPullUpToRefresh();
+							}
+						}
+					});
+				})
+			})
+			
+			
 		})(mui);
 		
 		</script>
