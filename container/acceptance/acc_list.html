@@ -9,9 +9,7 @@
 		<link href="../../css/mui.min.css" rel="stylesheet" />
 		<link href="../../css/themes.css" rel="stylesheet" />
 		<link href="../../css/index_view.css" rel="stylesheet" />
-		<script src="../../js/mui.min.js"></script>
-		<script src="../../js/template-web.js" type="text/javascript" charset="utf-8"></script>
-		<script src="../../js/utils.js" type="text/javascript" charset="utf-8"></script>
+		
 	</head>
 
 	<body>
@@ -28,16 +26,18 @@
 				<div class="mui-slider-group">
 					<div id="item1mobile" class="mui-slider-item mui-control-content mui-active">
 						<div id="scroll1" class="mui-scroll-wrapper">
-							<div class="mui-scroll">
-								<ul id="mui-table-view" class="mui-table-view">
-									
-								</ul>
+							<div class="mui-scroll" id="mui-table-view-tab1">
+								<div class="mui-loading">
+									<div class="mui-spinner">
+									</div>
+								</div>
+								
 							</div>
 						</div>
 					</div>
 					<div id="item2mobile" class="mui-slider-item mui-control-content">
 						<div id="scroll2" class="mui-scroll-wrapper">
-							<div class="mui-scroll">
+							<div class="mui-scroll" id="mui-table-view-tab2">
 								<div class="mui-loading">
 									<div class="mui-spinner">
 									</div>
@@ -48,108 +48,111 @@
 					</div>
 				</div>
 			</div>
-
 		</div>
-		<!--<div class="mui-loading" >
-			<div class="mui-spinner">
-			</div>
-		    玩命加载中...
-		</div>-->
-
 		
-		<!--<script src="../js/mui.min.js"></script>-->
+		<script src="../../js/mui.min.js"></script>
+		<script src="../../js/mui.pullToRefresh.js"></script>
+		<script src="../../js/mui.pullToRefresh.material.js"></script>
+		<script src="../../js/template-web.js" type="text/javascript" charset="utf-8"></script>
+		<script src="../../js/utils.js" type="text/javascript" charset="utf-8"></script>
 		<script src="../../js/common.js" type="text/javascript" charset="utf-8"></script>
 		<script type="text/javascript">
 			
 
 			(function($) {
 				
-			$.init()
-				
-			$('.mui-scroll-wrapper').scroll({
-				deceleration: 0.1,
-				indicators: true //是否显示滚动条
-			});
-			var html2 = '<ul class="mui-table-view"><li class="mui-table-view-cell">第二个选项卡子项-1</li><li class="mui-table-view-cell">第二个选项卡子项-2</li><li class="mui-table-view-cell">第二个选项卡子项-3</li><li class="mui-table-view-cell">第二个选项卡子项-4</li><li class="mui-table-view-cell">第二个选项卡子项-5</li></ul>';
-			var item2 = document.getElementById('item2mobile');
-			document.getElementById('slider').addEventListener('slide', function(e) {
-				if (e.detail.slideNumber === 1) {
-					if (item2.querySelector('.mui-loading')) {
-						setTimeout(function() {
-							item2.querySelector('.mui-scroll').innerHTML = html2;
-						}, 500);
-					}
-				}
-			});
-			
-			//tab页切的点击事件
-			var sliderSegmentedControl = document.getElementById('sliderSegmentedControl');
-			$('.mui-input-group').on('change', 'input', function() {
-				if (this.checked) {
-					sliderSegmentedControl.className = 'mui-slider-indicator mui-segmented-control mui-segmented-control-inverted mui-segmented-control-' + this.value;
-					//force repaint
-					sliderProgressBar.setAttribute('style', sliderProgressBar.getAttribute('style'));
-				}
-			});
-			// 模板加载
-			$.ready(function(){
-				//console.log("当前页面URL："+plus.webview.currentWebview().getURL());
-				var data = {
-					list: [{
-						"id":"1",
-						"supplierName": "中国医药集团",
-						"drugName": "西咪替丁",
-						"producter": "北京汉典制药有限公司",
-						"distributionNo": "AADKSF1OOSKDF2",
-						"planNo": "plan1213sdfa",
-						"date": "2018-08-08"
-					},{
-						"id":"2",
-						"supplierName": "华润医药集团",
-						"drugName": "头孢克肟颗粒",
-						"producter": "北京北大药业有限公司",
-						"distributionNo": "AADKSF1OOSKDF2",
-						"planNo": "plan1od09932sdfaafd422",
-						"date": "2018-01-19"
-					},{
-						"id":"3",
-						"supplierName": "广州医药",
-						"drugName": "阿司匹林",
-						"producter": "湖北省益康制药厂",
-						"distributionNo": "AADKSF1OOSKDF2",
-						"planNo": "plan332342sdfa123",
-						"date": "2018-04-19"
-					}]
-				};
-				var utils = new Utils();
-				utils.appendModule('#list_tpl');
-				var html = template('list_tpl_view', data);
-				document.getElementById('mui-table-view').innerHTML = html;
-			});
-			//绑定点击事件  - 进入详情页
+				$.init()
 					
-			$('#slider').on('tap','.moreDetail',function(){
-				let id = this.getAttribute('data-id');
-				console.log(id,'id');
-				common.openwin('acc_detail',{ targetId: id },{
-					titleText: '验收详情'
-				})
-			});
-			
-			// 绑定事件 --确认验收
-			$('#slider').on('tap','.acceptance',function(){
-				let id = this.getAttribute('data-id');
-				console.log(id,'id')
-				var btnArray = ['否', '是'];
-				mui.confirm('是否确认验收？', '确认', btnArray, function(e) {
-					if (e.index == 1) {
-						alert('你点击了是')
-					} else {
-						alert('你点击了否')
-					}
-				})
-			});
-		})(mui);
+				var deceleration = mui.os.ios?0.003:0.0009;
+				$('.mui-scroll-wrapper').scroll({
+					bounce: false,
+					indicators: true, //是否显示滚动条
+					deceleration:deceleration
+				});
+				
+				// 模板加载
+				$.ready(function(){
+					//console.log("当前页面URL："+plus.webview.currentWebview().getURL());
+					var data = {
+						list: [{
+							"id":"1",
+							"supplierName": "中国医药集团",
+							"drugName": "西咪替丁",
+							"producter": "北京汉典制药有限公司",
+							"distributionNo": "AADKSF1OOSKDF2",
+							"planNo": "plan1213sdfa",
+							"date": "2018-08-08"
+						},{
+							"id":"2",
+							"supplierName": "华润医药集团",
+							"drugName": "头孢克肟颗粒",
+							"producter": "北京北大药业有限公司",
+							"distributionNo": "AADKSF1OOSKDF2",
+							"planNo": "plan1od09932sdfaafd422",
+							"date": "2018-01-19"
+						},{
+							"id":"3",
+							"supplierName": "广州医药",
+							"drugName": "阿司匹林",
+							"producter": "湖北省益康制药厂",
+							"distributionNo": "AADKSF1OOSKDF2",
+							"planNo": "plan332342sdfa123",
+							"date": "2018-04-19"
+						}]
+					};
+					var utils = new Utils();
+					utils.appendModule('#list_tpl');
+					var html = template('list_tpl_view', data);
+					document.getElementById('mui-table-view-tab1').innerHTML = html;
+					
+					
+					var item2 = document.getElementById('item2mobile');
+					document.getElementById('slider').addEventListener('slide', function(e) {
+						if (e.detail.slideNumber === 1) {
+							if (item2.querySelector('.mui-loading')) {
+								setTimeout(function() {
+									document.getElementById('mui-table-view-tab2').innerHTML = html;
+								}, 500);
+							}
+						}
+					});
+				
+					//tab页切的点击事件
+					var sliderSegmentedControl = document.getElementById('sliderSegmentedControl');
+					$('.mui-input-group').on('change', 'input', function() {
+						if (this.checked) {
+							sliderSegmentedControl.className = 'mui-slider-indicator mui-segmented-control mui-segmented-control-inverted mui-segmented-control-' + this.value;
+							//force repaint
+							sliderProgressBar.setAttribute('style', sliderProgressBar.getAttribute('style'));
+						}
+					});
+					//绑定点击事件  - 进入详情页
+						
+					$('#slider').on('tap','.moreDetail',function(){
+						let id = this.getAttribute('data-id');
+						console.log(id,'id');
+						common.openwin('acc_detail',{ targetId: id },{
+							titleText: '验收详情'
+						})
+					});
+					
+					// 绑定事件 --确认验收
+					$('#slider').on('tap','.acceptance',function(){
+						let id = this.getAttribute('data-id');
+						console.log(id,'id')
+						var btnArray = ['否', '是'];
+						mui.confirm('是否确认验收？', '确认', btnArray, function(e) {
+							if (e.index == 1) {
+								alert('你点击了是')
+							} else {
+								alert('你点击了否')
+							}
+						})
+					});
+					
+				});
+				
+			})(mui);
 		
 		</script>
 	</body>

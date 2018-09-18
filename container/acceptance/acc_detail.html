@@ -9,9 +9,7 @@
 		<link href="../../css/mui.min.css" rel="stylesheet" />
 		<link href="../../css/themes.css" rel="stylesheet" />
 		<link href="../../css/index_view.css" rel="stylesheet" />
-		<script src="../../js/mui.min.js"></script>
-		<script src="../../js/template-web.js" type="text/javascript" charset="utf-8"></script>
-		<script src="../../js/utils.js" type="text/javascript" charset="utf-8"></script>
+		
 	</head>
 
 	<body>
@@ -43,53 +41,57 @@
 			</form>
 			<button type="button" class="mui-btn mui-btn-warning mui-btn-block" data-loading-text = "提交中" data-loading-icon-position="right">确认验收</button>
 		</div>
+		
 		<script src="../../js/mui.min.js"></script>
+		<script src="../../js/template-web.js" type="text/javascript" charset="utf-8"></script>
+		<script src="../../js/utils.js" type="text/javascript" charset="utf-8"></script>
 		<script src="../../js/common.js" type="text/javascript" charset="utf-8"></script>
+		
 		<script type="text/javascript">
 			
 
 			(function($) {
 				
-			$.init()
-			mui(document.body).on('tap', '.mui-btn', function(e) {
-	            mui(this).button('loading');
-	            setTimeout(function() {
-	                mui(this).button('reset');
-	                common.openwin('../Result/index',{ acceptance: true })
-	            }.bind(this), 2000);
-	        });
+				$.init()
+				mui(document.body).on('tap', '.mui-btn', function(e) {
+		            mui(this).button('loading');
+		            setTimeout(function() {
+		                mui(this).button('reset');
+		                common.openwin('../Result/index',{ acceptance: true })
+		            }.bind(this), 2000);
+		        });
 
-			// 模板加载
-			$.ready(function(){
-				//console.log("当前页面URL："+plus.webview.currentWebview().getURL());
-				var data = {
-					list: [{
-						"id":"1",
-						"type":"暗销盘",
-						"deptName":"部门1",
-						"createrUser":"王大雷",
-						"pdPerson":"王磊",
-						"supplier:Name": "静注人免疫球蛋白",
-						"drugName": "西咪替丁",
-						"producter": "北京汉典制药有限公司",
-						"distributionNo": "AADKSF1OOSKDF2",
-						"spec":"80mg/瓶",
-						"date": "2018-08-08",
-						"updateTime":'2018-08-10'
-					}]
-				};
-				var utils = new Utils();
-				utils.appendModule('#acc_detail_tpl');
-				var html = template('detail_tpl', data);
-				document.getElementById('detailContent').innerHTML = html;
-			});
-			$.plusReady(function(){
-				var self = plus.webview.currentWebview();
-				console.log(self,'self')
-//				var name = self.name;
-//				console.log(name,'name')
-			})
-		})(mui);
+				// 模板加载
+				$.ready(function(){
+					//console.log("当前页面URL："+plus.webview.currentWebview().getURL());
+					var data = {
+						list: [{
+							"id":"1",
+							"type":"暗销盘",
+							"deptName":"部门1",
+							"createrUser":"王大雷",
+							"pdPerson":"王磊",
+							"supplier:Name": "静注人免疫球蛋白",
+							"drugName": "西咪替丁",
+							"producter": "北京汉典制药有限公司",
+							"distributionNo": "AADKSF1OOSKDF2",
+							"spec":"80mg/瓶",
+							"date": "2018-08-08",
+							"updateTime":'2018-08-10'
+						}]
+					};
+					var utils = new Utils();
+					utils.appendModule('#acc_detail_tpl');
+					var html = template('detail_tpl', data);
+					document.getElementById('detailContent').innerHTML = html;
+				});
+				$.plusReady(function(){
+					var self = plus.webview.currentWebview();
+					console.log(self,'self')
+	//				var name = self.name;
+	//				console.log(name,'name')
+				})
+			})(mui);
 		
 		</script>
 	</body>

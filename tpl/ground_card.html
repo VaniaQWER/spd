@@ -1,6 +1,6 @@
 
 <script type="text/html" id='ground_list'>
-	<div>
+	<ul class="mui-table-view">
 		{{ each list value i}}
 			<div class="am-card scrollList-item am-card-full" data-id={{ value.id }}>
 				<div class="am-card-header">
@@ -26,7 +26,5 @@
 			<div style="background-color: rgb(245, 245, 249); height: 3px; border-bottom: 1px solid rgb(236, 236, 237);">
 			</div>
 		{{/each}}
-	</div>
-	
-	
+	</ul>
 </script>
