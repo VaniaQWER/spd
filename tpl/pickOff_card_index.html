@@ -1,0 +1,29 @@
+<!--拣货下架 - index -  yuwei-->
+<script type="text/html" id='index_list_view'>
+	<ul class="mui-table-view special_list">
+		{{ each list value i}}
+			<div class="am-card scrollList-item am-card-full" data-id={{ value.id }}>
+				<div class="am-card-body">
+					<div class="am-flexbox am-flexbox-align-center">
+						<div class="am-flexbox-item"> 
+							拣货单号：<span>{{ value.distributionNo }}</span> 
+						</div>
+						<div class="mui-pull-right"> 
+							零库存补货  待拣货
+						</div>
+					</div>
+					<div class="am-flexbox am-flexbox-align-center">
+						<div class="am-flexbox-item"> 
+							发起时间：<span>{{ value.date }}</span> 
+						</div>
+						<div class="am-flexbox-item"> 
+							品项数：<span>{{ i + 1 }}</span> 
+						</div>
+					</div>
+				</div>
+			</div>
+		{{/each}}
+	</ul>
+	
+	
+</script>

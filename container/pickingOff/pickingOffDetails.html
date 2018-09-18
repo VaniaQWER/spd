@@ -48,7 +48,7 @@
 					</li>
 				</ul>
 			</form>
-			<button type="button" class="mui-btn mui-btn-warning mui-btn-block">确认验收</button>
+			<button type="button" class="mui-btn mui-btn-warning mui-btn-block">确认拣货</button>
 		</div>
 		<script src="../js/mui.min.js"></script>
 		<script type="text/javascript">
@@ -64,7 +64,7 @@
 				var data = {
 					list: [{
 						"id":"1",
-						"type":"暗销盘",
+						"type":"待拣货",
 						"deptName":"部门1",
 						"createrUser":"王大雷",
 						"pdPerson":"王磊",
@@ -81,6 +81,7 @@
 				utils.appendModule('#acc_detail_tpl');
 				var html = template('detail_tpl', data);
 				document.getElementById('detailContent').innerHTML = html;
+				
 			});
 		})(mui);
 		

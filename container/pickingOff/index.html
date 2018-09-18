@@ -8,7 +8,15 @@
 		<link href="../../css/mui.min.css" rel="stylesheet" />
 		<link href="../../css/themes.css" rel="stylesheet" />
 		<link href="../../css/index_view.css" rel="stylesheet" />
-		<link rel="import" href="../../tpl/stockQuery_card.html" id="card_view"/>
+		<link rel="import" href="../../tpl/pickOff_card_index.html" id="card_view"/>
+		<style>
+			.am-card-body{
+				padding: 6px 15px 6px !important;
+			}
+			.am-card{
+				min-height: auto;
+			}
+		</style>
 	</head>
 
 	<body>
@@ -19,7 +27,7 @@
 		</header>
 		<div class="mui-content">
 		    <div class="mui-input-row mui-search search_head">
-				<input type="search" class="mui-input-clear" placeholder="下架单号">
+				<input type="search" class="mui-input-clear" placeholder="下架单号" onclick="toSearchPage()">
 			</div>
 			<div id="slider" class="mui-slider themes_tab">
 				<div id="sliderSegmentedControl" class="mui-slider-indicator mui-segmented-control mui-segmented-control-inverted">
@@ -179,14 +187,16 @@
 					
 					$('#slider').on('tap','.am-card',function(){
 						console.log(123)
-						common.openwin('details',{name:123})
+						common.openwin('pickingOffList',{name:123})
 					})
 				
 				})
-			
-			
+				
 		})(mui);
-		
+		//去详情页面
+		function toSearchPage (){
+			common.openwin('../commonPages/searchPage')
+		}
 		</script>
 	</body>
 
