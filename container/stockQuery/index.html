@@ -14,11 +14,11 @@
 
 	<body>
 		
-		<header class="mui-bar mui-bar-nav theme_back">
+		<!--<header class="mui-bar mui-bar-nav theme_back">
 		   	<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
 		   	<a class="mui-pull-left theme_back_font">返回</a>
 		    <h1 class="mui-title">库存查询</h1>
-		</header>
+		</header>-->
 		<div class="mui-content">
 		    <div class="mui-input-row mui-search search_head">
 				<input type="search" class="mui-input-clear" placeholder="通用名/商品名/生产厂家" onclick="toSearchPage()">
@@ -181,7 +181,9 @@
 					
 					$('#slider').on('tap','.am-card',function(){
 						console.log(123)
-						common.openwin('details',{name:123})
+						common.openwin('details',{name:123},{
+							titleText:'详情'
+						})
 					})
 				
 				})

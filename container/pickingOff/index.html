@@ -20,11 +20,11 @@
 	</head>
 
 	<body>
-		<header class="mui-bar mui-bar-nav theme_back">
+		<!--<header class="mui-bar mui-bar-nav theme_back">
 		   	<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
 		   	<a class="mui-pull-left theme_back_font">返回</a>
 		    <h1 class="mui-title">拣货下架</h1>
-		</header>
+		</header>-->
 		<div class="mui-content">
 		    <div class="mui-input-row mui-search search_head">
 				<input type="search" class="mui-input-clear" placeholder="下架单号" onclick="toSearchPage()">
@@ -187,7 +187,9 @@
 					
 					$('#slider').on('tap','.am-card',function(){
 						console.log(123)
-						common.openwin('pickingOffList',{name:123})
+						common.openwin('pickingOffList',{},{
+							titleText: '药品信息'
+						})
 					})
 				
 				})
