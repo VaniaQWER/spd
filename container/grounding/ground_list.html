@@ -15,12 +15,6 @@
 	</head>
 
 	<body>
-		
-		<header class="mui-bar mui-bar-nav theme_back">
-		   	<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
-		   	<a class="mui-pull-left theme_back_font">返回</a>
-		    <h1 class="mui-title">药品信息</h1>
-		</header>
 		<div class="mui-content">
 		    <div class="mui-input-row mui-search search_head">
 				<input type="search" class="mui-input-clear" placeholder="供应商名称">
@@ -137,11 +131,13 @@
 			$('#slider').on('tap','.moreDetail',function(){
 				let id = this.getAttribute('data-id');
 				console.log(id,'id');
-				common.openwin('ground_detail',{ targetId: id })
+				common.openwin('ground_detail',{ targetId: id },{
+					titleText: '详情'
+				})
 			});
 			
-			// 绑定事件 --确认验收
-			$('#slider').on('tap','.acceptance',function(){
+			// 绑定事件 --确认上架
+			$('#slider').on('tap','.ground',function(){
 				let id = this.getAttribute('data-id');
 				console.log(id,'id')
 				var btnArray = ['否', '是'];

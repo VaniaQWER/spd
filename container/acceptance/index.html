@@ -15,15 +15,9 @@
 	</head>
 
 	<body>
-		
-		<header class="mui-bar mui-bar-nav theme_back">
-		   	<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
-		   	<a class="mui-pull-left theme_back_font">返回</a>
-		    <h1 class="mui-title">验收列表</h1>
-		</header>
 		<div class="mui-content">
 		    <div class="mui-input-row mui-search search_head">
-				<input type="search" class="mui-input-clear" placeholder="供应商名称">
+				<input type="search" class="mui-input-clear" placeholder="供应商名称" onclick="toSearchPage()">
 			</div>
 			<div id="slider" class="mui-slider themes_tab">
 				<div id="sliderSegmentedControl" class="mui-slider-indicator mui-segmented-control mui-segmented-control-inverted">
@@ -131,7 +125,9 @@
 			$('#slider').on('tap','.am-card',function(){
 				let id = this.getAttribute('data-id');
 				console.log(id,'id');
-				common.openwin('acc_list',{ targetId: id })
+				common.openwin('acc_list',{ targetId: id }, {
+					titleText: '药品信息'
+				})
 			})
 		})(mui);
 		

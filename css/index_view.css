@@ -138,7 +138,7 @@ html:not([data-scale]) .scrollList-item .am-card-footer::before {
     flex: 1 1;
 }
 .am-card-body {
-    padding:0px 15px!important;
+    padding:12px 15px!important;
 }
 
 .am-flexbox.am-flexbox-align-center {
@@ -197,6 +197,10 @@ html:not([data-scale]) .scrollList-item .am-card-footer::before {
 .am-card-footer-extra{
 	text-align: right;
 }
+.am-card-footer-extra button{
+	padding: 3px 6px !important;
+	line-height: 1.5 !important;
+}
 .am-flexbox .am-flexbox-item:first-child {
     margin-left: 0;
 }
@@ -212,8 +216,6 @@ html:not([data-scale]) .scrollList-item .am-card-footer::before {
 	color: red;
 	font-size: 12px;
 }
-
-
 
 .inline-Input{
     width: 57% !important;
