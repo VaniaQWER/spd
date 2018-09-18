@@ -1,6 +1,5 @@
 <!doctype html>
 <html>
-
 <head>
     <meta charset="utf-8">
     <title></title>
@@ -10,7 +9,6 @@
     <link rel="stylesheet" type="text/css" href="../../css/home.css" />
     <link rel="import" href="../../tpl/message.html" id="message" />
 </head>
-
 <body>
     <header class="mui-bar mui-bar-nav themes_bg_color">
         <h1 class="mui-title themes_title">药品物流管理系统</h1>
@@ -34,7 +32,7 @@
                     <img src="../../images/icon_lower_frame.png" width="65" height="65" />
                     <div class="home-card-text">拣货下架</div>
                 </div>
-                <div class="home-card-item" data-src="../check/index" data-title='盘点'>
+                <div class="home-card-item" data-src="../check/index" ><!--data-title='盘点'-->
                     <img src="../../images/icon_inventory.png" width="65" height="65" />
                     <div class="home-card-text">盘点</div>
                 </div>
@@ -117,9 +115,16 @@
                 })
 				// 点击跳转
 				$('.home-card-content').on('tap', '.home-card-item',function() {
-					common.openwin(this.dataset.src, {}, {
-						titleText: this.dataset.title
-					})
+						
+					
+					if(this.dataset.title){
+						common.openwin(this.dataset.src, {}, {
+							titleText: this.dataset.title,
+						})
+					}else{
+						common.openwin(this.dataset.src, {})
+					}
+					
 				})
             })
         }(mui, document))

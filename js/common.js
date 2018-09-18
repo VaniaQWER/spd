@@ -19,21 +19,37 @@
 	//打开常规窗口
 	owner.openwin = function (id, argu, titleNView) {
 		var nview = Object.assign({}, OWNER_TITLE_NVIEW, titleNView)
-		mui.openWindow({
-			url: id + '.html',
-			id: id,
-			show: {
-				aniShow: 'none'
-			},
-			styles: {
-				titleNView: nview
-			},
-			createNew: false,
-			waiting: {
-				autoShow: true
-			},
-			extras: ( argu && typeof argu === 'object' ) ? argu : JSON.parse(argu)
-		});
+		if(titleNView){
+			mui.openWindow({
+				url: id + '.html',
+				id: id,
+				show: {
+					aniShow: 'none'
+				},
+				styles: {
+					titleNView: nview
+				},
+				createNew: false,
+				waiting: {
+					autoShow: true
+				},
+				extras: ( argu && typeof argu === 'object' ) ? argu : JSON.parse(argu)
+			});
+		}else{
+			mui.openWindow({
+				url: id + '.html',
+				id: id,
+				show: {
+					aniShow: 'none'
+				},
+				createNew: false,
+				waiting: {
+					autoShow: true
+				},
+				extras: ( argu && typeof argu === 'object' ) ? argu : JSON.parse(argu)
+			});
+		}
+		
 	}
 
 	function getParents(id) {
