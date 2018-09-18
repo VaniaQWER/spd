@@ -22,23 +22,23 @@
         <div class="home-card-wrapper">
             <div class="home-card-title">我的工作</div>
             <div class="home-card-content">
-                <div>
+                <div class="home-card-item" data-src="../acceptance/index" data-title='验收'>
                     <img src="../../images/icon_check_before_acceptance.png" width="65" height="65" />
                     <div class="home-card-text">验收</div>
                 </div>
-                <div>
+                <div class="home-card-item" data-src="../grounding/index" data-title="上架">
                     <img src="../../images/icon_grounding.png" width="65" height="65" />
                     <div class="home-card-text">上架</div>
                 </div>
-                <div>
+                <div class="home-card-item" data-src="../pickingOff/index" data-title='拣货下架'>
                     <img src="../../images/icon_lower_frame.png" width="65" height="65" />
                     <div class="home-card-text">拣货下架</div>
                 </div>
-                <div>
+                <div class="home-card-item" data-src="../check/index" data-title='盘点'>
                     <img src="../../images/icon_inventory.png" width="65" height="65" />
                     <div class="home-card-text">盘点</div>
                 </div>
-                <div>
+                <div class="home-card-item" data-src="../stockQuery/index" data-title='库存查询'>
                     <img src="../../images/icon_query.png" width="65" height="65" />
                     <div class="home-card-text">库存查询</div>
                 </div>
@@ -115,6 +115,12 @@
 						titleText: '账号'
 					})
                 })
+				// 点击跳转
+				$('.home-card-content').on('tap', '.home-card-item',function() {
+					common.openwin(this.dataset.src, {}, {
+						titleText: this.dataset.title
+					})
+				})
             })
         }(mui, document))
     </script>
