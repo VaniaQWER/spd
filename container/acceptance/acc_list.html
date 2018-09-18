@@ -134,17 +134,15 @@
 			});
 			//绑定点击事件  - 进入详情页
 					
-			$('#slider').on('tap','.moreDetail',function(e){
-				let target = e.target;
-				let id = target.getAttribute('data-id');
+			$('#slider').on('tap','.moreDetail',function(){
+				let id = this.getAttribute('data-id');
 				console.log(id,'id');
 				common.openwin('acc_detail',{ targetId: id })
 			});
 			
 			// 绑定事件 --确认验收
-			$('#slider').on('tap','.acceptance',function(e){
-				let target = e.target;
-				let id = target.getAttribute('data-id');
+			$('#slider').on('tap','.acceptance',function(){
+				let id = this.getAttribute('data-id');
 				console.log(id,'id')
 				var btnArray = ['否', '是'];
 				mui.confirm('是否确认验收？', '确认', btnArray, function(e) {

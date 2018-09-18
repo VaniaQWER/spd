@@ -129,8 +129,7 @@
 			//绑定点击事件  - 进入详情页
 					
 			$('#slider').on('tap','.am-card',function(){
-				let target = e.target;
-				let id = target.getAttribute('data-id');
+				let id = this.getAttribute('data-id');
 				console.log(id,'id');
 				common.openwin('acc_list',{ targetId: id })
 			})

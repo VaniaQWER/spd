@@ -221,3 +221,23 @@ html:not([data-scale]) .scrollList-item .am-card-footer::before {
     padding: 0px !important;
     margin-bottom: 0 !important;
 }
+.am-result{
+	text-align: center;
+}
+.am-result .am-result-title {
+    margin-top: 15px;
+    line-height: 1;
+}
+
+.am-result .am-result-title, .am-result .am-result-message {
+    font-size: 21px;
+    color: #000;
+    padding-left: 15px;
+    padding-right: 15px;
+}
+.am-result .am-result-message {
+    margin-top: 9px;
+    line-height: 1.5;
+    font-size: 16px;
+    color: #888;
+}
