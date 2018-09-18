@@ -1,0 +1,81 @@
+
+<script type="text/html" id='list_tpl_view'>
+	<div>
+		{{ each list value i}}
+			<div class="am-card scrollList-item am-card-full" data-id={{ value.id }}>
+				<div class="am-card-header">
+					<div class="am-card-header-content">
+						<span style="font-size: 18px; color: rgb(51, 51, 51); font-weight: bold;">
+						{{ value.drugName}}</span>
+					</div>
+					<div class="am-card-header-extra">
+						<span>未提交</span>
+					</div>
+				</div>
+				<div class="am-card-body">
+					<div class="am-flexbox am-flexbox-align-center">
+						<div class="am-flexbox-item"> 
+							单位：<span>{{ value.distributionNo }}</span> 
+						</div>
+						<div class="am-flexbox-item"> 
+							货位：<span>A1231</span> 
+						</div>
+					</div>
+					
+					<div class="am-flexbox am-flexbox-align-center">
+						<div class="am-flexbox-item"> 
+							数量：
+							{{if !value.isEdit}}
+								<span>666</span> 
+							{{else if value.isEdit}}
+								<span><input type="text" name="planNo" id="planNo" class="inline-Input"/></span> 
+							{{/if}}
+							
+						</div>
+						<div class="am-flexbox-item">
+						 	规格：<span>{{ value.date }}</span>
+						 </div>
+					</div>
+					{{if value.isEdit}}
+					<div class="am-flexbox am-flexbox-align-center">
+						<div class="am-flexbox-item"> 
+							生产日期：<span>{{ value.planNo }}</span> 
+						</div>
+						<div class="am-flexbox-item">
+						 	生产批号：
+						 	{{if !value.isEdit}}
+								<span>{{value.planNo}}</span> 
+							{{else if value.isEdit}}
+								<span><input type="text" name="planNo" id="planNo" class="inline-Input"/></span> 
+							{{/if}}
+						 </div>
+					</div>
+					<div class="am-flexbox am-flexbox-align-center">
+						<div class="am-flexbox-item"> 
+							有效期至：<span>{{ value.date }}</span> 
+						</div>
+						<div class="am-flexbox-item"> 
+							生产厂家：<span>{{ value.date }}</span> 
+						</div>
+					</div>
+					{{/if}}
+				</div>
+				<div class="am-card-footer">
+					<div class="am-card-footer-extra">
+						
+						{{if value.isEdit}}
+						<button type="button" class="mui-btn mui-btn-blue mui-btn-outlined eidtRow" style="margin: 0 5px;">收起编辑</button>
+						{{else if !value.isEdit}}
+						<button type="button" class="mui-btn mui-btn-blue mui-btn-outlined eidtRow" style="margin: 0 5px;">展开编辑</button>
+						{{/if}}
+						
+						<button type="button" class="mui-btn mui-btn-blue mui-btn-outlined toPage" style="margin: 0 5px;">更多详情</button>
+						<button type="button" class="mui-btn mui-btn-blue mui-btn-danger submitButton">提交</button>
+					</div>
+				</div>
+			</div>
+		{{/each}}
+	</div>
+	
+	
+</script>

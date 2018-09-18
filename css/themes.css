@@ -38,6 +38,14 @@
 .mui-slider-indicator.mui-segmented-control{
 	background: #fff;
 }
+.mui-search.mui-active:before{
+	left: 15px;
+	top:35px;
+}
+.mui-input-row.mui-search .mui-icon-clear{
+	top: 16px;
+    right: 6px;
+}
 .search_head{
 	padding:10px;
 }

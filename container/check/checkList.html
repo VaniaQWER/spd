@@ -9,7 +9,7 @@
 		<link href="../../css/mui.min.css" rel="stylesheet" />
 		<link href="../../css/themes.css" rel="stylesheet" />
 		<link href="../../css/index_view.css" rel="stylesheet" />
-		<link rel="import" href="../../tpl/stockQuery_card.html" id="card_view"/>
+		<link rel="import" href="./list_tpl.html" id="card_view"/>
 	</head>
 
 	<body>
@@ -66,14 +66,10 @@
 		<script src="../../js/template-web.js" type="text/javascript" charset="utf-8"></script>
 		<script src="../../js/utils.js" type="text/javascript" charset="utf-8"></script>
 		<script src="../../js/common.js" type="text/javascript" charset="utf-8"></script>
-		
 		<script type="text/javascript">
-			
-
 			(function($) {
 				$.init();
 					
-	
 				var deceleration = mui.os.ios?0.003:0.0009;
 				$('.mui-scroll-wrapper').scroll({
 					bounce: false,
@@ -91,7 +87,8 @@
 							"producter": "北京汉典制药有限公司",
 							"distributionNo": "AADKSF1OOSKDF2",
 							"num": "323",
-							"date": "2018-08-08"
+							"date": "2018-08-08",
+							"isEdit":true,
 						},{
 							"id":"2",
 							"supplierName": "注射用复方甘草酸苷",
@@ -100,7 +97,8 @@
 							"num": "666",
 							"limitNum":"20",
 							"planNo": "2",
-							"date": "2018-01-19"
+							"date": "2018-01-19",
+							"isEdit":false,
 						},{
 							"id":"3",
 							"supplierName": "阿司匹林",
@@ -108,7 +106,8 @@
 							"producter": "湖北省益康制药厂",
 							"num": "888",
 							"planNo": "plan332342sdfa123",
-							"date": "2018-04-19"
+							"date": "2018-04-19",
+							"isEdit":false,
 						},{
 							"id":"4",
 							"supplierName": "阿司匹林",
@@ -116,7 +115,8 @@
 							"producter": "湖北省益康制药厂",
 							"num": "888",
 							"planNo": "plan332342sdfa123",
-							"date": "2018-05-19"
+							"date": "2018-05-19",
+							"isEdit":false,
 						},{
 							"id":"5",
 							"supplierName": "阿司匹林",
@@ -124,12 +124,13 @@
 							"producter": "湖北省益康制药厂",
 							"num": "888",
 							"planNo": "plan332342sdfa123",
-							"date": "2018-05-29"
+							"date": "2018-05-29",
+							"isEdit":false,
 						}]
 					};
 					var utils = new Utils();
 					utils.appendModule('#card_view');
-					var html = template('index_list_view', data);
+					var html = template('list_tpl_view', data);
 					document.getElementById('mui-table-view-tab1').innerHTML = html;
 				
 	
@@ -179,11 +180,17 @@
 					
 					//绑定点击事件  - 进入详情页
 					
-					$('#slider').on('tap','.am-card',function(){
-						console.log(123)
-						common.openwin('details',{name:123})
+					$('#slider').on('tap','.toPage',function(){
+						common.openwin('checkDetails')
 					})
-				
+					$('#slider').on('tap','.submitButton',function(){
+						var btnArray = ['否', '是'];
+						$.confirm('确定要执行此操作吗？', '确认提交', btnArray, function(e) {
+							if (e.index == 1) {
+							} else {
+							}
+						})
+					})
 				})
 			
 			

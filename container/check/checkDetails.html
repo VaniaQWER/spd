@@ -1,0 +1,93 @@
+<!--盘点详情  - 详情页 - yuweI-->
+<!doctype html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<link rel="import" href="./detail_tpl.html" id="acc_detail_tpl"/>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="../../css/mui.min.css" rel="stylesheet" />
+		<link href="../../css/themes.css" rel="stylesheet" />
+		<link href="../../css/index_view.css" rel="stylesheet" />
+		<script src="../../js/mui.min.js"></script>
+		<script src="../../js/template-web.js" type="text/javascript" charset="utf-8"></script>
+		<script src="../../js/utils.js" type="text/javascript" charset="utf-8"></script>
+	</head>
+
+	<body>
+		
+		<header class="mui-bar mui-bar-nav theme_back">
+		   	<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+		   	<a class="mui-pull-left theme_back_font">返回</a>
+		    <h1 class="mui-title">详情</h1>
+		</header>
+		
+		<div class="mui-content detailRow">
+			<div class="detail-header-flex">
+				<div class="am-action">
+					<a class="mui-icon mui-icon-arrowleft"></a>
+					<a class="theme_back_font">上一个</a>
+				</div>
+				<div>1/12</div>
+				<div class="am-action">
+					<a class="theme_next_font">下一个</a>
+					<a class="mui-icon mui-icon-arrowright"></a>
+				</div>
+			</div>
+			<form class="mui-input-group" id="detailContent" style="background:none;">
+				<ul class="mui-table-view" style="margin-bottom:12px;">
+					<li class="mui-table-view-cell mui-collapse">
+						<a class="mui-navigate-right" href="#">产品信息</a>
+						<div class="mui-collapse-content">
+								<div class="mui-input-row">
+									<label>通用名</label>
+									<p class="detailRow_content">131312313131231313123131312313131231313123</p>
+									<span class="detailRow_right">25</span>
+								</div>
+						</div>
+					</li>
+				</ul>
+			</form>
+			
+			
+			<button type="button" class="mui-btn mui-btn-warning mui-btn-block">确认提交</button>
+		</div>
+		<script src="../js/mui.min.js"></script>
+		<script type="text/javascript">
+			
+
+			(function($) {
+				
+			$.init()
+			
+			// 模板加载
+			$.ready(function(){
+				//console.log("当前页面URL："+plus.webview.currentWebview().getURL());
+				var data = {
+					list: [{
+						"id":"1",
+						"type":"待拣货",
+						"deptName":"部门1",
+						"createrUser":"王大雷",
+						"pdPerson":"王磊",
+						"supplier:Name": "静注人免疫球蛋白",
+						"drugName": "西咪替丁",
+						"producter": "北京汉典制药有限公司",
+						"distributionNo": "AADKSF1OOSKDF2",
+						"spec":"80mg/瓶",
+						"date": "2018-08-08",
+						"updateTime":'2018-08-10'
+					}]
+				};
+				var utils = new Utils();
+				utils.appendModule('#acc_detail_tpl');
+				var html = template('detail_tpl', data);
+				document.getElementById('detailContent').innerHTML = html;
+				
+			});
+		})(mui);
+		
+		</script>
+	</body>
+
+</html>

@@ -212,3 +212,12 @@ html:not([data-scale]) .scrollList-item .am-card-footer::before {
 	color: red;
 	font-size: 12px;
 }
+
+
+
+.inline-Input{
+    width: 57% !important;
+    height: 20px !important;
+    padding: 0px !important;
+    margin-bottom: 0 !important;
+}
