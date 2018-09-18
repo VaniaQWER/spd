@@ -14,12 +14,16 @@
 
 	<body>
 		
-		<header class="mui-bar mui-bar-nav theme_back">
+		<!--<header class="mui-bar mui-bar-nav theme_back">
 		   	<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
 		   	<a class="mui-pull-left theme_back_font">返回</a>
 		    <h1 class="mui-title">药品信息</h1>
-		</header>
+		</header>-->
 		<div class="mui-content">
+			
+			<div class="qrcode" id="qrcode" onclick="clicked('../commonPages/qrcode.html',true,true)">
+				<img src="../../assest/qrcode.png" />
+			</div>
 		    <div class="mui-input-row mui-search search_head">
 				<input type="search" class="mui-input-clear" placeholder="商品名/生产厂家/货位">
 			</div>
@@ -66,7 +70,13 @@
 		<script src="../../js/template-web.js" type="text/javascript" charset="utf-8"></script>
 		<script src="../../js/utils.js" type="text/javascript" charset="utf-8"></script>
 		<script src="../../js/common.js" type="text/javascript" charset="utf-8"></script>
+		<script src="../../js/qrcode.js" type="text/javascript" charset="utf-8"></script>
 		<script type="text/javascript">
+			/*获取二维码返回值*/
+			function scaned(t, r, f) {
+				console.log(r);//返回二维码读取的数据
+			}
+			
 			(function($) {
 				$.init();
 					
@@ -78,7 +88,7 @@
 				});
 				
 				$.ready(function(){
-	
+			
 					var data = {
 						list: [{
 							"id":"1",
@@ -181,7 +191,9 @@
 					//绑定点击事件  - 进入详情页
 					
 					$('#slider').on('tap','.toPage',function(){
-						common.openwin('checkDetails')
+						common.openwin('checkDetails',{},{
+							titleText:'详情'
+						})
 					})
 					$('#slider').on('tap','.submitButton',function(){
 						var btnArray = ['否', '是'];
