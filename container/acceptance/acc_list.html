@@ -1,10 +1,10 @@
-<!--验收列表  - 列表页 - wwb-->
+<!--验收列表  - 药品信息 列表页 - wwb-->
 <!doctype html>
 <html>
 	<head>
 		<meta charset="UTF-8">
 		<title></title>
-		<link rel="import" href="../../tpl/acceptance_card.html " id="card_view"/>
+		<link rel="import" href="./list_tpl.html" id="list_tpl"/>
 		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
 		<link href="../../css/mui.min.css" rel="stylesheet" />
 		<link href="../../css/themes.css" rel="stylesheet" />
@@ -19,7 +19,7 @@
 		<header class="mui-bar mui-bar-nav theme_back">
 		   	<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
 		   	<a class="mui-pull-left theme_back_font">返回</a>
-		    <h1 class="mui-title">验收列表</h1>
+		    <h1 class="mui-title">药品信息</h1>
 		</header>
 		<div class="mui-content">
 		    <div class="mui-input-row mui-search">
@@ -121,8 +121,8 @@
 					}]
 				};
 				var utils = new Utils();
-				utils.appendModule('#card_view');
-				var html = template('index_list_view', data);
+				utils.appendModule('#list_tpl');
+				var html = template('list_tpl_view', data);
 				document.getElementById('mui-table-view').innerHTML = html;
 			});
 			//绑定点击事件  - 进入详情页
@@ -130,7 +130,8 @@
 			$('#slider').on('tap','.am-card',function(){
 				
 				
-			})
+			});
+			
 		})(mui);
 		
 		</script>

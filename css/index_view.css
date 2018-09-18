@@ -62,6 +62,25 @@ html:not([data-scale]) .am-list-body::after {
     -ms-transform: scaleY(0.5);
     transform: scaleY(0.5);
 }
+html:not([data-scale]) .scrollList-item .am-card-footer::before {
+    content: '';
+    position: absolute;
+    background-color: #ddd;
+    display: block;
+    z-index: 1;
+    top: 0;
+    right: auto;
+    bottom: auto;
+    left: 0;
+    width: 100%;
+    height: 1PX;
+    -webkit-transform-origin: 50% 50%;
+    -ms-transform-origin: 50% 50%;
+    transform-origin: 50% 50%;
+    -webkit-transform: scaleY(0.5);
+    -ms-transform: scaleY(0.5);
+    transform: scaleY(0.5);
+}
 .am-card.am-card-full {
     position: relative;
     border-top: 1PX solid #ddd;
@@ -121,6 +140,7 @@ html:not([data-scale]) .am-list-body::after {
 .am-card-body {
     padding:0px 15px!important;
 }
+
 .am-flexbox.am-flexbox-align-center {
     -ms-flex-align: center;
     align-items: center;
@@ -160,6 +180,22 @@ html:not([data-scale]) .am-list-body::after {
 	white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+.scrollList-item .am-card-footer{
+	position: relative;
+}
+.am-card-footer{
+	font-size: 14px;
+    color: #888;
+    padding: 5px 15px;
+    display: -ms-flexbox;
+    display: flex;
+}
+.am-card-footer-content, .am-card-footer-extra{
+	flex: 1 1;
+}
+.am-card-footer-extra{
+	text-align: right;
 }
 .am-flexbox .am-flexbox-item:first-child {
     margin-left: 0;

@@ -1,0 +1,48 @@
+
+<script type="text/html" id='list_tpl_view'>
+	<div>
+		{{ each list value i}}
+			<div class="am-card scrollList-item am-card-full" data-id={{ value.id }}>
+				<div class="am-card-header">
+					<div class="am-card-header-content">
+						<span style="font-size: 18px; color: rgb(51, 51, 51); font-weight: bold;">
+						{{ value.drugName}}</span>
+					</div>
+					<div class="am-card-header-extra">
+						<span>零库存补货</span>
+					</div>
+				</div>
+				<div class="am-card-body">
+					<div class="am-flexbox am-flexbox-align-center">
+						<div class="am-flexbox-item"> 
+							单位：<span>{{ value.distributionNo }}</span> 
+						</div>
+						<div class="am-flexbox-item"> 
+							规格：<span>95</span> 
+						</div>
+					</div>
+					<div class="am-flexbox am-flexbox-align-center">
+						<div class="am-flexbox-item"> 
+							数量：<span>{{ value.planNo }}</span> 
+						</div>
+						<div class="am-flexbox-item">
+						 生产厂家：<span>{{ value.date }}</span>
+						 </div>
+					</div>
+				</div>
+				<div class="am-card-footer">
+					<div class="am-card-footer-content"></div>
+					<div class="am-card-footer-extra">
+						<button type="button" class="mui-btn mui-btn-blue mui-btn-primary edit">展开编辑</button>
+						<button type="button" class="mui-btn mui-btn-blue mui-btn-outlined moreDetail" style="margin: 0 5px;">更多详情</button>
+						<button type="button" class="mui-btn mui-btn-blue mui-btn-danger acceptance">确认验收</button>
+					</div>
+				</div>
+			</div>
+			<div style="background-color: rgb(245, 245, 249); height: 3px; border-bottom: 1px solid rgb(236, 236, 237);">
+			</div>
+		{{/each}}
+	</div>
+	
+	
+</script>
