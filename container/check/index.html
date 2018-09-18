@@ -7,6 +7,7 @@
 		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
 		<link href="../../css/mui.min.css" rel="stylesheet" />
 		<link href="../../css/themes.css" rel="stylesheet" />
+		<link href="../../css/check.css" rel="stylesheet" />
 		<link href="../../css/index_view.css" rel="stylesheet" />
 		<link rel="import" href="../../tpl/check_card.html" id="card_view"/>
 	</head>
@@ -17,13 +18,39 @@
 		   	<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
 		   	<a class="mui-pull-left theme_back_font">返回</a>
 		    <h1 class="mui-title">盘点</h1>
-		    <a class="mui-pull-right" style="height: 45px;padding-top: 12px;">新建盘点</a>
+		    <a href="#modal" class="mui-pull-right"  style="height: 45px;padding-top: 12px;">新建盘点</a>
 		</header>
 		<div class="mui-content">
 			<div class="mui-scroll-wrapper">
 				<h4 class="title_h3">盘点记录</h4>
 				<div class="mui-scroll" id='scroll'>
 					<!--此处填充template-->
+				</div>
+			</div>
+			<div id="modal" class="mui-modal">
+				<header class="mui-bar mui-bar-nav">
+					<a class="mui-icon mui-icon-close mui-pull-right" href="#modal"></a>
+					<h1 class="mui-title">新建盘点</h1>
+				</header>
+				<div class="mui-content" style="height: 100%;padding-top: 12px;">
+						<div class="gird">
+							<div class="gird-label">盘点类型：</div>
+							<button type="button" class="mui-btn gird-button">明盘</button>
+							<button type="button" class="mui-btn gird-button">暗盘</button>
+						</div>
+						<div class="gird">
+							<div class="gird-label"></div>
+							<button type="button" class="mui-btn gird-button">全盘</button>
+							<button type="button" class="mui-btn gird-button">动盘</button>
+							<button type="button" class="mui-btn gird-button">动销盘</button>
+						</div>
+						<div class="gird">
+							<div class="gird-label">备注：</div>
+							<div class="gird-content">
+								<textarea id="textarea" rows="5" placeholder="多行文本框"></textarea>
+							</div>
+						</div>
+						<button class="mui-btn mui-btn-block">确定</button>
 				</div>
 			</div>
 		</div>
@@ -48,7 +75,7 @@
 					      callback :function(){
 					      	console.log(123)
 					      	$('#scroll').pullRefresh().endPulldown();
-
+	
 					      } //必选，刷新函数，根据具体业务来编写，比如通过ajax从服务器获取新数据；
 					    },
 					    up : {

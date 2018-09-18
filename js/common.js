@@ -1,7 +1,7 @@
 (function(owner) {
 
 	//打开常规窗口
-	owner.openwin = function (id) {
+	owner.openwin = function (id,argu) {
 		mui.openWindow({
 			url: id + '.html',
 			id: id,
@@ -16,7 +16,8 @@
 			createNew: false,
 			waiting: {
 				autoShow: true
-			}
+			},
+			extras:argu ? JSON.stringify(argu):null,
 		});
 	}
 

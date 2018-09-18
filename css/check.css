@@ -1,0 +1,28 @@
+/*盘点*/
+.gird{
+	display: flex;
+	justify-content:flex-start;
+	align-content: center;
+	align-items: start;
+    padding: 5px 10px;
+}
+.gird-label{
+	width:20%;
+	display: inline-block;
+}
+.gird-button{
+    width: 19%;
+    margin: 0 1%;
+}
+.gird-content{
+	width: 77%;
+}
+.mui-content .mui-btn.mui-btn-block{
+	margin:0 5%;
+	font-size: 14px;
+	width: 90%;
+	padding: 10px 0;
+	background: #f2a11c;
+	color: #fff;
+	border: 0;
+}
