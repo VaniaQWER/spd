@@ -1,0 +1,108 @@
+<script type="text/html" id='detail_tpl'>
+	<div style="margin-top:10px;">
+		{{ each list value i }}
+		<ul class="mui-table-view" style="margin-bottom:8px;">
+			<li class="mui-table-view-cell mui-collapse">
+				<a class="mui-navigate-right" href="#">单据信息</a>
+				<div class="mui-collapse-content">
+						<div class="mui-input-row">
+							<label>盘点单号</label>
+							<p class="detailRow_content">{{value.distributionNo}}</p>
+						</div>
+						<div class="mui-input-row">
+							<label>类型</label>
+							<p class="detailRow_content">{{value.type}}</p>
+						</div>
+						<div class="mui-input-row">
+							<label>部门</label>
+							<p class="detailRow_content">{{value.deptName}}</p>
+						</div>
+						<div class="mui-input-row">
+							<label>制单人</label>
+							<p class="detailRow_content">{{value.createrUser}}</p>
+						</div>
+						<div class="mui-input-row">
+							<label>制单时间</label>
+							<p class="detailRow_content">{{value.date}}</p>
+						</div>
+						<div class="mui-input-row">
+							<label>盘点周期</label>
+							<p class="detailRow_content">{{value.distributionNo}}</p>
+						</div>
+						<div class="mui-input-row">
+							<label>盘点人</label>
+							<p class="detailRow_content">{{value.pdPerson}}</p>
+						</div>
+						<div class="mui-input-row">
+							<label>提交时间</label>
+							<p class="detailRow_content">{{value.updateTime}}</p>
+						</div>
+				</div>
+			</li>
+		</ul>
+		<ul class="mui-table-view" style="margin-bottom:8px;">
+			<li class="mui-table-view-cell mui-collapse mui-active">
+				<a class="mui-navigate-right" href="#">产品信息</a>
+				<div class="mui-collapse-content">
+						<div class="mui-input-row">
+							<label>通用名称</label>
+							<p class="detailRow_content">{{value.distributionNo}}</p>
+						</div>
+						<div class="mui-input-row">
+							<label>商品名</label>
+							<p class="detailRow_content">{{value.type}}</p>
+						</div>
+						<div class="mui-input-row">
+							<label>规格</label>
+							<p class="detailRow_content">{{value.deptName}}</p>
+						</div>
+						<div class="mui-input-row">
+							<label>剂型</label>
+							<p class="detailRow_content">{{value.createrUser}}</p>
+						</div>
+						<div class="mui-input-row">
+							<label>生产厂家</label>
+							<p class="detailRow_content">{{value.date}}</p>
+						</div>
+						<div class="mui-input-row">
+							<label>批准文号</label>
+							<p class="detailRow_content">{{value.distributionNo}}</p>
+						</div>
+						<div class="mui-input-row">
+							<label>包装规格</label>
+							<p class="detailRow_content">{{value.pdPerson}}</p>
+						</div>
+						<div class="mui-input-row">
+							<label>单位</label>
+							<p class="detailRow_content">{{value.updateTime}}</p>
+						</div>
+						<div class="mui-input-row">
+							<label>生产批号</label>
+							<p class="detailRow_content">{{value.updateTime}}</p>
+						</div>
+						<div class="mui-input-row">
+							<label>生产日期</label>
+							<p class="detailRow_content">{{value.updateTime}}</p>
+						</div>
+						<div class="mui-input-row">
+							<label>有效期至</label>
+							<p class="detailRow_content">{{value.updateTime}}</p>
+						</div>
+						<div class="mui-input-row">
+							<label>验收温度（℃）</label>
+							<p class="detailRow_content">{{value.updateTime}}</p>
+						</div>
+						<div class="mui-input-row">
+							<label>配送数量</label>
+							<p class="detailRow_content">{{value.updateTime}}</p>
+						</div>
+						<div class="mui-input-row">
+							<label>实到数量</label>
+							<p class="detailRow_content">{{value.updateTime}}</p>
+						</div>
+				</div>
+			</li>
+		</ul>
+		{{ /each }}
+	</div>
+</script>

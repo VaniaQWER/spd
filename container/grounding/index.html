@@ -1,10 +1,10 @@
-<!--验收列表  - 药品信息 列表页 - wwb-->
+<!--上架  - 列表页 - wwb-->
 <!doctype html>
 <html>
 	<head>
 		<meta charset="UTF-8">
 		<title></title>
-		<link rel="import" href="./list_tpl.html" id="list_tpl"/>
+		<link rel="import" href="../../tpl/ground_card.html " id="card_view"/>
 		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
 		<link href="../../css/mui.min.css" rel="stylesheet" />
 		<link href="../../css/themes.css" rel="stylesheet" />
@@ -19,7 +19,8 @@
 		<header class="mui-bar mui-bar-nav theme_back">
 		   	<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
 		   	<a class="mui-pull-left theme_back_font">返回</a>
-		    <h1 class="mui-title">药品信息</h1>
+		    <h1 class="mui-title">上架
+		    	列表</h1>
 		</header>
 		<div class="mui-content">
 		    <div class="mui-input-row mui-search search_head">
@@ -56,14 +57,6 @@
 			</div>
 
 		</div>
-		<!--<div class="mui-loading" >
-			<div class="mui-spinner">
-			</div>
-		    玩命加载中...
-		</div>-->
-
-		
-		<!--<script src="../js/mui.min.js"></script>-->
 		<script src="../../js/common.js" type="text/javascript" charset="utf-8"></script>
 		<script type="text/javascript">
 			
@@ -128,33 +121,19 @@
 					}]
 				};
 				var utils = new Utils();
-				utils.appendModule('#list_tpl');
-				var html = template('list_tpl_view', data);
+				utils.appendModule('#card_view');
+				var html = template('ground_list', data);
 				document.getElementById('mui-table-view').innerHTML = html;
 			});
 			//绑定点击事件  - 进入详情页
 					
-			$('#slider').on('tap','.moreDetail',function(e){
+			$('#slider').on('tap','.am-card',function(e){
 				let target = e.target;
 				let id = target.getAttribute('data-id');
 				console.log(id,'id');
-				common.openwin('acc_detail',{ targetId: id })
-			});
-			
-			// 绑定事件 --确认验收
-			$('#slider').on('tap','.acceptance',function(e){
-				let target = e.target;
-				let id = target.getAttribute('data-id');
-				console.log(id,'id')
-				var btnArray = ['否', '是'];
-				mui.confirm('是否确认验收？', '确认', btnArray, function(e) {
-					if (e.index == 1) {
-						alert('你点击了是')
-					} else {
-						alert('你点击了否')
-					}
-				})
-			});
+				common.openwin('ground_list',{ targetId: id })
+				
+			})
 		})(mui);
 		
 		</script>

@@ -9,7 +9,7 @@
 						{{ value.drugName}}</span>
 					</div>
 					<div class="am-card-header-extra">
-						<span>零库存补货</span>
+						<span>待上架</span>
 					</div>
 				</div>
 				<div class="am-card-body">
@@ -18,13 +18,18 @@
 							单位：<span>{{ value.distributionNo }}</span> 
 						</div>
 						<div class="am-flexbox-item"> 
-							规格：<span>95</span> 
+							货位：<span>95</span> 
 						</div>
 					</div>
 					<div class="am-flexbox am-flexbox-align-center">
 						<div class="am-flexbox-item"> 
 							数量：<span>{{ value.planNo }}</span> 
 						</div>
+						<div class="am-flexbox-item">
+						 规格：<span>{{ value.date }}</span>
+						</div>
+					</div>
+					<div class="am-flexbox am-flexbox-align-center">
 						<div class="am-flexbox-item">
 						 生产厂家：<span>{{ value.date }}</span>
 						 </div>
@@ -33,12 +38,10 @@
 				<div class="am-card-footer">
 					<div class="am-card-footer-content"></div>
 					<div class="am-card-footer-extra">
-						<button type="button" class="mui-btn mui-btn-blue mui-btn-primary edit" data-id={{ value.id }}>展开编辑</button>
 						<button type="button" class="mui-btn mui-btn-blue mui-btn-outlined moreDetail" data-id={{ value.id }} style="margin: 0 5px;">更多详情</button>
-						<button type="button" class="mui-btn mui-btn-blue mui-btn-danger acceptance" data-id={{ value.id }}>确认验收</button>
+						<button type="button" class="mui-btn mui-btn-blue mui-btn-primary ground" data-id={{ value.id }}>确认上架</button>
 					</div>
 				</div>
-			</div>
 			<div style="background-color: rgb(245, 245, 249); height: 3px; border-bottom: 1px solid rgb(236, 236, 237);">
 			</div>
 		{{/each}}
