@@ -1,13 +1,28 @@
+/* body背景色 */
+body {
+	background: #f5f5f5;
+}
+/* 背景屎黄色 */
 .themes_bg_color {
 	background: #f2a11c;
 }
 
+/* 白色字体 */
 .themes_font_color {
 	color: #fff;
 }
+/* 导航标题 */
+.themes_title {
+	font-family: PingFang-SC Regular;
+	color: #fff;
+}
 
+/* 导航右侧操作栏 */
 .themes_nav_right {
-	
+	display: inline-block;
+	float: right;
+	vertical-align: middle;
+	margin-top: 0px;	
 }
 
 /*返回文字样式*/
@@ -175,5 +190,4 @@ html,body{
 .special_list.mui-table-view:before{
 	background: none!important;
 }
-
 

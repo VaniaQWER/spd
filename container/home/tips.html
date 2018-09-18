@@ -1,0 +1,35 @@
+<!doctype html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="../../css/mui.css" rel="stylesheet" />
+		<link rel="stylesheet" type="text/css" href="../../css/home.css" />
+		<link rel="import" href="../../tpl/tips.html" id="tips" />
+	</head>
+
+	<body>
+		<div class="mui-content">
+
+		</div>
+		<script src="../../js/mui.js"></script>
+		<script src="../../js/template-web.js" type="text/javascript" charset="utf-8"></script>
+		<script src="../../js/utils.js" type="text/javascript" charset="utf-8"></script>
+		<script type="text/javascript">
+			(function($, doc) {
+				// 挂载模板
+				var utils = new Utils();
+				utils.appendModule('#tips')
+				
+				$.init()
+				$.plusReady(function() {
+					var self = plus.webview.currentWebview();
+
+				})
+			}(mui, document))
+		</script>
+	</body>
+
+</html>

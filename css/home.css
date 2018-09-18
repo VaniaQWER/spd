@@ -1,0 +1,28 @@
+.home-card-wrapper {
+	margin-top: 16px;
+	background: #fff;
+	padding: 18px 16px;
+}
+
+.home-card-content {
+	padding-top: 18px;
+	display: flex;
+	justify-content: space-between;
+}
+
+.home-card-title {
+	border-left: 6px solid #EC971F;
+	font-size: 18px;
+	padding-left: 13px;
+}
+
+.home-card-content .home-card-text {
+	font-family: PingFang-SC-Regular;
+	text-align: center;
+	font-size: 14px;
+	color: rgba(0, 0, 0, .65);
+}
+
+.mui-media-body {
+	width: 200px !!important;
+}

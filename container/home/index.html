@@ -1,0 +1,123 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <link href="../../css/mui.css" rel="stylesheet" />
+    <link rel="stylesheet" type="text/css" href="../../css/themes.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/home.css" />
+    <link rel="import" href="../../tpl/message.html" id="message" />
+</head>
+
+<body>
+    <header class="mui-bar mui-bar-nav themes_bg_color">
+        <h1 class="mui-title themes_title">药品物流管理系统</h1>
+        <div class="themes_font_color themes_nav_right mui-icon mui-icon-contact">
+
+        </div>
+    </header>
+    <div class="mui-content">
+        <div class="home-card-wrapper">
+            <div class="home-card-title">我的工作</div>
+            <div class="home-card-content">
+                <div>
+                    <img src="../../images/icon_check_before_acceptance.png" width="65" height="65" />
+                    <div class="home-card-text">验收</div>
+                </div>
+                <div>
+                    <img src="../../images/icon_grounding.png" width="65" height="65" />
+                    <div class="home-card-text">上架</div>
+                </div>
+                <div>
+                    <img src="../../images/icon_lower_frame.png" width="65" height="65" />
+                    <div class="home-card-text">拣货下架</div>
+                </div>
+                <div>
+                    <img src="../../images/icon_inventory.png" width="65" height="65" />
+                    <div class="home-card-text">盘点</div>
+                </div>
+                <div>
+                    <img src="../../images/icon_query.png" width="65" height="65" />
+                    <div class="home-card-text">库存查询</div>
+                </div>
+            </div>
+        </div>
+        <div class="home-card-wrapper">
+            <div class="home-card-title">提醒消息</div>
+            <div class="home-card-content" id="message-list">
+
+            </div>
+        </div>
+    </div>
+    <script src="../../js/mui.js"></script>
+    <script src="../../js/template-web.js" type="text/javascript" charset="utf-8"></script>
+    <script src="../../js/utils.js" type="text/javascript" charset="utf-8"></script>
+	<script src="../../js/common.js" type="text/javascript" charset="utf-8"></script>
+    <script type="text/javascript">
+        (function ($, doc) {
+			// 挂载模板
+			var utils = new Utils();
+			utils.appendModule('#message')
+			/*  */
+            $.init({
+                pullRefresh: {
+                    container: "#message-list", //下拉刷新容器标识，querySelector能定位的css选择器均可，比如：id、.class等
+                    down: {
+                        style: 'circle', //必选，下拉刷新样式，目前支持原生5+ ‘circle’ 样式
+                        color: '#f2a11c',
+                        auto: true, //可选,默认false.首次加载自动上拉刷新一次
+                        callback: function () {
+                            var data = {
+                                list: [{
+                                    id: 1,
+                                    title: '药品“注射用复方甘草酸苷”库存量低于库存下限，请注意补充。',
+                                    date: '2018-09-17 17:44:38'
+                                }, {
+                                    id: 2,
+                                    title: '药品“注射用复方甘草酸苷”库存量低于库存下限，请注意补充。',
+                                    date: '2018-09-17 17:44:38'
+                                }, {
+                                    id: 3,
+                                    title: '药品“注射用复方甘草酸苷”库存量低于库存下限，请注意补充。',
+                                    date: '2018-09-17 17:44:38'
+                                }, {
+                                    id: 4,
+                                    title: '药品“注射用复方甘草酸苷”库存量低于库存下限，请注意补充。',
+                                    date: '2018-09-17 17:44:38'
+                                }, {
+                                    id: 5,
+                                    title: '药品“注射用复方甘草酸苷”库存量低于库存下限，请注意补充。',
+                                    date: '2018-09-17 17:44:38'
+                                }]
+                            }
+                            utils.innerTplHtml('message-tpl', '#message-list', data, function() {
+								$('#message-list').pullRefresh().endPulldown();
+								$('.home-card-wrapper').on('tap', '.message-detail',function() {
+									common.openwin('./tips', {
+										tipId: this.dataset.id
+									}, {
+										titleText: '提醒'
+									})
+								})
+							})
+                        }
+                    }
+                }
+            });
+            $.plusReady(function () {
+                var btn = document.querySelector('.themes_nav_right')
+                btn.addEventListener('tap', function (e) {
+					common.openwin('./profile', {
+						tipId: this.dataset.id
+					}, {
+						titleText: '账号'
+					})
+                })
+            })
+        }(mui, document))
+    </script>
+</body>
+
+</html>
