@@ -81,6 +81,14 @@ html:not([data-scale]) .scrollList-item .am-card-footer::before {
     -ms-transform: scaleY(0.5);
     transform: scaleY(0.5);
 }
+input{
+	margin-bottom: 0 !important;
+	height: 30px !important;
+}
+.am-tabs * {
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+}
 .am-card.am-card-full {
     position: relative;
     border-top: 1PX solid #ddd;
@@ -111,8 +119,8 @@ html:not([data-scale]) .scrollList-item .am-card-footer::before {
     padding: 9px 15px;
 }
 .am-card-header-content {
-    -ms-flex: 1 1;
-    flex: 1 1;
+    -ms-flex: 2 1;
+    flex: 2 1;
     text-align: left;
     color: #000;
     display: -ms-flexbox;
@@ -211,6 +219,65 @@ html:not([data-scale]) .scrollList-item .am-card-footer::before {
     flex: 1 1;
     margin-left: 8px;
     min-width: 10px;
+}
+.am-list-item.am-input-item {
+    height: 36px;
+    padding-left: 15px;
+}
+.scrollList-item .am-list-item.am-input-item {
+    padding-left: 0 !important;
+}
+.am-list-line:after, .scrollList-item .am-list-line:after, .am-list-body div:not(:last-child) .am-list-line {
+    background: none !important;
+    border: 0 !important;
+}
+.am-list-item .am-list-line {
+    position: relative;
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex: 1 1;
+    flex: 1 1;
+    -ms-flex-item-align: stretch;
+    align-self: stretch;
+    padding-right: 15px;
+    overflow: hidden;
+}
+.am-list-item.am-list-item-middle .am-list-line {
+    -ms-flex-align: center;
+    align-items: center;
+}
+.am-list-item .am-input-label.am-input-label-4 {
+    width: 70px;
+}
+.am-list-item .am-input-label {
+    color: #000;
+    font-size: 14px;
+    margin-left: 0;
+    margin-right: 5px;
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    padding: 2px 0;
+}
+.am-list-item .am-input-control {
+    font-size: 14px;
+    -ms-flex: 1 1;
+    flex: 1 1;
+    border-bottom: solid 1px #EEEEEE;
+}
+.am-list-item .am-input-control input {
+    color: #000;
+    font-size: 14px;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    width: 100%;
+    padding: 2px 0;
+    border: 0;
+    background-color: transparent;
+    line-height: 1;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
 }
 .font-danger{
 	color: red;

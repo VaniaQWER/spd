@@ -79,6 +79,7 @@
 							"drugName": "西咪替丁",
 							"producter": "北京汉典制药有限公司",
 							"distributionNo": "AADKSF1OOSKDF2",
+							"num":"123",
 							"planNo": "plan1213sdfa",
 							"date": "2018-08-08"
 						},{
@@ -88,6 +89,7 @@
 							"producter": "北京北大药业有限公司",
 							"distributionNo": "AADKSF1OOSKDF2",
 							"planNo": "plan1od09932sdfaafd422",
+							"num":"456",
 							"date": "2018-01-19"
 						},{
 							"id":"3",
@@ -96,7 +98,44 @@
 							"producter": "湖北省益康制药厂",
 							"distributionNo": "AADKSF1OOSKDF2",
 							"planNo": "plan332342sdfa123",
+							"num":"674",
 							"date": "2018-04-19"
+						},{
+							"id":"4",
+							"supplierName": "贵州药业",
+							"drugName": "感冒药",
+							"producter": "湖北省益康制药厂",
+							"distributionNo": "AADKSF1OOSKDF2",
+							"planNo": "plan332342sdfa123",
+							"num":"215",
+							"date": "2018-05-15"
+						},{
+							"id":"5",
+							"supplierName": "广州医药",
+							"drugName": "金银花胶囊",
+							"producter": "湖北炎黄本草药业有限公司",
+							"distributionNo": "AADKSF1OOSKDF2",
+							"planNo": "plan332342sdfa123",
+							"num":"875",
+							"date": "2018-06-16"
+						},{
+							"id":"6",
+							"supplierName": "浙江英特集团",
+							"drugName": "阿莫西林胶囊",
+							"producter": "沈阳神龙药业有限公司",
+							"distributionNo": "AADKSF1OOSKDF2",
+							"planNo": "plan332342sdfa123",
+							"num":"325",
+							"date": "2018-08-29"
+						},{
+							"id":"7",
+							"supplierName": "民生药业集团",
+							"drugName": "阿奇霉素片",
+							"producter": "北京北大药业有限公司",
+							"distributionNo": "AADKSF1OOSKDF2",
+							"planNo": "plan332342sdfa123",
+							"num":"547",
+							"date": "2017-12-28"
 						}]
 					};
 					var utils = new Utils();
@@ -114,6 +153,28 @@
 							}
 						}
 					});
+					
+					//循环初始化所有下拉刷新，上拉加载。
+					$.each(document.querySelectorAll('.mui-slider-group .mui-scroll'), function(index, pullRefreshEl) {
+						$(pullRefreshEl).pullToRefresh({
+							down: {
+								callback: function() {
+									console.log('down')
+									var self = this;
+									self.endPullDownToRefresh();
+								}
+							},
+							up: {
+								contentrefresh : "正在加载...",//可选，正在加载状态时，上拉加载控件上显示的标题内容
+	      						contentnomore:'没有更多数据了',
+								callback: function() {
+									console.log('up')
+									var self = this;
+									self.endPullUpToRefresh();
+								}
+							}
+						});
+					})
 				
 					//tab页切的点击事件
 					var sliderSegmentedControl = document.getElementById('sliderSegmentedControl');

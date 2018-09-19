@@ -15,7 +15,7 @@
 				<div class="am-card-body">
 					<div class="am-flexbox am-flexbox-align-center">
 						<div class="am-flexbox-item"> 
-							单位：<span>{{ value.distributionNo }}</span> 
+							单位：<span>{{ value.unit }}</span> 
 						</div>
 						<div class="am-flexbox-item"> 
 							货位：<span>95</span> 
@@ -23,15 +23,15 @@
 					</div>
 					<div class="am-flexbox am-flexbox-align-center">
 						<div class="am-flexbox-item"> 
-							数量：<span>{{ value.planNo }}</span> 
+							数量：<span>{{ value.num }}</span> 
 						</div>
 						<div class="am-flexbox-item">
-						 规格：<span>{{ value.date }}</span>
+						 规格：<span>{{ value.spec }}</span>
 						</div>
 					</div>
 					<div class="am-flexbox am-flexbox-align-center">
 						<div class="am-flexbox-item">
-						 生产厂家：<span>{{ value.date }}</span>
+						 生产厂家：<span>{{ value.producter }}</span>
 						 </div>
 					</div>
 				</div>
@@ -42,7 +42,8 @@
 						<button type="button" class="mui-btn mui-btn-danger ground" data-id={{ value.id }}>确认上架</button>
 					</div>
 				</div>
-			<div style="background-color: rgb(245, 245, 249); height: 3px; border-bottom: 1px solid rgb(236, 236, 237);">
+			</div>	
+			<div style="background-color: #f5f5f9; height: 6px;">
 			</div>
 		{{/each}}
 	</ul>

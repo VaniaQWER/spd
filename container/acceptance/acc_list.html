@@ -14,10 +14,10 @@
 
 	<body>
 		<div class="mui-content">
-		    <div class="mui-input-row mui-search search_head">
-				<input type="search" class="mui-input-clear" placeholder="供应商名称">
+		    <div class="mui-input-row mui-search search_head" onclick="toSearchPage()">
+				<input type="search" class="mui-input-clear" placeholder="通用名/商品名/生产厂家">
 			</div>
-			<div id="slider" class="mui-slider themes_tab">
+			<div id="slider" class="mui-slider themes_tab" class="am-tabs">
 				<div id="sliderSegmentedControl" class="mui-slider-indicator mui-segmented-control mui-segmented-control-inverted">
 					<a class="mui-control-item themes_font_color_tab" href="#item1mobile">待验收</a>
 					<a class="mui-control-item themes_font_color_tab" href="#item2mobile">已验收</a>
@@ -73,9 +73,11 @@
 				// 模板加载
 				$.ready(function(){
 					//console.log("当前页面URL："+plus.webview.currentWebview().getURL());
-					var data = {
+					var data1 = { // 待验收
+						acceptance: true,
 						list: [{
 							"id":"1",
+							"editable": false,
 							"supplierName": "中国医药集团",
 							"drugName": "西咪替丁",
 							"producter": "北京汉典制药有限公司",
@@ -84,6 +86,7 @@
 							"date": "2018-08-08"
 						},{
 							"id":"2",
+							"editable": false,
 							"supplierName": "华润医药集团",
 							"drugName": "头孢克肟颗粒",
 							"producter": "北京北大药业有限公司",
@@ -92,6 +95,38 @@
 							"date": "2018-01-19"
 						},{
 							"id":"3",
+							"editable": false,
+							"supplierName": "广州医药",
+							"drugName": "阿司匹林",
+							"producter": "湖北省益康制药厂",
+							"distributionNo": "AADKSF1OOSKDF2",
+							"planNo": "plan332342sdfa123",
+							"date": "2018-04-19"
+						}]
+					};
+					var data2 = { // 已验收
+						acceptance: false,
+						list: [{
+							"id":"1",
+							"editable": false,
+							"supplierName": "中国医药集团",
+							"drugName": "西咪替丁",
+							"producter": "北京汉典制药有限公司",
+							"distributionNo": "AADKSF1OOSKDF2",
+							"planNo": "plan1213sdfa",
+							"date": "2018-08-08"
+						},{
+							"id":"2",
+							"editable": false,
+							"supplierName": "华润医药集团",
+							"drugName": "头孢克肟颗粒",
+							"producter": "北京北大药业有限公司",
+							"distributionNo": "AADKSF1OOSKDF2",
+							"planNo": "plan1od09932sdfaafd422",
+							"date": "2018-01-19"
+						},{
+							"id":"3",
+							"editable": false,
 							"supplierName": "广州医药",
 							"drugName": "阿司匹林",
 							"producter": "湖北省益康制药厂",
@@ -102,7 +137,8 @@
 					};
 					var utils = new Utils();
 					utils.appendModule('#list_tpl');
-					var html = template('list_tpl_view', data);
+					var html = template('list_tpl_view', data1);
+					var html2 = template('list_tpl_view', data2);
 					document.getElementById('mui-table-view-tab1').innerHTML = html;
 					
 					
@@ -111,7 +147,7 @@
 						if (e.detail.slideNumber === 1) {
 							if (item2.querySelector('.mui-loading')) {
 								setTimeout(function() {
-									document.getElementById('mui-table-view-tab2').innerHTML = html;
+									document.getElementById('mui-table-view-tab2').innerHTML = html2;
 								}, 500);
 							}
 						}
@@ -126,6 +162,72 @@
 							sliderProgressBar.setAttribute('style', sliderProgressBar.getAttribute('style'));
 						}
 					});
+					
+					// 展开编辑
+					$('#slider').on('tap','.edit',function(){
+						this.innerHTML = this.innerHTML === '展开编辑' ? '收起编辑':'展开编辑' ;
+						let id = this.getAttribute('data-id');
+						let index = this.getAttribute('data-index');
+						var addDiv = document.createElement('div');
+						addDiv.className = 'editForm';
+						addDiv.innerHTML = '<div class="am-flexbox am-flexbox-align-center">'+
+						'<div class="am-flexbox-item">' + 
+						'<div class="am-list-item am-input-item am-list-item-middle">' + 
+						'<div class="am-list-line">'+
+						'<div class="am-input-label am-input-label-4">实到数量:</div>'+
+						'<div class="am-input-control">'+
+						'<input pattern="[0-9]*" type="number" placeholder="请输入"/>'+
+						'</div>'+
+						'</div>'+
+						'</div>'+
+						'</div>' +
+						'<div class="am-flexbox-item">' + 
+						'<div class="am-list-item am-input-item am-list-item-middle">' + 
+						'<div class="am-list-line">'+
+						'<div class="am-input-label am-input-label-4">生产日期:</div>'+
+						'<div class="am-input-control">'+
+						'<input pattern="[0-9]*" type="date" placeholder="请输入"/>'+
+						'</div>'+
+						'</div>'+
+						'</div>'+
+						'</div>' +
+						'</div>' +
+						'<div class="am-flexbox am-flexbox-align-center">'+
+						'<div class="am-flexbox-item">' + 
+						'<div class="am-list-item am-input-item am-list-item-middle">' + 
+						'<div class="am-list-line">'+
+						'<div class="am-input-label am-input-label-4">生产批号:</div>'+
+						'<div class="am-input-control">'+
+						'<input pattern="[0-9]*" type="text" placeholder="请输入"/>'+
+						'</div>'+
+						'</div>'+
+						'</div>'+
+						'</div>' +
+						'<div class="am-flexbox-item">' + 
+						'<div class="am-list-item am-input-item am-list-item-middle">' + 
+						'<div class="am-list-line">'+
+						'<div class="am-input-label am-input-label-4">有效期至:</div>'+
+						'<div class="am-input-control">'+
+						'<input pattern="[0-9]*" type="date" placeholder="请输入"/>'+
+						'</div>'+
+						'</div>'+
+						'</div>'+
+						'</div>' +
+						'</div>'+
+						'<div class="am-flexbox am-flexbox-align-center">'+
+						'<div class="am-flexbox-item">批准文号：'+
+						'<span>ffdaxx2342ssdfs</span>'+
+						'</div>'+
+						'</div>';
+						if($('.am-card-body')[index].querySelectorAll('.editForm').length === 0){
+							$('.am-card-body')[index].appendChild(addDiv);
+						}else{
+							console.log('已经有了');
+							var child = $('.am-card-body')[index].querySelector('.editForm');
+							$('.am-card-body')[index].removeChild(child);
+						}
+					});
+					
 					//绑定点击事件  - 进入详情页
 						
 					$('#slider').on('tap','.moreDetail',function(){

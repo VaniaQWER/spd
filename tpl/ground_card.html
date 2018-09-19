@@ -5,8 +5,8 @@
 			<div class="am-card scrollList-item am-card-full" data-id={{ value.id }}>
 				<div class="am-card-header">
 					<div class="am-card-header-content">
-						<span style="font-size: 18px; color: rgb(51, 51, 51); font-weight: bold;">
-						 上架单号： {{ value.supplierName}}</span>
+						<span style="font-size: 16px; color: rgb(51, 51, 51); font-weight: bold;">
+						 上架单号： {{ value.distributionNo}}</span>
 					</div>
 					<div class="am-card-header-extra">
 						<span>零库存补货</span>
@@ -15,15 +15,15 @@
 				<div class="am-card-body" style='padding: 12px 15px;'>
 					<div class="am-flexbox am-flexbox-align-center">
 						<div class="am-flexbox-item"> 
-							验收时间：<span>{{ value.planNo }}</span> 
+							验收时间：<span>{{ value.date }}</span> 
 						</div>
 						<div class="am-flexbox-item">
-						 品相数：<span>{{ value.date }}</span>
+						 品相数：<span>{{ value.num }}</span>
 						 </div>
 					</div>
 				</div>
 			</div>
-			<div style="background-color: rgb(245, 245, 249); height: 3px; border-bottom: 1px solid rgb(236, 236, 237);">
+			<div style="background-color: #f5f5f9; height: 6px;">
 			</div>
 		{{/each}}
 	</ul>
