@@ -63,65 +63,104 @@
 
 		</div>
 		
-		<script src="../js/mui.min.js"></script>
+		<script src="../../js/mui.min.js"></script>
 		<script src="../../js/mui.pullToRefresh.js"></script>
 		<script src="../../js/mui.pullToRefresh.material.js"></script>
+		<script src="../../js/template-web.js" type="text/javascript" charset="utf-8"></script>
+		<script src="../../js/utils.js" type="text/javascript" charset="utf-8"></script>
+		<script src="../../js/common.js" type="text/javascript" charset="utf-8"></script>
+		<script src="../../js/request.js" type="text/javascript" charset="utf-8"></script>
 		
 		<script type="text/javascript">
 			
 			(function($) {
 				
-			$.init()
-				
 			$('.mui-scroll-wrapper').scroll({
 				deceleration: 0.1,
 				indicators: true //是否显示滚动条
 			});
-			
 			// 模板加载
-			$.ready(function(){
+			var utils = new Utils();
+			utils.appendModule('#list_tpl');
+			
+			$.plusReady(function(){
 				
-				//console.log("当前页面URL："+plus.webview.currentWebview().getURL());
-				var data = {
-					list: [{
-						"id":"1",
-						"supplierName": "中国医药集团",
-						"drugName": "西咪替丁",
-						"producter": "北京汉典制药有限公司",
-						"distributionNo": "AADKSF1OOSKDF2",
-						"planNo": "plan1213sdfa",
-						"date": "2018-08-08"
-					},{
-						"id":"2",
-						"supplierName": "华润医药集团",
-						"drugName": "头孢克肟颗粒",
-						"producter": "北京北大药业有限公司",
-						"distributionNo": "AADKSF1OOSKDF2",
-						"planNo": "plan1od09932sdfaafd422",
-						"date": "2018-01-19"
-					},{
-						"id":"3",
-						"supplierName": "广州医药",
-						"drugName": "阿司匹林",
-						"producter": "湖北省益康制药厂",
-						"distributionNo": "AADKSF1OOSKDF2",
-						"planNo": "plan332342sdfa123",
-						"date": "2018-04-19"
-					}]
-				};
-				var utils = new Utils();
-				utils.appendModule('#list_tpl');
-				var html = template('list_tpl_view', data);
-				document.getElementById('mui-table-view-tab1').innerHTML = html;
+				var selected = undefined,hasChecked = false,url = undefined;
+				currSelected();
+				$.init({
+	                pullRefresh: {
+	                    container: selected, //下拉刷新容器标识，querySelector能定位的css选择器均可，比如：id、.class等
+	                    down: {
+	                        style: 'circle', //必选，下拉刷新样式，目前支持原生5+ ‘circle’ 样式
+	                        color: '#f2a11c',
+	                        auto: true, //可选,默认false.首次加载自动上拉刷新一次
+	                        callback: function () {
+	                        	url = !hasChecked ? '/undercarriage': '/undercarriage1'
+	                        	mui.ajaxRequest(url,{
+	                        		type: 'GET',
+	                        		success: function(data){
+	                        			data.picking = hasChecked
+	                        			return template(selected,data);
+	                        		},
+	                        		error: function(xhr,type,errorThrown){
+										alert(xhr.responseText)
+	                        		}
+	                        	})
+	                        }
+	                    },
+	                    up: {
+							contentrefresh : "正在加载...",//可选，正在加载状态时，上拉加载控件上显示的标题内容
+      						contentnomore:'没有更多数据了',
+							callback: function() {
+								console.log('up')
+								var self = this;
+								console.log(self,'self')
+//									self.endPullUpToRefresh();
+							}
+						}
+	                }
+	                
+	            });
+	            
 				
-				var item2 = document.getElementById('item2mobile');
+				 /* 渲染模板   */
+				
+            	function template(selected, data){
+                    utils.innerTplHtml('picking_tpl', selected, data, function() {
+						$('#mui-table-view-tab1').pullRefresh().endPulldown();
+					})
+            	}
+            	
+            	function currSelected(){
+					var item1mobile = document.querySelector('#item1mobile');
+					var item2mobile = document.querySelector('#item2mobile');
+					if(item1mobile.className.indexOf('mui-active')>0){
+						selected = '#mui-table-view-tab1';
+						hasChecked = false;
+					}else{
+						selected = '#mui-table-view-tab2';
+						hasChecked = true;
+					}
+            	}
+            	
+            	var item2 = document.getElementById('item2mobile');
 				document.getElementById('slider').addEventListener('slide', function(e) {
+					currSelected();
 					if (e.detail.slideNumber === 1) {
 						if (item2.querySelector('.mui-loading')) {
-							setTimeout(function() {
-								document.getElementById('mui-table-view-tab2').innerHTML = html;
-							}, 500);
+							mui.ajaxRequest('/undercarriage1',{
+                        		type: 'GET',
+                        		success: function(data){
+                        			data.picking = hasChecked;
+                        			return template(selected,data);
+                        		},
+                        		error: function(xhr,type,errorThrown){
+									alert(xhr.responseText)
+                        		}
+                        	})
 						}
+					}else{
+						console.log('待验收')
 					}
 				});
 				
@@ -134,51 +173,22 @@
 						sliderProgressBar.setAttribute('style', sliderProgressBar.getAttribute('style'));
 					}
 				});
-				
-				
-				//循环初始化所有下拉刷新，上拉加载。
-					$.each(document.querySelectorAll('.mui-slider-group .mui-scroll'), function(index, pullRefreshEl) {
-						$(pullRefreshEl).pullToRefresh({
-							down: {
-								callback: function() {
-									console.log('down')
-									var self = this;
-									self.endPullDownToRefresh();
-								}
-							},
-							up: {
-								contentrefresh : "正在加载...",//可选，正在加载状态时，上拉加载控件上显示的标题内容
-	      						contentnomore:'没有更多数据了',
-								callback: function() {
-									console.log('up')
-									var self = this;
-									self.endPullUpToRefresh();
-								}
-							}
-						});
-					})
-				
-				
-				
-				
-				
-				//绑定点击事件  - 进入详情页
+            	
+            	//绑定点击事件  - 进入详情页
 				$('#slider').on('tap','.toPage',function(){
 					console.log(123)
 					common.openwin('pickingOffDetails',{name:123},{
 						titleText: '详情'
 					})
 				})
+				
+				// 绑定事件 --确认上架
 				$('#slider').on('tap','.submitButton',function(){
 					var btnArray = ['否', '是'];
 					$.confirm('确定要执行此操作吗？', '确认拣货', btnArray, function(e) {
-//						if (e.index == 1) {
-//						} else {
-//						}
-					})
+							
+					},'div')
 				})
-			
-			
 			});
 			
 		})(mui);

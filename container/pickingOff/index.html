@@ -72,14 +72,14 @@
 		<script src="../../js/template-web.js" type="text/javascript" charset="utf-8"></script>
 		<script src="../../js/utils.js" type="text/javascript" charset="utf-8"></script>
 		<script src="../../js/common.js" type="text/javascript" charset="utf-8"></script>
+		<script src="../../js/request.js" type="text/javascript" charset="utf-8"></script>
+		
 		
 		<script type="text/javascript">
 			
 
 			(function($) {
-				$.init();
-					
-	
+				
 				var deceleration = mui.os.ios?0.003:0.0009;
 				$('.mui-scroll-wrapper').scroll({
 					bounce: false,
@@ -87,66 +87,87 @@
 					deceleration:deceleration
 				});
 				
-				$.ready(function(){
-	
-					var data = {
-						list: [{
-							"id":"1",
-							"supplierName": "静注人免疫球蛋白",
-							"drugName": "西咪替丁",
-							"producter": "北京汉典制药有限公司",
-							"distributionNo": "AADKSF1OOSKDF2",
-							"num": "323",
-							"date": "2018-08-08"
-						},{
-							"id":"2",
-							"supplierName": "注射用复方甘草酸苷",
-							"drugName": "头孢克肟颗粒",
-							"producter": "北京北大药业有限公司",
-							"num": "666",
-							"limitNum":"20",
-							"planNo": "2",
-							"date": "2018-01-19"
-						},{
-							"id":"3",
-							"supplierName": "阿司匹林",
-							"drugName": "阿司匹林",
-							"producter": "湖北省益康制药厂",
-							"num": "888",
-							"planNo": "plan332342sdfa123",
-							"date": "2018-04-19"
-						},{
-							"id":"4",
-							"supplierName": "阿司匹林",
-							"drugName": "阿司匹林",
-							"producter": "湖北省益康制药厂",
-							"num": "888",
-							"planNo": "plan332342sdfa123",
-							"date": "2018-05-19"
-						},{
-							"id":"5",
-							"supplierName": "阿司匹林",
-							"drugName": "阿司匹林",
-							"producter": "湖北省益康制药厂",
-							"num": "888",
-							"planNo": "plan332342sdfa123",
-							"date": "2018-05-29"
-						}]
-					};
-					var utils = new Utils();
-					utils.appendModule('#card_view');
-					var html = template('index_list_view', data);
-					document.getElementById('mui-table-view-tab1').innerHTML = html;
+				var utils = new Utils();
+				utils.appendModule('#card_view');
 				
-	
-					var item2 = document.getElementById('item2mobile');
+				$.plusReady(function(){
+					var selected = undefined,hasChecked = false,url = undefined;
+					currSelected();
+					$.init({
+		                pullRefresh: {
+		                    container: selected, //下拉刷新容器标识，querySelector能定位的css选择器均可，比如：id、.class等
+		                    down: {
+		                        style: 'circle', //必选，下拉刷新样式，目前支持原生5+ ‘circle’ 样式
+		                        color: '#f2a11c',
+		                        auto: true, //可选,默认false.首次加载自动上拉刷新一次
+		                        callback: function () {
+		                        	url = !hasChecked ? '/undercarriage': '/undercarriage1'
+		                        	mui.ajaxRequest(url,{
+			                        		type: 'GET',
+			                        		success: function(data){
+			                        			data.picking = hasChecked
+			                        			return template(selected,data);
+			                        		},
+			                        		error: function(xhr,type,errorThrown){
+												alert(xhr.responseText)
+			                        		}
+		                        		})
+		                        	
+		                        }
+		                    },
+		                    up: {
+								contentrefresh : "正在加载...",//可选，正在加载状态时，上拉加载控件上显示的标题内容
+	      						contentnomore:'没有更多数据了',
+								callback: function() {
+									console.log('up')
+									var self = this;
+									console.log(self,'self')
+//									self.endPullUpToRefresh();
+								}
+							}
+		                }
+		                
+		            });
+		            
+					
+					 /* 渲染模板   */
+					
+	            	function template(selected, data){
+	                    utils.innerTplHtml('pick_list', selected, data, function() {
+							$('#mui-table-view-tab1').pullRefresh().endPulldown();
+						})
+	            	}
+	            	
+	            	function currSelected(){
+						var item1mobile = document.querySelector('#item1mobile');
+						var item2mobile = document.querySelector('#item2mobile');
+						if(item1mobile.className.indexOf('mui-active')>0){
+							selected = '#mui-table-view-tab1';
+							hasChecked = false;
+						}else{
+							selected = '#mui-table-view-tab2';
+							hasChecked = true;
+						}
+	            	}
+	            	
+	            	var item2 = document.getElementById('item2mobile');
 					document.getElementById('slider').addEventListener('slide', function(e) {
+						currSelected();
 						if (e.detail.slideNumber === 1) {
 							if (item2.querySelector('.mui-loading')) {
-								setTimeout(function() {
-									document.getElementById('mui-table-view-tab2').innerHTML = html;
-								}, 500);
+								mui.ajaxRequest('/acceptanceList2',{
+	                        		type: 'GET',
+	                        		success: function(data){
+	                        			data.picking = hasChecked
+	                        			return template(selected,data);
+	                        		},
+	                        		error: function(xhr,type,errorThrown){
+										alert(xhr.responseText)
+	                        		}
+	                        	})
 							}
+						}else{
+							console.log('待验收')
 						}
 					});
 					
@@ -159,29 +180,6 @@
 							sliderProgressBar.setAttribute('style', sliderProgressBar.getAttribute('style'));
 						}
 					});
-					
-					//循环初始化所有下拉刷新，上拉加载。
-					$.each(document.querySelectorAll('.mui-slider-group .mui-scroll'), function(index, pullRefreshEl) {
-						$(pullRefreshEl).pullToRefresh({
-							down: {
-								callback: function() {
-									console.log('down')
-									var self = this;
-									self.endPullDownToRefresh();
-								}
-							},
-							up: {
-								contentrefresh : "正在加载...",//可选，正在加载状态时，上拉加载控件上显示的标题内容
-	      						contentnomore:'没有更多数据了',
-								callback: function() {
-									console.log('up')
-									var self = this;
-									self.endPullUpToRefresh();
-								}
-							}
-						});
-					})
-				
 					
 					//绑定点击事件  - 进入详情页
 					

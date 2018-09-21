@@ -53,13 +53,16 @@
     <script src="../../js/template-web.js" type="text/javascript" charset="utf-8"></script>
     <script src="../../js/utils.js" type="text/javascript" charset="utf-8"></script>
 	<script src="../../js/common.js" type="text/javascript" charset="utf-8"></script>
+	<script src="../../js/request.js" type="text/javascript" charset="utf-8"></script>
     <script type="text/javascript">
         (function ($, doc) {
+			
 			// 挂载模板
 			var utils = new Utils();
-			utils.appendModule('#message')
-			/*  */
-            $.init({
+			utils.appendModule('#message');
+
+            $.plusReady(function () {
+            	$.init({
                 pullRefresh: {
                     container: "#message-list", //下拉刷新容器标识，querySelector能定位的css选择器均可，比如：id、.class等
                     down: {
@@ -67,44 +70,33 @@
                         color: '#f2a11c',
                         auto: true, //可选,默认false.首次加载自动上拉刷新一次
                         callback: function () {
-                            var data = {
-                                list: [{
-                                    id: 1,
-                                    title: '药品“注射用复方甘草酸苷”库存量低于库存下限，请注意补充。',
-                                    date: '2018-09-17 17:44:38'
-                                }, {
-                                    id: 2,
-                                    title: '药品“注射用复方甘草酸苷”库存量低于库存下限，请注意补充。',
-                                    date: '2018-09-17 17:44:38'
-                                }, {
-                                    id: 3,
-                                    title: '药品“注射用复方甘草酸苷”库存量低于库存下限，请注意补充。',
-                                    date: '2018-09-17 17:44:38'
-                                }, {
-                                    id: 4,
-                                    title: '药品“注射用复方甘草酸苷”库存量低于库存下限，请注意补充。',
-                                    date: '2018-09-17 17:44:38'
-                                }, {
-                                    id: 5,
-                                    title: '药品“注射用复方甘草酸苷”库存量低于库存下限，请注意补充。',
-                                    date: '2018-09-17 17:44:38'
-                                }]
-                            }
-                            utils.innerTplHtml('message-tpl', '#message-list', data, function() {
-								$('#message-list').pullRefresh().endPulldown();
-								$('.home-card-wrapper').on('tap', '.message-detail',function() {
-									common.openwin('./tips', {
-										tipId: this.dataset.id
-									}, {
-										titleText: '提醒'
-									})
-								})
-							})
+                        	mui.ajaxRequest('/message',{
+                        		type: 'GET',
+                        		success: function(data){
+                        			return template(data);
+                        		},
+                        		error: function(xhr,type,errorThrown){
+									alert(xhr.responseText)
+                        		}
+                        	})
                         }
                     }
                 }
             });
-            $.plusReady(function () {
+            	// 渲染模板 
+            	function template(data){
+                    utils.innerTplHtml('message-tpl', '#message-list', data, false, function() {
+						$('#message-list').pullRefresh().endPulldown();
+						$('.home-card-wrapper').on('tap', '.message-detail',function() {
+							console.log(this.dataset,'dataset')
+							common.openwin('./tips', {
+								tipId: JSON.stringify(this.dataset)
+							}, {
+								titleText: '提醒'
+							})
+						})
+					})
+            	}
                 var btn = document.querySelector('.themes_nav_right')
                 btn.addEventListener('tap', function (e) {
 					common.openwin('./profile', {
@@ -115,8 +107,6 @@
                 })
 				// 点击跳转
 				$('.home-card-content').on('tap', '.home-card-item',function() {
-						
-					
 					if(this.dataset.title){
 						common.openwin(this.dataset.src, {}, {
 							titleText: this.dataset.title,

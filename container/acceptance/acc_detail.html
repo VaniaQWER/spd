@@ -58,14 +58,7 @@
 			(function($) {
 				
 				$.init()
-				mui(document.body).on('tap', '#acceptance', function(e) {
-		            mui(this).button('loading');
-		            setTimeout(function() {
-		                mui(this).button('reset');
-		                common.openwin('../Result/index',{ acceptance: true })
-		            }.bind(this), 2000);
-		        });
-
+				
 				// 模板加载
 				$.ready(function(){
 					//console.log("当前页面URL："+plus.webview.currentWebview().getURL());
@@ -89,8 +82,8 @@
 					utils.appendModule('#acc_detail_tpl');
 					var html = template('detail_tpl', data);
 					document.getElementById('detailContent').innerHTML = html;
-				});
-				/*
+					
+					/*
 					 *2 点击添加按钮 增加选填项    开始
 					 * 
 					 * 拖拽后显示操作图标，点击操作图标删除元素
@@ -105,11 +98,11 @@
 							'<div class="mui-input-group">' +
 							'<div class="mui-input-row">' +
 							'<label>生产批号</label>' +
-							'<input type="text" name="buycontent" class="mui-input-clear mui-input" placeholder="请输入" >' +
+							'<input type="text" name="buycontent" class="mui-input-clear mui-input mui-input-ph"  placeholder="请输入" >' +
 							'</div>' +
 							'<div class="mui-input-row">' +
 							'<label>数量</label>' +
-							'<input type="text" name="buycontent" class="mui-input-clear mui-input" placeholder="请输入" >' +
+							'<input type="number" name="buycontent" class="mui-input-clear mui-input mui-input-num"  placeholder="请输入" >' +
 							'</div>' +
 							'</div>' +
 							'</div>' +
@@ -149,6 +142,35 @@
 						});
 						var btnArray = ['确认', '取消'];
 					}
+					// 验收
+					var acceptance = document.querySelector('#acceptance');
+					acceptance.addEventListener('tap',function(e){
+						var phValue = document.querySelector('.mui-input').value; // 批号文号
+						var phList = document.querySelector('#List').querySelectorAll('.mui-input-ph');
+						var numList = document.querySelector('#List').querySelectorAll('.mui-input-num');
+						let postData = [];
+						for (let i =0 ;i < phList.length; i++) {
+							let values = {};
+							values.producterPH =  phList[i].value;
+							values.num = numList[i].value
+							postData.push(values);
+						}
+						console.log(phValue,'phValue'); // 批准文号
+						console.log(postData,'postData'); // 批号 数据
+						var btnArray = ['否', '是'];
+						mui.confirm('是否确认验收？', '确认', btnArray, function(e) {
+							if (e.index == 1) {
+								alert('你点击了是');
+								/* 与后台交互  */
+							}
+						},'div')
+						
+					})
+					
+					
+					
+				});
+				
 				
 				$.plusReady(function(){
 					var self = plus.webview.currentWebview();

@@ -1,5 +1,5 @@
 
-<script type="text/html" id='list_tpl_view'>
+<script type="text/html" id='ground_list'>
 	<ul id="mui-table-view" class="mui-table-view">
 		{{ each list value i}}
 			<div class="am-card scrollList-item am-card-full" data-id={{ value.id }}>
@@ -9,13 +9,17 @@
 						{{ value.drugName}}</span>
 					</div>
 					<div class="am-card-header-extra">
-						<span>待上架</span>
+						{{ if hasGrounding }}
+							<span class="hasGround ground-tag">已上架</span>
+							{{ else }}
+								<span class="before-ground ground-tag">待上架</span>
+						{{ /if }}
 					</div>
 				</div>
 				<div class="am-card-body">
 					<div class="am-flexbox am-flexbox-align-center">
 						<div class="am-flexbox-item"> 
-							单位：<span>{{ value.unit }}</span> 
+							单位：<span>{{ value.replanUnit }}</span> 
 						</div>
 						<div class="am-flexbox-item"> 
 							货位：<span>95</span> 
@@ -23,7 +27,7 @@
 					</div>
 					<div class="am-flexbox am-flexbox-align-center">
 						<div class="am-flexbox-item"> 
-							数量：<span>{{ value.num }}</span> 
+							数量：<span>{{ value.total }}</span> 
 						</div>
 						<div class="am-flexbox-item">
 						 规格：<span>{{ value.spec }}</span>
@@ -39,7 +43,9 @@
 					<div class="am-card-footer-content"></div>
 					<div class="am-card-footer-extra">
 						<button type="button" class="mui-btn mui-btn-blue mui-btn-outlined moreDetail" data-id={{ value.id }} style="margin: 0 5px;">更多详情</button>
-						<button type="button" class="mui-btn mui-btn-danger ground" data-id={{ value.id }}>确认上架</button>
+						{{ if !hasGrounding }}
+							<button type="button" class="mui-btn mui-btn-danger ground" data-id={{ value.id }}>确认上架</button>
+						{{ /if }}
 					</div>
 				</div>
 			</div>	

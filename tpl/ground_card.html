@@ -9,7 +9,12 @@
 						 上架单号： {{ value.distributionNo}}</span>
 					</div>
 					<div class="am-card-header-extra">
-						<span>零库存补货</span>
+						<span>{{value.type  }} </span>
+						{{ if hasGrounding }}
+							<span class="hasGround ground-tag">已上架</span>
+							{{ else }}
+								<span class="before-ground ground-tag">待上架</span>
+						{{ /if }}
 					</div>
 				</div>
 				<div class="am-card-body" style='padding: 12px 15px;'>
@@ -18,7 +23,7 @@
 							验收时间：<span>{{ value.date }}</span> 
 						</div>
 						<div class="am-flexbox-item">
-						 品相数：<span>{{ value.num }}</span>
+						 品相数：<span>{{ value.total }}</span>
 						 </div>
 					</div>
 				</div>

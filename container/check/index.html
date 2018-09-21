@@ -59,10 +59,16 @@
 		<script src="../../js/template-web.js" type="text/javascript" charset="utf-8"></script>
 		<script src="../../js/utils.js" type="text/javascript" charset="utf-8"></script>
 		<script src="../../js/common.js" type="text/javascript" charset="utf-8"></script>
+		<script src="../../js/request.js" type="text/javascript" charset="utf-8"></script>
 
 		<script type="text/javascript">
 			(function($){
-				$.init({
+				
+				var utils = new Utils();
+				utils.appendModule('#card_view');
+				
+				$.plusReady(function(){
+				 	$.init({
 					pullRefresh :{
 						container:"#scroll",
 						down : {
@@ -73,7 +79,16 @@
 					      offset:'0px', //可选 默认0px,下拉刷新控件的起始位置
 					      auto: true,//可选,默认false.首次加载自动上拉刷新一次
 					      callback :function(){
-					      	console.log(123)
+					      	mui.ajaxRequest('/inventory1',{
+                        		type: 'GET',
+                        		success: function(data){
+                        			return template(data);
+                        		},
+                        		error: function(xhr,type,errorThrown){
+									alert(xhr.responseText)
+                        		}
+                    		})
+					      	
 					      	$('#scroll').pullRefresh().endPulldown();
 	
 					      } //必选，刷新函数，根据具体业务来编写，比如通过ajax从服务器获取新数据；
@@ -87,102 +102,21 @@
 					      	this.endPullupToRefresh(true);
 					      } //必选，刷新函数，根据具体业务来编写，比如通过ajax从服务器获取新数据；
 					    }
-				    }	
-				});
+				    }
+				})
+				 	/* 渲染模板   */
 					
-				$.ready(function(){
-					
-					var data = {
-						list: [{
-							"id":"1",
-							"supplierName": "静注人免疫球蛋白",
-							"drugName": "西咪替丁",
-							"producter": "北京汉典制药有限公司",
-							"distributionNo": "AADKSF1OOSKDF2",
-							"num": "323",
-							"date": "2018-08-08"
-						},{
-							"id":"2",
-							"supplierName": "注射用复方甘草酸苷",
-							"drugName": "头孢克肟颗粒",
-							"distributionNo": "AADKSF1OOSKDF2",
-							"num": "666",
-							"limitNum":"20",
-							"planNo": "2",
-							"date": "2018-01-19"
-						},{
-							"id":"2",
-							"supplierName": "注射用复方甘草酸苷",
-							"drugName": "头孢克肟颗粒",
-							"producter": "北京北大药业有限公司",
-							"distributionNo": "AADKSF1OOSKDF2",
-							"num": "666",
-							"limitNum":"20",
-							"planNo": "2",
-							"date": "2018-01-19"
-						},{
-							"id":"2",
-							"supplierName": "注射用复方甘草酸苷",
-							"drugName": "头孢克肟颗粒",
-							"producter": "北京北大药业有限公司",
-							"distributionNo": "AADKSF1OOSKDF2",
-							"num": "666",
-							"limitNum":"20",
-							"planNo": "2",
-							"date": "2018-01-19"
-						},{
-							"id":"2",
-							"supplierName": "注射用复方甘草酸苷",
-							"drugName": "头孢克肟颗粒",
-							"producter": "北京北大药业有限公司",
-							"distributionNo": "AADKSF1OOSKDF2",
-							"num": "666",
-							"limitNum":"20",
-							"planNo": "2",
-							"date": "2018-01-19"
-						},{
-							"id":"3",
-							"supplierName": "阿司匹林",
-							"drugName": "阿司匹林",
-							"producter": "湖北省益康制药厂",
-							"num": "888",
-							"planNo": "plan332342sdfa123",
-							"distributionNo": "AADKSF1OOSKDF2",
-							"date": "2018-04-19"
-						},{
-							"id":"4",
-							"supplierName": "阿司匹林",
-							"drugName": "阿司匹林",
-							"producter": "湖北省益康制药厂",
-							"num": "888",
-							"planNo": "plan332342sdfa123",
-							"distributionNo": "AADKSF1OOSKDF2",
-							"date": "2018-05-19"
-						},{
-							"id":"5",
-							"supplierName": "阿司匹林",
-							"drugName": "阿司匹林",
-							"producter": "湖北省益康制药厂",
-							"num": "888",
-							"planNo": "plan332342sdfa123",
-							"distributionNo": "AADKSF1OOSKDF2",
-							"date": "2018-05-29"
-						}]
-					};
-					var utils = new Utils();
-					utils.appendModule('#card_view');
-					var html = template('index_list_view', data);
-					document.getElementById('scroll').innerHTML = html;
-				 
-				 
-				 	$('#scroll').on('tap','.am-card-body',function(){
+            	function template(data){
+                    utils.innerTplHtml('check_list', '#scroll', data, function() {
+						$('#scroll').pullRefresh().endPulldown();
+					})
+            	}
+            	$('#scroll').on('tap','.am-card-body',function(){
 				 		common.openwin('checkList',{},{
 				 			titleText:'药品信息'
 				 		})
 				 	})
 				})
-			
-			
 		})(mui);
 		
 		</script>
