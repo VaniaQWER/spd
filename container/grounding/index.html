@@ -16,7 +16,7 @@
 		    <div class="mui-input-row mui-search search_head">
 				<input type="search" class="mui-input-clear" placeholder="供应商名称">
 			</div>
-			<div id="slider" class="mui-slider themes_tab">
+			<div id="slider" class="mui-slider themes_tab mui-fullscreen">
 				<div id="sliderSegmentedControl" class="mui-slider-indicator mui-segmented-control mui-segmented-control-inverted">
 					<a class="mui-control-item themes_font_color_tab" href="#item1mobile">待上架</a>
 					<a class="mui-control-item themes_font_color_tab" href="#item2mobile">已上架</a>
@@ -28,6 +28,7 @@
 							<div class="mui-scroll" id='mui-table-view-tab1'>
 								<div class="mui-loading">
 									<div class="mui-spinner">
+										
 									</div>
 								</div>
 								<!-- template-->
@@ -71,85 +72,75 @@
 				var utils = new Utils();
 				utils.appendModule('#card_view');
 				
+				/* 渲染模板   */
+				var selected = undefined,hasChecked = false,url = undefined;
+				currSelected();
+				
+            	function template(selected, data,self, insertType){
+            		console.log(selected,'selected')
+        			utils.innerTplHtml('ground', selected, data, insertType);
+            	}
+            	
+            	function currSelected(){
+					var item1mobile = document.querySelector('#item1mobile');
+					var item2mobile = document.querySelector('#item2mobile');
+					if(item1mobile.className.indexOf('mui-active')>0){
+						selected = '#mui-table-view-tab1';
+						hasChecked = false;
+					}else{
+						selected = '#mui-table-view-tab2';
+						hasChecked = true;
+					}
+            	}
+            	/*
+            	 	下拉刷新
+            	 * */
+            	function pulldownRefresh(){
+					url = !hasChecked ? '/groundList': '/groundList2';
+					var self = this;
+					mui.ajaxRequest(url,{
+                		type: 'GET',
+                		success: function(data){
+                			self.endPullDownToRefresh(true);
+                			data.hasGrounding = hasChecked
+							return template(selected,data,self,false)
+                			
+                		},
+                		error: function(xhr,type,errorThrown){
+							alert(xhr.responseText)
+                		}
+            		});
+				}
+            	/*
+					 
+				 *  上拉加载更多
+				 * */
+				function pullupRefresh(){
+					url = !hasChecked ? '/groundList': '/groundList2';
+					var self = this;
+					mui.ajaxRequest(url,{
+                		type: 'GET',
+                		success: function(data){
+                			self.endPullUpToRefresh();
+                			data.hasGrounding = hasChecked
+							return template(selected,data,self,true)
+                			
+                		},
+                		error: function(xhr,type,errorThrown){
+							alert(xhr.responseText)
+                		}
+            		});
+				}
+				
 				$.plusReady(function(){
-					var selected = undefined,hasChecked = false,url = undefined;
-					currSelected();
-					$.init({
-		                pullRefresh: {
-		                    container: selected, //下拉刷新容器标识，querySelector能定位的css选择器均可，比如：id、.class等
-		                    down: {
-		                        style: 'circle', //必选，下拉刷新样式，目前支持原生5+ ‘circle’ 样式
-		                        color: '#f2a11c',
-		                        auto: true, //可选,默认false.首次加载自动上拉刷新一次
-		                        callback: function () {
-		                        	url = !hasChecked ? '/groundList': '/groundList2'
-		                        	mui.ajaxRequest(url,{
-			                        		type: 'GET',
-			                        		success: function(data){
-			                        			console.log(data,'data')
-			                        			data.hasGrounding = hasChecked
-			                        			return template(selected,data);
-			                        		},
-			                        		error: function(xhr,type,errorThrown){
-												alert(xhr.responseText)
-			                        		}
-		                        		})
-		                        	
-		                        }
-		                    },
-		                    up: {
-								contentrefresh : "正在加载...",//可选，正在加载状态时，上拉加载控件上显示的标题内容
-	      						contentnomore:'没有更多数据了',
-								callback: function() {
-									console.log('up')
-									var self = this;
-									console.log(self,'self')
-//									self.endPullUpToRefresh();
-								}
-							}
-		                }
-		                
-		            });
-		            
 					
-					 /* 渲染模板   */
-					
-	            	function template(selected, data){
-	                    utils.innerTplHtml('ground_list', selected, data, function() {
-							$('#mui-table-view-tab1').pullRefresh().endPulldown();
-						})
-	            	}
-	            	
-	            	function currSelected(){
-						var item1mobile = document.querySelector('#item1mobile');
-						var item2mobile = document.querySelector('#item2mobile');
-						if(item1mobile.className.indexOf('mui-active')>0){
-							selected = '#mui-table-view-tab1';
-							hasChecked = false;
-						}else{
-							selected = '#mui-table-view-tab2';
-							hasChecked = true;
-						}
-	            	}
-	            	
 	            	var item2 = document.getElementById('item2mobile');
 					document.getElementById('slider').addEventListener('slide', function(e) {
 						currSelected();
 						if (e.detail.slideNumber === 1) {
 							if (item2.querySelector('.mui-loading')) {
-								mui.ajaxRequest('/groundList2',{
-	                        		type: 'GET',
-	                        		success: function(data){
-	                        			data.hasGrounding = hasChecked;
-	                        			return template(selected,data);
-	                        		},
-	                        		error: function(xhr,type,errorThrown){
-										alert(xhr.responseText)
-	                        		}
-	                        	})
+								mui(".mui-slider-group .mui-scroll").pullToRefresh()[1].pullDownLoading();
 							}
-						}else{
-							console.log('待验收')
 						}
 					});
 					
@@ -162,6 +153,27 @@
 							sliderProgressBar.setAttribute('style', sliderProgressBar.getAttribute('style'));
 						}
 					});
+					
+					//循环初始化所有下拉刷新，上拉加载。
+					$.each(document.querySelectorAll('.mui-slider-group .mui-scroll'), function(index, pullRefreshEl) {
+						
+						$(pullRefreshEl).pullToRefresh({
+							down: {
+								style:'circle',
+								contentdown : "下拉可以刷新",
+								contentover : "释放立即刷新",
+								contentrefresh : "正在刷新...",
+								callback: pulldownRefresh
+							},
+							up: {
+								contentrefresh : "正在加载...",//可选，正在加载状态时，上拉加载控件上显示的标题内容
+	      						contentnomore:'没有更多数据了',
+								callback: pullupRefresh
+							}
+						});
+					});
+					// 第一个tab 默认加载一次数据
+					mui(".mui-slider-group .mui-scroll").pullToRefresh()[0].pullDownLoading();
 	            	
 	            	//绑定点击事件  - 进入详情页
 						

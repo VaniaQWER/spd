@@ -76,8 +76,8 @@
 				/* 渲染模板   */
 				var selected = undefined,hasChecked = false,url = undefined;
 				currSelected();
-            	function template(selected, data,self, insertType){
-            		console.log(selected,'selected')
+				
+            	function template(selected, data, insertType){
         			utils.innerTplHtml('list_tpl_view', selected, data, insertType);
             	}
             	
@@ -103,7 +103,7 @@
                 		success: function(data){
                 			data.acceptance = !hasChecked ? true: false;
                 			self.endPullDownToRefresh(true);
-							return template(selected,data,self,false)
+							return template(selected,data,false)
                 			
                 		},
                 		error: function(xhr,type,errorThrown){
@@ -123,7 +123,7 @@
                 		success: function(data){
                 			self.endPullUpToRefresh();
                 			data.acceptance = !hasChecked ? true: false;
-							return template(selected,data,self,true)
+							return template(selected,data,true)
                 			
                 		},
                 		error: function(xhr,type,errorThrown){
