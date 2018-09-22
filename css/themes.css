@@ -47,12 +47,10 @@ body {
 	color: #f2a11c !important;
 }
 /*tab 页切内容高度 */
-.mui-slider .mui-slider-group{
-	height:86vh;
+
+.mui-fullscreen{
+	top: 60px;
 }
-/*.mui-plus-pullrefresh .mui-scroll-wrapper{
-	height: 100%;
-}*/
 .mui-slider-indicator.mui-segmented-control{
 	background: #fff;
 }
@@ -102,7 +100,7 @@ html,body{
 	display: block;
 	text-align: center;
 	background-color: #efeff4;
-	border: 1px solid red;
+	border: 1px solid #ddd;
 	border-radius: 25px;
 	background-clip: padding-box;
 	box-shadow: 0 4px 10px #bbb;
@@ -135,7 +133,7 @@ html,body{
 }
 .mui-pull-top-canvas {
 	overflow: hidden;
-	background-color:red;
+	background-color: #fafafa;
 	border-radius: 40px;
 	box-shadow: 0 4px 10px #bbb;
 	width: 40px;
@@ -189,7 +187,6 @@ html,body{
     font-size: 14px;
     background: #fff;
     margin: 6px 0 0;
-    border-bottom: solid 1px #EEEEEE;
 }
 .special_list.mui-table-view:before{
 	background: none!important;

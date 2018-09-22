@@ -26,13 +26,10 @@
 					<div id="item1mobile" class="mui-slider-item mui-control-content mui-active">
 						<div id="scroll1" class="mui-scroll-wrapper">
 							<div class="mui-scroll" id='mui-table-view-tab1'>
-								<ul class="mui-table-view">
-									
-								</ul>
-								<!--<div class="mui-loading">
+								<div class="mui-loading">
 									<div class="mui-spinner">
 									</div>
-								</div>-->
+								</div>
 							</div>
 						</div>
 					</div>
@@ -63,7 +60,10 @@
 			function toSearchPage (){
 				common.openwin('../commonPages/searchPage')
 			}
-			(function($,doc) {
+			(function($) {
+				
+				$.init()
+					
 				
 				var deceleration = mui.os.ios?0.003:0.0009;
 				$('.mui-scroll-wrapper').scroll({
@@ -71,87 +71,111 @@
 					indicators: true, //是否显示滚动条
 					deceleration:deceleration
 				});
-				
 				var utils = new Utils();
 				utils.appendModule('#card_view');
-				$.plusReady(function() {
-					var selected = undefined,hasChecked = false,url = undefined;
-					currSelected();
+				
+				/* 渲染模板   */
+				var selected = undefined,hasChecked = false,url = undefined;
+				currSelected();
+            	function template(selected, data,self, insertType){
+            		console.log(selected,'selected')
+        			utils.innerTplHtml('acceptance', selected, data, insertType);
+            	}
+            	
+            	function currSelected(){
+					var item1mobile = document.querySelector('#item1mobile');
+					var item2mobile = document.querySelector('#item2mobile');
+					if(item1mobile.className.indexOf('mui-active')>0){
+						selected = '#mui-table-view-tab1';
+						hasChecked = false;
+					}else{
+						selected = '#mui-table-view-tab2';
+						hasChecked = true;
+					}
+            	}
+            	/*
+            	 	下拉刷新
+            	 * */
+            	function pulldownRefresh(){
+					url = !hasChecked ? '/acceptanceList': '/acceptanceList2';
+					var self = this;
+					mui.ajaxRequest(url,{
+                		type: 'GET',
+                		success: function(data){
+                			self.endPullDownToRefresh(true);
+							return template(selected,data,self,false)
+                			
+                		},
+                		error: function(xhr,type,errorThrown){
+							alert(xhr.responseText)
+                		}
+            		});
+				}
+            	/*
+					 
+				 *  上拉加载更多
+				 * */
+				function pullupRefresh(){
+					url = !hasChecked ? '/acceptanceList': '/acceptanceList2';
+					var self = this;
+					mui.ajaxRequest(url,{
+                		type: 'GET',
+                		success: function(data){
+                			self.endPullUpToRefresh();
+							return template(selected,data,self,true)
+                			
+                		},
+                		error: function(xhr,type,errorThrown){
+							alert(xhr.responseText)
+                		}
+            		});
+				}
+			
+				$.plusReady(function(){
+					//console.log("当前页面URL："+plus.webview.currentWebview().getURL());
+					var item2 = document.getElementById('item2mobile');
+					document.getElementById('slider').addEventListener('slide', function(e) {
+						currSelected();
+						if (e.detail.slideNumber === 1) {
+							if (item2.querySelector('.mui-loading')) {
+								mui(".mui-slider-group .mui-scroll").pullToRefresh()[1].pullDownLoading();
+							}
+						}
+					});
+					
+					//tab页切的点击事件
+					var sliderSegmentedControl = document.getElementById('sliderSegmentedControl');
+					$('.mui-input-group').on('change', 'input', function() {
+						if (this.checked) {
+							sliderSegmentedControl.className = 'mui-slider-indicator mui-segmented-control mui-segmented-control-inverted mui-segmented-control-' + this.value;
+							//force repaint
+							sliderProgressBar.setAttribute('style', sliderProgressBar.getAttribute('style'));
+						}
+					});
+					
+					
 					//循环初始化所有下拉刷新，上拉加载。
 					$.each(document.querySelectorAll('.mui-slider-group .mui-scroll'), function(index, pullRefreshEl) {
+						
 						$(pullRefreshEl).pullToRefresh({
 							down: {
 								style:'circle',
-								color: '#f2a11c',
-								auto: true,
+								contentdown : "下拉可以刷新",
+								contentover : "释放立即刷新",
+								contentrefresh : "正在刷新...",
 								callback: pulldownRefresh
 							},
-
 							up: {
-								auto: true,
-								contentrefresh: '正在加载...',
+								contentrefresh : "正在加载...",//可选，正在加载状态时，上拉加载控件上显示的标题内容
+	      						contentnomore:'没有更多数据了',
 								callback: pullupRefresh
 							}
 						});
 					});
-					/*
-					 	下拉刷新
-					 * */
-					function pulldownRefresh(){
-						url = !hasChecked ? '/acceptanceList': '/acceptanceList2';
-						var self = this;
-						setTimeout(function(){
-							mui.ajaxRequest(url,{
-		                		type: 'GET',
-		                		success: function(data){
-									return template(selected,data,self,false)
-		                			
-		                		},
-		                		error: function(xhr,type,errorThrown){
-									alert(xhr.responseText)
-		                		}
-		            		})
-						},1);
-					}
-					/*
-					 
-					 *  上拉加载更多
-					 * */
-					function pullupRefresh(){
-						url = !hasChecked ? '/acceptanceList': '/acceptanceList2';
-						var self = this;
-						setTimeout(function(){
-							mui.ajaxRequest(url,{
-		                		type: 'GET',
-		                		success: function(data){
-									return template(selected,data,self,true)
-		                			
-		                		},
-		                		error: function(xhr,type,errorThrown){
-									alert(xhr.responseText)
-		                		}
-		            		})
-						},1);
-					}
-					/* 渲染模板   */
+					// 第一个tab 默认加载一次数据
+					mui(".mui-slider-group .mui-scroll").pullToRefresh()[0].pullDownLoading();
 					
-	            	function template(selected, data,self, insertType){
-            			utils.innerTplHtml('acceptance', selected, data, insertType);
-            			self.endPullDownToRefresh();
-	            	}
-	            	
-	            	function currSelected(){
-						var item1mobile = document.querySelector('#item1mobile');
-						var item2mobile = document.querySelector('#item2mobile');
-						if(item1mobile.className.indexOf('mui-active')>0){
-							selected = '#mui-table-view-tab1';
-							hasChecked = false;
-						}else{
-							selected = '#mui-table-view-tab2';
-							hasChecked = true;
-						}
-	            	}
-	            	//绑定点击事件  - 进入详情页
+					//绑定点击事件  - 进入详情页
 						
 					$('#slider').on('tap','.am-card',function(){
 						let id = this.getAttribute('data-id');
@@ -159,9 +183,10 @@
 						common.openwin('acc_list',{ targetId: id }, {
 							titleText: '药品信息'
 						})
-					});
-				})
-			})(mui,document);
+					})
+				});
+				
+			})(mui);
 		
 		</script>
 	</body>

@@ -83,7 +83,9 @@
 					var html = template('detail_tpl', data);
 					document.getElementById('detailContent').innerHTML = html;
 					
-					/*
+					
+				});
+				/*
 					 *2 点击添加按钮 增加选填项    开始
 					 * 
 					 * 拖拽后显示操作图标，点击操作图标删除元素
@@ -165,12 +167,9 @@
 							}
 						},'div')
 						
-					})
-					
-					
+					});
 					
 				});
-				
 				
 				$.plusReady(function(){
 					var self = plus.webview.currentWebview();

@@ -16,11 +16,16 @@ Utils.prototype.appendModule = function(selector) {
  * @params [function] callback 回调方法
  */
 Utils.prototype.innerTplHtml = function(tplId, innerSelector ,data, insertType ,callback) {
+	console.log(insertType,'insertType')
 	var html = template(tplId, data);
 	if (html) {
 		if(!insertType){
 			document.querySelector(innerSelector).innerHTML = html;
 		}else{
+			if(document.querySelector(innerSelector).querySelector('.mui-pull-bottom-tips')){
+				var node = document.querySelector(innerSelector).querySelector('.mui-pull-bottom-tips')
+				document.querySelector(innerSelector).removeChild(node);
+			}
 			html = document.querySelector(innerSelector).innerHTML + html;
 			document.querySelector(innerSelector).innerHTML = html;
 		}
