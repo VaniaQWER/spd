@@ -13,12 +13,12 @@
 	</head>
 
 	<body>
-		
-		<!--<header class="mui-bar mui-bar-nav theme_back">
-		   	<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
-		   	<a class="mui-pull-left theme_back_font">返回</a>
-		    <h1 class="mui-title">库存查询</h1>
-		</header>-->
+		<header class="mui-bar mui-bar-nav themes_bg_color">
+		   	<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left">
+		   		<label class="mui-pull-right theme_back_font">返回</label>
+		   	</a>
+		    <h1 class="mui-title themes_title">库存查询</h1>
+		</header>
 		<div class="mui-content">
 		    <div class="mui-input-row mui-search search_head">
 				<input type="search" class="mui-input-clear" placeholder="通用名/商品名/生产厂家" onclick="toSearchPage()">
@@ -69,7 +69,11 @@
 		<script src="../../js/request.js" type="text/javascript" charset="utf-8"></script>
 		<script type="text/javascript">
 			
-
+			//去搜索页面
+			function toSearchPage (){
+				common.openwin('../commonPages/searchPage',true,true)
+			}
+			
 			(function($) {
 				$.init();
 					

@@ -58,7 +58,20 @@
 		<script src="../../js/common.js" type="text/javascript" charset="utf-8"></script>
 		<script src="../../js/request.js" type="text/javascript" charset="utf-8"></script>
 		<script type="text/javascript">
-			
+			if(window.plus) {
+                plusready();
+            } else {
+                document.addEventListener('plusready', plusready, false);
+            }
+            function plusready() {
+                var w = plus.webview.currentWebview();
+                var data = w.targetId;
+				console.log(data,'data')
+                //处理返回事件
+                plus.key.addEventListener('backbutton',function(){
+                    plus.webview.currentWebview().close();
+                })
+            }
 
 			(function($) {
 				

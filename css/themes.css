@@ -6,7 +6,9 @@ body {
 .themes_bg_color {
 	background: #f2a11c;
 }
-
+.themes_bg_color a{
+	color: #FFFFFF !important;
+}
 /* 白色字体 */
 .themes_font_color {
 	color: #fff;
@@ -27,16 +29,22 @@ body {
 
 /*返回文字样式*/
 .theme_back a{
-	color: #f2a11c !important;
+	/*color: #f2a11c !important;*/
+	color: #FFFFFF !important;
 }
 .theme_back_font,.theme_next_font{
-	color: #f2a11c ;
-	margin-top: 13px;
+	/*color: #f2a11c ;*/
+	color: #FFFFFF;
+	margin-top: 7px;
     font-size: 14px;
 	
 }
 .theme_font_danger{
 	color: red ;
+}
+/* mui content 内容区 距顶部距离 */
+.mui-bar-nav~.mui-content .mui-slider.mui-fullscreen{
+	top: 102px;
 }
 /*tab页切里面的文字颜色*/
 /*tab被选中的当前横线颜色*/

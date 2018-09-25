@@ -12,10 +12,19 @@
 	</head>
 
 	<body>
+		<header class="mui-bar mui-bar-nav themes_bg_color">
+		   	<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left">
+		   		
+		   	</a>
+		   	<!--<label class="mui-pull-right theme_back_font">返回</label>-->
+		    <h1 class="mui-title themes_title">验收</h1>
+		    <a href="#modal" class="mui-pull-right"  style="height: 45px;padding-top: 12px;">
+		    	<div class="qrcode" id="qrcode" onclick="clicked('../commonPages/qrcode',true,true)">
+					<img src="../../assest/qrcode.png" width="24" height="24"/>
+				</div>
+		    </a>
+		</header>
 		<div class="mui-content">
-			<div class="qrcode" id="qrcode" onclick="clicked('../commonPages/qrcode',true,true)">
-				<img src="../../assest/qrcode.png" width="24" height="24"/>
-			</div>
 		    <div class="mui-input-row mui-search search_head">
 				<input type="search" class="mui-input-clear" placeholder="供应商名称" onclick="toSearchPage()">
 			</div>
@@ -59,22 +68,26 @@
 		<script src="../../js/request.js" type="text/javascript" charset="utf-8"></script>
 		
 		<script type="text/javascript">
+			
 			/*获取二维码返回值*/
 			function scaned(t, r, f) {
 				console.log(r);//返回二维码读取的数据
+				common.openwin('acc_list',{ targetId: r }, {
+					titleText: '药品信息'
+				})
 			}
+			
 			function clicked(){
-				common.openwin('../commonPages/qrcode',true,true)
+				common.openwin('../commonPages/qrcode',true,{ titleText: '扫码验收' })
 			}
 			//去搜索页面
 			function toSearchPage (){
-				common.openwin('../commonPages/searchPage')
+				common.openwin('../commonPages/searchPage',true,true)
 			}
 			(function($) {
 				
 				$.init()
 					
-				
 				var deceleration = mui.os.ios?0.003:0.0009;
 				$('.mui-scroll-wrapper').scroll({
 					bounce: false,
@@ -143,6 +156,10 @@
 			
 				$.plusReady(function(){
 					//console.log("当前页面URL："+plus.webview.currentWebview().getURL());
+					plus.key.addEventListener('backbutton',function(){
+	                    plus.webview.currentWebview().close();
+	                })
+					
 					var item2 = document.getElementById('item2mobile');
 					document.getElementById('slider').addEventListener('slide', function(e) {
 						currSelected();

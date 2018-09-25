@@ -59,14 +59,6 @@
 		}
 		
 	}
-	function clicked(url,argu,titleNView){
-		owner.openwin('../commonPages/qrcode',true,true)
-	}
-	/*获取二维码返回值*/
-	function scaned(t, r, f) {
-		console.log(r);//返回二维码读取的数据
-	}
-			
 	
 	function getParents(id) {
 		try {

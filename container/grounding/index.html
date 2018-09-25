@@ -12,9 +12,20 @@
 	</head>
 
 	<body>
+		<header class="mui-bar mui-bar-nav themes_bg_color">
+		   	<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left">
+		   		<label class="mui-pull-right theme_back_font">返回</label>
+		   	</a>
+		    <h1 class="mui-title themes_title">上架</h1>
+		    <a href="#modal" class="mui-pull-right"  style="height: 45px;padding-top: 12px;">
+		    	<div class="qrcode" id="qrcode" onclick="clicked('../commonPages/qrcode',true,true)">
+					<img src="../../assest/qrcode.png" width="24" height="24"/>
+				</div>
+		    </a>
+		</header>
 		<div class="mui-content">
 		    <div class="mui-input-row mui-search search_head">
-				<input type="search" class="mui-input-clear" placeholder="供应商名称">
+				<input type="search" class="mui-input-clear" placeholder="供应商名称" onclick="toSearchPage()">
 			</div>
 			<div id="slider" class="mui-slider themes_tab mui-fullscreen">
 				<div id="sliderSegmentedControl" class="mui-slider-indicator mui-segmented-control mui-segmented-control-inverted">
@@ -59,7 +70,22 @@
 		<script src="../../js/request.js" type="text/javascript" charset="utf-8"></script>
 		<script type="text/javascript">
 			
-
+			//去搜索页面
+			function toSearchPage (){
+				common.openwin('../commonPages/searchPage',true,true)
+			}
+			
+			function clicked(){
+				common.openwin('../commonPages/qrcode',true,{ titleText: '扫码上架' })
+			}
+			
+			/*获取二维码返回值*/
+			function scaned(t, r, f) {
+				console.log(r);//返回二维码读取的数据
+				common.openwin('ground_list',{ targetId: r }, {
+					titleText: '药品信息'
+				})
+			}
 			(function($,doc) {
 				
 				var deceleration = mui.os.ios?0.003:0.0009;
