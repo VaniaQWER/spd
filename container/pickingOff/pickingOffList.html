@@ -36,14 +36,7 @@
 					<div id="item1mobile" class="mui-slider-item mui-control-content mui-active">
 						<div id="scroll1" class="mui-scroll-wrapper">
 							<div class="mui-scroll"  id='mui-table-view-tab1'>
-								<div class="mui-loading">
-									<div class="mui-spinner">
-									</div>
-								</div>
-								<!--此处引入template-html-->
-								<!--<ul class="mui-table-view">
-									
-								</ul>-->
+								
 							</div>
 						</div>
 					</div>
@@ -168,9 +161,7 @@
 				document.getElementById('slider').addEventListener('slide', function(e) {
 					currSelected();
 					if (e.detail.slideNumber === 1) {
-						if (item2.querySelector('.mui-loading')) {
-							mui(".mui-slider-group .mui-scroll").pullToRefresh()[1].pullDownLoading();
-						}
+						mui(".mui-slider-group .mui-scroll").pullToRefresh()[1].pullDownLoading();
 					}
 				});
 					
