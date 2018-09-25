@@ -76,7 +76,7 @@
 				var selected = undefined,hasChecked = false,url = undefined;
 				currSelected();
 				
-            	function template(selected, data,self, insertType){
+            	function template(selected, data, insertType){
             		console.log(selected,'selected')
         			utils.innerTplHtml('ground', selected, data, insertType);
             	}
@@ -103,7 +103,7 @@
                 		success: function(data){
                 			self.endPullDownToRefresh(true);
                 			data.hasGrounding = hasChecked
-							return template(selected,data,self,false)
+							return template(selected,data,false)
                 			
                 		},
                 		error: function(xhr,type,errorThrown){
@@ -179,6 +179,7 @@
 						
 					$('#slider').on('tap','.am-card',function(){
 						let id = this.getAttribute('data-id');
+						document.activeElement.blur();
 						console.log(id,'id');
 						common.openwin('ground_list',{ targetId: id }, {
 							titleText: '药品信息'

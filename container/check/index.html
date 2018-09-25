@@ -5,11 +5,19 @@
 		<meta charset="UTF-8">
 		<title></title>
 		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
 		<link href="../../css/mui.min.css" rel="stylesheet" />
 		<link href="../../css/themes.css" rel="stylesheet" />
 		<link href="../../css/check.css" rel="stylesheet" />
 		<link href="../../css/index_view.css" rel="stylesheet" />
 		<link rel="import" href="../../tpl/check_card.html" id="card_view"/>
+		<style>
+			.mui-plus-pullrefresh .mui-scroll {
+                position: absolute;
+                width: 100%;
+            }
+		</style>
 	</head>
 
 	<body>
@@ -21,10 +29,15 @@
 		    <a href="#modal" class="mui-pull-right"  style="height: 45px;padding-top: 12px;">新建盘点</a>
 		</header>
 		<div class="mui-content">
-			<div class="mui-scroll-wrapper">
-				<h4 class="title_h3">盘点记录</h4>
+			<h4 class="title_h3">盘点记录</h4>
+			
+			<div id="check_scroll1" class="mui-scroll-wrapper">
 				<div class="mui-scroll" id='scroll'>
-					<!--此处填充template-->
+					<div class="mui-loading">
+						<div class="mui-spinner">
+							
+						</div>
+					</div>
 				</div>
 			</div>
 			<div id="modal" class="mui-modal">
@@ -56,62 +69,96 @@
 		</div>
 		
 		<script src="../../js/mui.js"></script>
+		<script src="../../js/mui.pullToRefresh.js"></script>
+		<script src="../../js/mui.pullToRefresh.material.js"></script>
 		<script src="../../js/template-web.js" type="text/javascript" charset="utf-8"></script>
 		<script src="../../js/utils.js" type="text/javascript" charset="utf-8"></script>
 		<script src="../../js/common.js" type="text/javascript" charset="utf-8"></script>
 		<script src="../../js/request.js" type="text/javascript" charset="utf-8"></script>
 
+		
+
 		<script type="text/javascript">
+			mui.init();
 			(function($){
+				
+				var deceleration = mui.os.ios?0.003: 0.1;
+				$('.mui-scroll-wrapper').scroll({
+					bounce: false,
+					indicators: false, //是否显示滚动条
+					deceleration:deceleration
+				});
 				
 				var utils = new Utils();
 				utils.appendModule('#card_view');
+
+				/*
+            	 	下拉刷新
+            	 * */
+            	function pulldownRefresh(){
+					var self = this;
+					mui.ajaxRequest('/inventory1',{
+                		type: 'GET',
+                		success: function(data){
+							self.endPullDownToRefresh(true);
+							return template(data, false)
+                			
+                		},
+                		error: function(xhr,type,errorThrown){
+							alert(xhr.responseText)
+                		}
+            		});
+				}
+				
+				/*
+					 
+				 *  上拉加载更多
+				 * */
+				function pullupRefresh(){
+					var self = this;
+					mui.ajaxRequest('/inventory1',{
+                		type: 'GET',
+                		success: function(data){
+                			self.endPullUpToRefresh();
+							return template(data, true)
+                			
+                		},
+                		error: function(xhr,type,errorThrown){
+							alert(xhr.responseText)
+                		}
+            		});
+				}
+            	
+				/* 渲染模板   */
+				function template(data, insertType){
+        			utils.innerTplHtml('check_list', '#scroll', data, insertType);
+            	}
 				
 				$.plusReady(function(){
-				 	$.init({
-					pullRefresh :{
-						container:"#scroll",
-						down : {
-					      style:'circle',//必选，下拉刷新样式，目前支持原生5+ ‘circle’ 样式
-					      color:'#2BD009', //可选，默认“#2BD009” 下拉刷新控件颜色
-					      height:'50px',//可选,默认50px.下拉刷新控件的高度,
-					      range:'100px', //可选 默认100px,控件可下拉拖拽的范围
-					      offset:'0px', //可选 默认0px,下拉刷新控件的起始位置
-					      auto: true,//可选,默认false.首次加载自动上拉刷新一次
-					      callback :function(){
-					      	mui.ajaxRequest('/inventory1',{
-                        		type: 'GET',
-                        		success: function(data){
-                        			return template(data);
-                        		},
-                        		error: function(xhr,type,errorThrown){
-									alert(xhr.responseText)
-                        		}
-                    		})
-					      	
-					      	$('#scroll').pullRefresh().endPulldown();
-	
-					      } //必选，刷新函数，根据具体业务来编写，比如通过ajax从服务器获取新数据；
-					    },
-					    up : {
-					      height:50,//可选.默认50.触发上拉加载拖动距离
-					      auto:true,//可选,默认false.自动上拉加载一次
-					      contentrefresh : "正在加载...",//可选，正在加载状态时，上拉加载控件上显示的标题内容
-					      contentnomore:'没有更多数据了',//可选，请求完毕若没有更多数据时显示的提醒内容；
-					      callback :function(){
-					      	this.endPullupToRefresh(true);
-					      } //必选，刷新函数，根据具体业务来编写，比如通过ajax从服务器获取新数据；
-					    }
-				    }
-				})
-				 	/* 渲染模板   */
-					
-            	function template(data){
-                    utils.innerTplHtml('check_list', '#scroll', data, function() {
-						$('#scroll').pullRefresh().endPulldown();
-					})
-            	}
-            	$('#scroll').on('tap','.am-card-body',function(){
+				 	
+				 	//循环初始化所有下拉刷新，上拉加载。
+					$.each(document.querySelectorAll('.mui-scroll'), function(index, pullRefreshEl) {
+						console.log(pullRefreshEl,'pullRefreshEl')
+						$(pullRefreshEl).pullToRefresh({
+							down: {
+								style:'circle',
+								contentdown : "下拉可以刷新",
+								contentover : "释放立即刷新",
+								contentrefresh : "正在刷新...",
+								callback: pulldownRefresh
+							},
+							up: {
+								contentrefresh : "正在加载...",//可选，正在加载状态时，上拉加载控件上显示的标题内容
+	      						contentnomore:'没有更多数据了',
+								callback: pullupRefresh
+							}
+						});
+					});
+					console.log(mui(".mui-scroll").pullToRefresh())
+					mui(".mui-scroll").pullToRefresh().pullDownLoading();
+				 	
+	            	$('#check_scroll1').on('tap','.am-card-body',function(){
+	            		document.activeElement.blur();
 				 		common.openwin('checkList',{},{
 				 			titleText:'药品信息'
 				 		})

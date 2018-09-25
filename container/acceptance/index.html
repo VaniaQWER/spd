@@ -13,6 +13,9 @@
 
 	<body>
 		<div class="mui-content">
+			<div class="qrcode" id="qrcode" onclick="clicked('../commonPages/qrcode',true,true)">
+				<img src="../../assest/qrcode.png" width="24" height="24"/>
+			</div>
 		    <div class="mui-input-row mui-search search_head">
 				<input type="search" class="mui-input-clear" placeholder="供应商名称" onclick="toSearchPage()">
 			</div>
@@ -56,6 +59,13 @@
 		<script src="../../js/request.js" type="text/javascript" charset="utf-8"></script>
 		
 		<script type="text/javascript">
+			/*获取二维码返回值*/
+			function scaned(t, r, f) {
+				console.log(r);//返回二维码读取的数据
+			}
+			function clicked(){
+				common.openwin('../commonPages/qrcode',true,true)
+			}
 			//去搜索页面
 			function toSearchPage (){
 				common.openwin('../commonPages/searchPage')
@@ -77,8 +87,8 @@
 				/* 渲染模板   */
 				var selected = undefined,hasChecked = false,url = undefined;
 				currSelected();
-            	function template(selected, data,self, insertType){
-            		console.log(selected,'selected')
+				
+            	function template(selected, data, insertType){
         			utils.innerTplHtml('acceptance', selected, data, insertType);
             	}
             	
@@ -103,7 +113,7 @@
                 		type: 'GET',
                 		success: function(data){
                 			self.endPullDownToRefresh(true);
-							return template(selected,data,self,false)
+							return template(selected,data,false)
                 			
                 		},
                 		error: function(xhr,type,errorThrown){
@@ -122,7 +132,7 @@
                 		type: 'GET',
                 		success: function(data){
                 			self.endPullUpToRefresh();
-							return template(selected,data,self,true)
+							return template(selected,data,true)
                 			
                 		},
                 		error: function(xhr,type,errorThrown){
@@ -179,6 +189,7 @@
 						
 					$('#slider').on('tap','.am-card',function(){
 						let id = this.getAttribute('data-id');
+						document.activeElement.blur(); // 隐藏软键盘
 						console.log(id,'id');
 						common.openwin('acc_list',{ targetId: id }, {
 							titleText: '药品信息'

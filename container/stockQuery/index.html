@@ -23,7 +23,7 @@
 		    <div class="mui-input-row mui-search search_head">
 				<input type="search" class="mui-input-clear" placeholder="通用名/商品名/生产厂家" onclick="toSearchPage()">
 			</div>
-			<div id="slider" class="mui-slider themes_tab">
+			<div id="slider" class="mui-slider themes_tab mui-fullscreen">
 				<div id="sliderSegmentedControl" class="mui-slider-indicator mui-segmented-control mui-segmented-control-inverted">
 					<a class="mui-control-item themes_font_color_tab" href="#item1mobile">全部</a>
 					<a class="mui-control-item themes_font_color_tab" href="#item2mobile">更多筛选</a>
@@ -66,7 +66,7 @@
 		<script src="../../js/template-web.js" type="text/javascript" charset="utf-8"></script>
 		<script src="../../js/utils.js" type="text/javascript" charset="utf-8"></script>
 		<script src="../../js/common.js" type="text/javascript" charset="utf-8"></script>
-		
+		<script src="../../js/request.js" type="text/javascript" charset="utf-8"></script>
 		<script type="text/javascript">
 			
 
@@ -81,65 +81,92 @@
 					deceleration:deceleration
 				});
 				
-				$.ready(function(){
-	
-					var data = {
-						list: [{
-							"id":"1",
-							"supplierName": "静注人免疫球蛋白",
-							"drugName": "西咪替丁",
-							"producter": "北京汉典制药有限公司",
-							"distributionNo": "AADKSF1OOSKDF2",
-							"num": "323",
-							"date": "2018-08-08"
-						},{
-							"id":"2",
-							"supplierName": "注射用复方甘草酸苷",
-							"drugName": "头孢克肟颗粒",
-							"producter": "北京北大药业有限公司",
-							"num": "666",
-							"limitNum":"20",
-							"planNo": "2",
-							"date": "2018-01-19"
-						},{
-							"id":"3",
-							"supplierName": "阿司匹林",
-							"drugName": "阿司匹林",
-							"producter": "湖北省益康制药厂",
-							"num": "888",
-							"planNo": "plan332342sdfa123",
-							"date": "2018-04-19"
-						},{
-							"id":"4",
-							"supplierName": "阿司匹林",
-							"drugName": "阿司匹林",
-							"producter": "湖北省益康制药厂",
-							"num": "888",
-							"planNo": "plan332342sdfa123",
-							"date": "2018-05-19"
-						},{
-							"id":"5",
-							"supplierName": "阿司匹林",
-							"drugName": "阿司匹林",
-							"producter": "湖北省益康制药厂",
-							"num": "888",
-							"planNo": "plan332342sdfa123",
-							"date": "2018-05-29"
-						}]
-					};
-					var utils = new Utils();
-					utils.appendModule('#card_view');
-					var html = template('index_list_view', data);
-					document.getElementById('mui-table-view-tab1').innerHTML = html;
+				var utils = new Utils();
+				utils.appendModule('#card_view');
 				
-	
+				/* 渲染模板   */
+				var selected = undefined,hasChecked = false,url = undefined;
+				currSelected();
+				
+            	function template(selected, data,self, insertType){
+        			utils.innerTplHtml('stock', selected, data, insertType);
+            	}
+            	
+            	function currSelected(){
+					var item1mobile = document.querySelector('#item1mobile');
+					var item2mobile = document.querySelector('#item2mobile');
+					if(item1mobile.className.indexOf('mui-active')>0){
+						selected = '#mui-table-view-tab1';
+						hasChecked = false;
+					}else{
+						selected = '#mui-table-view-tab2';
+						hasChecked = true;
+					}
+            	}
+            	/*
+            	 	下拉刷新
+            	 * */
+            	function pulldownRefresh(){
+					url = !hasChecked ? '/stock1': '/stock2';
+					var self = this;
+					mui.ajaxRequest(url,{
+                		type: 'GET',
+                		success: function(data){
+                			self.endPullDownToRefresh(true);
+                			data.hasGrounding = hasChecked
+							return template(selected,data,self,false)
+                			
+                		},
+                		error: function(xhr,type,errorThrown){
+							alert(xhr.responseText)
+                		}
+            		});
+				}
+            	/*
+					 
+				 *  上拉加载更多
+				 * */
+				function pullupRefresh(){
+					url = !hasChecked ? '/stock1': '/stock2';
+					var self = this;
+					mui.ajaxRequest(url,{
+                		type: 'GET',
+                		success: function(data){
+                			self.endPullUpToRefresh();
+                			data.hasGrounding = hasChecked
+							return template(selected,data,self,true)
+                			
+                		},
+                		error: function(xhr,type,errorThrown){
+							alert(xhr.responseText)
+                		}
+            		});
+				}
+				
+				$.plusReady(function(){
+					
+					//循环初始化所有下拉刷新，上拉加载。
+					$.each(document.querySelectorAll('.mui-slider-group .mui-scroll'), function(index, pullRefreshEl) {
+						$(pullRefreshEl).pullToRefresh({
+							down: {
+								callback: pulldownRefresh
+							},
+							up: {
+								contentrefresh : "正在加载...",//可选，正在加载状态时，上拉加载控件上显示的标题内容
+	      						contentnomore:'没有更多数据了',
+								callback: pullupRefresh
+							}
+						});
+					});
+					// 第一个tab 默认加载一次数据
+					mui(".mui-slider-group .mui-scroll").pullToRefresh()[0].pullDownLoading();
+					
 					var item2 = document.getElementById('item2mobile');
 					document.getElementById('slider').addEventListener('slide', function(e) {
+						currSelected();
 						if (e.detail.slideNumber === 1) {
 							if (item2.querySelector('.mui-loading')) {
-								setTimeout(function() {
-									document.getElementById('mui-table-view-tab2').innerHTML = html;
-								}, 500);
+								mui(".mui-slider-group .mui-scroll").pullToRefresh()[1].pullDownLoading();
 							}
 						}
 					});
@@ -154,33 +181,11 @@
 						}
 					});
 					
-					//循环初始化所有下拉刷新，上拉加载。
-					$.each(document.querySelectorAll('.mui-slider-group .mui-scroll'), function(index, pullRefreshEl) {
-						$(pullRefreshEl).pullToRefresh({
-							down: {
-								callback: function() {
-									console.log('down')
-									var self = this;
-									self.endPullDownToRefresh();
-								}
-							},
-							up: {
-								contentrefresh : "正在加载...",//可选，正在加载状态时，上拉加载控件上显示的标题内容
-	      						contentnomore:'没有更多数据了',
-								callback: function() {
-									console.log('up')
-									var self = this;
-									self.endPullUpToRefresh();
-								}
-							}
-						});
-					})
-				
-					
 					//绑定点击事件  - 进入详情页
 					
 					$('#slider').on('tap','.am-card',function(){
 						console.log(123)
+						document.activeElement.blur();
 						common.openwin('details',{name:123},{
 							titleText:'详情'
 						})

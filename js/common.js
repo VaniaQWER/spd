@@ -13,13 +13,21 @@
 			color: "#CCCCCC", // 分割线颜色,默认值为"#CCCCCC"  
 			height: "1px" // 分割线高度,默认值为"2px"
 		},
-		autoBackButton: true
+		autoBackButton: true,
 	}
 	
 	//打开常规窗口
 	owner.openwin = function (id, argu, titleNView) {
 		var nview = Object.assign({}, OWNER_TITLE_NVIEW, titleNView)
 		if(titleNView){
+			if(titleNView.isScan){
+				nview.buttons = [{
+					"float": "right",
+					"text": "扫一扫",
+					"fontSize": "10px",
+					"onclick": clicked
+				}]
+			}
 			mui.openWindow({
 				url: id + '.html',
 				id: id,
@@ -51,7 +59,15 @@
 		}
 		
 	}
-
+	function clicked(url,argu,titleNView){
+		owner.openwin('../commonPages/qrcode',true,true)
+	}
+	/*获取二维码返回值*/
+	function scaned(t, r, f) {
+		console.log(r);//返回二维码读取的数据
+	}
+			
+	
 	function getParents(id) {
 		try {
 			var self = plus.webview.currentWebview();

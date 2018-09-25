@@ -51,23 +51,13 @@
 				}
 				0% {
 					opacity: 0;
-					-webkit-transform: translate3d(0, -300px, 0);
-					transform: translate3d(0, -300px, 0);
+					-webkit-transform: translate3d(0, 2000px, 0);
+					transform: translate3d(0, 2000px, 0);
 				}
 				60% {
-					opacity: .6;
-					-webkit-transform: translate3d(0, 5px, 0);
-					transform: translate3d(0, 5px, 0);
-				}
-				75% {
-					opacity: .7;
-					-webkit-transform: translate3d(0, 735px, 0);
-					transform: translate3d(0, 735px, 0);
-				}
-				90% {
-					opacity: .9;
-					-webkit-transform: translate3d(0, 750px, 0);
-					transform: translate3d(0, 750px, 0);
+					opacity: .8;
+					-webkit-transform: translate3d(0, 770px, 0);
+					transform: translate3d(0, 770px, 0);
 				}
 				100% {
 					opacity: 1;
@@ -122,12 +112,13 @@
 			});
 			//立即体验按钮点击事件
 			document.getElementById("close").addEventListener('tap', function(event) {
-				plus.storage.setItem("lauchFlag", "true");
+				
+				plus.storage.setItem("launchFlag", "true");
 				plus.navigator.setFullscreen(false);
 //				plus.webview.currentWebview().close();
 				mui.openWindow({
-				    url:'login/login.html',
-				    id:'login/login.html',
+				    url:'login/index.html',
+				    id:'login/index.html',
 				});
 			}, false);
 			//图片切换时，触发动画

@@ -9,7 +9,11 @@
 						{{ value.drugName}}</span>
 					</div>
 					<div class="am-card-header-extra">
-						<span>未提交</span>
+						{{ if hasChecked }}
+							<span class="hasGround ground-tag">已提交</span>
+							{{ else }}
+								<span class="before-ground ground-tag">未提交</span>
+						{{ /if }}
 					</div>
 				</div>
 				<div class="am-card-body">
@@ -23,14 +27,8 @@
 					</div>
 					
 					<div class="am-flexbox am-flexbox-align-center">
-						<div class="am-flexbox-item"> 
-							数量：
-							{{if !value.isEdit}}
-								<span>666</span> 
-							{{else if value.isEdit}}
-								<span><input type="text" name="planNo" id="planNo" class="inline-Input"/></span> 
-							{{/if}}
-							
+						<div class="am-flexbox-item am-flex-num"> 
+							数量：<span>{{ value.total }}</span>
 						</div>
 						<div class="am-flexbox-item">
 						 	规格：<span>{{ value.spec }}</span>
@@ -63,19 +61,22 @@
 				<div class="am-card-footer">
 					<div class="am-card-footer-extra">
 						
-						{{if value.isEdit}}
-						<button type="button" class="mui-btn mui-btn-blue mui-btn-outlined eidtRow" style="margin: 0 5px;">收起编辑</button>
-						{{else if !value.isEdit}}
-						<button type="button" class="mui-btn mui-btn-blue mui-btn-outlined eidtRow" style="margin: 0 5px;">展开编辑</button>
+						{{if !hasChecked}}
+							<button type="button" class="mui-btn mui-btn-blue mui-btn-outlined eidtRow" style="margin: 0 5px;" data-id={{ value.id }} data-index={{ i }}>展开编辑</button>
 						{{/if}}
-						
 						<button type="button" class="mui-btn mui-btn-blue mui-btn-outlined toPage" style="margin: 0 5px;">更多详情</button>
-						<button type="button" class="mui-btn mui-btn-blue mui-btn-danger submitButton">提交</button>
+						{{ if !hasChecked }}
+							<button type="button" class="mui-btn mui-btn-blue mui-btn-danger submitButton" data-id={{ value.id }} data-index={{ i }}>提交</button>
+						{{ /if }}
 					</div>
 				</div>
 			</div>
 		{{/each}}
 	</div>
-	
+	<div class="mui-pull-bottom-tips">
+		<div class="mui-pull-bottom-wrapper">
+			<span class="mui-pull-loading">上拉显示更多</span>
+		</div>
+	</div>
 	
 </script>

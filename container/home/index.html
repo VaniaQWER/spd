@@ -105,11 +105,13 @@
 						titleText: '账号'
 					})
                 })
+//              <a><span class="mui-icon-extra mui-icon-extra-sweep"></span></a>
 				// 点击跳转
 				$('.home-card-content').on('tap', '.home-card-item',function() {
 					if(this.dataset.title){
 						common.openwin(this.dataset.src, {}, {
 							titleText: this.dataset.title,
+							isScan: true
 						})
 					}else{
 						common.openwin(this.dataset.src, {})

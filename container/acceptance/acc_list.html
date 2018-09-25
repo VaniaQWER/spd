@@ -244,6 +244,7 @@
 					$('#slider').on('tap','.moreDetail',function(){
 						let id = this.getAttribute('data-id');
 						console.log(id,'id');
+						document.activeElement.blur(); // 隐藏软键盘
 						common.openwin('acc_detail',{ targetId: id },{
 							titleText: '验收详情'
 						})
@@ -255,6 +256,7 @@
 						let index = this.getAttribute('data-index');
 						console.log(id,'id');
 						console.log(index,'index');
+						document.activeElement.blur(); // 隐藏软键盘
 						if(document.querySelectorAll('.realNum')[index]){
 							var postData = {};
 							postData.realNum = document.querySelectorAll('.realNum')[index].value;

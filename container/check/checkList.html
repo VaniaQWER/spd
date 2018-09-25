@@ -27,7 +27,7 @@
 		    <div class="mui-input-row mui-search search_head">
 				<input type="search" class="mui-input-clear" placeholder="商品名/生产厂家/货位">
 			</div>
-			<div id="slider" class="mui-slider themes_tab">
+			<div id="slider" class="mui-slider themes_tab mui-fullscreen">
 				<div id="sliderSegmentedControl" class="mui-slider-indicator mui-segmented-control mui-segmented-control-inverted">
 					<a class="mui-control-item themes_font_color_tab" href="#item1mobile">未提交</a>
 					<a class="mui-control-item themes_font_color_tab" href="#item2mobile">已提交</a>
@@ -41,10 +41,7 @@
 									<div class="mui-spinner">
 									</div>
 								</div>
-								<!--此处引入template-html-->
-								<!--<ul class="mui-table-view">
-									
-								</ul>-->
+								
 							</div>
 						</div>
 					</div>
@@ -88,76 +85,94 @@
 				var utils = new Utils();
 				utils.appendModule('#card_view');
 				
+				var selected = undefined,hasChecked = false,url = undefined;
+				currSelected();
+				
+				/* 渲染模板   */
+					
+            	function template(selected, data,insertType){
+                    utils.innerTplHtml('check_list_tpl', selected, data, insertType)
+            	}
+            	
+            	function currSelected(){
+					var item1mobile = document.querySelector('#item1mobile');
+					var item2mobile = document.querySelector('#item2mobile');
+					if(item1mobile.className.indexOf('mui-active')>0){
+						selected = '#mui-table-view-tab1';
+						hasChecked = false;
+					}else{
+						selected = '#mui-table-view-tab2';
+						hasChecked = true;
+					}
+            	}
+				/*
+            	 	下拉刷新
+            	 * */
+            	function pulldownRefresh(){
+					url = !hasChecked ? '/inventory1': '/inventory2';
+					var self = this;
+					mui.ajaxRequest(url,{
+                		type: 'GET',
+                		success: function(data){
+                			data.hasChecked = hasChecked
+                			self.endPullDownToRefresh(true);
+							return template(selected,data,false)
+                			
+                		},
+                		error: function(xhr,type,errorThrown){
+							alert(xhr.responseText)
+                		}
+            		});
+				}
+            	/*
+					 
+				 *  上拉加载更多
+				 * */
+				function pullupRefresh(){
+					url = !hasChecked ? '/inventory1': '/inventory2';
+					var self = this;
+					mui.ajaxRequest(url,{
+                		type: 'GET',
+                		success: function(data){
+                			self.endPullUpToRefresh();
+							data.hasChecked = hasChecked
+							return template(selected,data,true)
+                			
+                		},
+                		error: function(xhr,type,errorThrown){
+							alert(xhr.responseText)
+                		}
+            		});
+				}
 				$.plusReady(function(){
-					var selected = undefined,hasChecked = false,url = undefined;
-					currSelected();
-					$.init({
-		                pullRefresh: {
-		                    container: selected, //下拉刷新容器标识，querySelector能定位的css选择器均可，比如：id、.class等
-		                    down: {
-		                        style: 'circle', //必选，下拉刷新样式，目前支持原生5+ ‘circle’ 样式
-		                        color: '#f2a11c',
-		                        auto: true, //可选,默认false.首次加载自动上拉刷新一次
-		                        callback: function () {
-		                        	url = !hasChecked ? '/inventory1': '/inventory2'
-		                        	mui.ajaxRequest(url,{
-			                        		type: 'GET',
-			                        		success: function(data){
-			                        			data.acceptance = !hasChecked ? true: false;
-			                        			return template(selected,data);
-			                        		},
-			                        		error: function(xhr,type,errorThrown){
-												alert(xhr.responseText)
-			                        		}
-		                        		})
-		                        	
-		                        }
-		                    },
-		                    up: {
+					
+					//循环初始化所有下拉刷新，上拉加载。
+					$.each(document.querySelectorAll('.mui-slider-group .mui-scroll'), function(index, pullRefreshEl) {
+						
+						$(pullRefreshEl).pullToRefresh({
+							down: {
+								style:'circle',
+								contentdown : "下拉可以刷新",
+								contentover : "释放立即刷新",
+								contentrefresh : "正在刷新...",
+								callback: pulldownRefresh
+							},
+							up: {
 								contentrefresh : "正在加载...",//可选，正在加载状态时，上拉加载控件上显示的标题内容
 	      						contentnomore:'没有更多数据了',
-								callback: function() {
-									console.log('up')
-									var self = this;
-									console.log(self,'self')
-//									self.endPullUpToRefresh();
-								}
+								callback: pullupRefresh
 							}
-		                }
-		            })
-					/* 渲染模板   */
+						});
+					});
+					// 第一个tab 默认加载一次数据
+					mui(".mui-slider-group .mui-scroll").pullToRefresh()[0].pullDownLoading();
 					
-	            	function template(selected, data){
-	                    utils.innerTplHtml('check_list_tpl', selected, data, function() {
-							$('#mui-table-view-tab1').pullRefresh().endPulldown();
-						})
-	            	}
-	            	
-	            	function currSelected(){
-						var item1mobile = document.querySelector('#item1mobile');
-						var item2mobile = document.querySelector('#item2mobile');
-						if(item1mobile.className.indexOf('mui-active')>0){
-							selected = '#mui-table-view-tab1';
-							hasChecked = false;
-						}else{
-							selected = '#mui-table-view-tab2';
-							hasChecked = true;
-						}
-	            	}
 					var item2 = document.getElementById('item2mobile');
 					document.getElementById('slider').addEventListener('slide', function(e) {
+						currSelected();
 						if (e.detail.slideNumber === 1) {
 							if (item2.querySelector('.mui-loading')) {
-								mui.ajaxRequest('/inventory2',{
-	                        		type: 'GET',
-	                        		success: function(data){
-	                        			data.acceptance = false;
-	                        			return template(selected,data);
-	                        		},
-	                        		error: function(xhr,type,errorThrown){
-										alert(xhr.responseText)
-	                        		}
-	                        	})
+								mui(".mui-slider-group .mui-scroll").pullToRefresh()[1].pullDownLoading();
 							}
 						}
 					});
@@ -171,15 +186,91 @@
 						}
 					});
 					
-					
+					 
+					 // 展开编辑
+					$('#slider').on('tap','.eidtRow',function(){
+						this.innerHTML = this.innerHTML === '展开编辑' ? '收起编辑':'展开编辑' ;
+						let id = this.getAttribute('data-id');
+						let index = this.getAttribute('data-index');
+						var numNode = document.querySelectorAll('.am-flex-num')[index];
+						var childText;
+						if(numNode.querySelector('span')){
+							childText = numNode.querySelector('span').innerText;
+						}else{
+							childText = numNode.querySelector('.relNum').value
+						}
+						var numInputHtml =  '<div class="am-flexbox-item">' + 
+						'<div class="am-list-item am-input-item am-list-item-middle">' + 
+						'<div class="am-list-line">'+
+						'<div class="am-input-label am-input-label-4">数量:</div>'+
+						'<div class="am-input-control">'+
+						'<input pattern="[0-9]*" type="number" value='+ childText +' placeholder="请输入" class="relNum"/>'+
+						'</div>'+
+						'</div>'+
+						'</div>'+
+						'</div>' +
+						'</div>';
+						var numHtml = '数量：'+'<span>'+ childText +'</span>';
+						var addDiv = document.createElement('div');
+						addDiv.className = 'editForm';
+						addDiv.innerHTML = '<div class="am-flexbox am-flexbox-align-center">'+
+						'<div class="am-flexbox-item">' + 
+						'<div class="am-list-item am-input-item am-list-item-middle">' + 
+						'<div class="am-list-line">'+
+						'<div class="am-input-label am-input-label-4">生产日期:</div>'+
+						'<div class="am-input-control">'+
+						'<input pattern="[0-9]*" type="date" placeholder="请输入" class="productDate"/>'+
+						'</div>'+
+						'</div>'+
+						'</div>'+
+						'</div>' +
+						'<div class="am-flexbox-item">' + 
+						'<div class="am-list-item am-input-item am-list-item-middle">' + 
+						'<div class="am-list-line">'+
+						'<div class="am-input-label am-input-label-4">生产批号:</div>'+
+						'<div class="am-input-control">'+
+						'<input pattern="[0-9]*" type="text" placeholder="请输入" class="producterPh"/>'+
+						'</div>'+
+						'</div>'+
+						'</div>'+
+						'</div>' +
+						'</div>' +
+						'<div class="am-flexbox am-flexbox-align-center">'+
+						'<div class="am-flexbox-item">' + 
+						'<div class="am-list-item am-input-item am-list-item-middle">' + 
+						'<div class="am-list-line">'+
+						'<div class="am-input-label am-input-label-4">有效期至:</div>'+
+						'<div class="am-input-control">'+
+						'<input pattern="[0-9]*" type="date" placeholder="请输入" class="userfulDate"/>'+
+						'</div>'+
+						'</div>'+
+						'</div>'+
+						'</div>' +
+						'<div class="am-flexbox-item">生产厂家：'+
+						'<span>ffdaxx2342ssdfs</span>'+
+						'</div>'+
+						'</div>'+
+						'</div>';
+						if($('.am-card-body')[index].querySelectorAll('.editForm').length === 0){
+							$('.am-card-body')[index].appendChild(addDiv);
+							numNode.innerHTML = numInputHtml;
+							
+						}else{
+							var child = $('.am-card-body')[index].querySelector('.editForm');
+							$('.am-card-body')[index].removeChild(child);
+							numNode.innerHTML = numHtml;
+						}
+					});
 					//绑定点击事件  - 进入详情页
 					
 					$('#slider').on('tap','.toPage',function(){
+						document.activeElement.blur();
 						common.openwin('checkDetails',{},{
 							titleText:'详情'
 						})
 					})
 					$('#slider').on('tap','.submitButton',function(){
+						document.activeElement.blur();
 						var btnArray = ['否', '是'];
 						$.confirm('确定要执行此操作吗？', '确认提交', btnArray, function(e) {
 							if (e.index == 1) {

@@ -88,6 +88,12 @@ input{
 	margin-bottom: 0 !important;
 	height: 30px !important;
 }
+.check_wrapper{
+	padding-top: 0 !important;
+}
+.check_wrapper #pullrefresh .mui-table-view-cell{
+	padding: 0;
+}
 .mui-input-row input{
 	height: 40px !important;
 }

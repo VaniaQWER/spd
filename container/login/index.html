@@ -30,8 +30,10 @@
 				</div>
 			</form>
 			<div class="mui-content-padded">
-				<button id='login' class="mui-btn mui-btn-block mui-btn-warning" data-loading-text = "登录中" data-loading-icon-position="right">登 录</button>
+				<button id='login' Readonly class="mui-btn mui-btn-block mui-btn-warning" data-loading-text = "登录中" data-loading-icon-position="right">登 录</button>
 			</div>
+			
+		</div>
 		<script src="../../js/mui.min.js"></script>
 		<script src="../../js/common.js"></script>
 		<script>
@@ -51,6 +53,7 @@
 						};
 						if(loginInfo.account === 'admin' && loginInfo.password === 'admin'){
 				            mui(this).button('loading');
+				            document.activeElement.blur(); // 隐藏软键盘
 				            setTimeout(function() {
 				                mui(this).button('reset');
 				                common.openwin('../home/index',{})

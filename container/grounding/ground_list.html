@@ -178,6 +178,7 @@
 						
 					$('#slider').on('tap','.moreDetail',function(){
 						let id = this.getAttribute('data-id');
+						document.activeElement.blur();
 						console.log(id,'id');
 						common.openwin('ground_detail',{ targetId: id },{
 							titleText: '详情'

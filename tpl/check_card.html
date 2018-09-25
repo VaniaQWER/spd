@@ -1,37 +1,40 @@
 <!--盘点 yuwei-->
 <script type="text/html" id='check_list'>
-	<ul class="mui-table-view special_list">
+	<ul class="mui-table-view">
 		{{ each list value i}}
-			<div class="am-card scrollList-item am-card-full" data-id={{ value.id }}>
-				<div class="am-card-header">
-					<div class="am-card-header-content">
-						<span style="font-size: 16px; color: rgb(51, 51, 51); font-weight: bold;">
-						 盘点单号： {{ value.distributionNo}}</span>
+			<li class="mui-table-view-cell">
+				<div class="am-card scrollList-item am-card-full" data-id={{ value.id }}>
+					<div class="am-card-header">
+						<div class="am-card-header-content">
+							<span style="font-size: 16px; color: rgb(51, 51, 51); font-weight: bold;">
+							 盘点单号： {{ value.distributionNo}}</span>
+						</div>
+						<div class="am-card-header-extra">
+							<span> 明盘全盘  </span>
+						</div>
 					</div>
-					<div class="am-card-header-extra">
-						<span> 明盘全盘  </span>
+					<div class="am-card-body">
+						<div class="am-flexbox am-flexbox-align-center">
+							<div class="am-flexbox-item"> 
+								制单时间：<span>{{ value.date }}</span> 
+							</div>
+							<div class="am-flexbox-item"> 
+								制单：<span>{{ value.total }}</span> 
+							</div>
+						</div>
+						<div class="am-flexbox am-flexbox-align-center">
+							<div class="am-flexbox-item"> 
+								盘点时间：<span>{{ value.date }}</span> 
+							</div>
+						</div>
 					</div>
 				</div>
-				<div class="am-card-body">
-					<div class="am-flexbox am-flexbox-align-center">
-						<div class="am-flexbox-item"> 
-							制单时间：<span>{{ value.date }}</span> 
-						</div>
-						<div class="am-flexbox-item"> 
-							制单：<span>{{ i +1 }}</span> 
-						</div>
-					</div>
-					<div class="am-flexbox am-flexbox-align-center">
-						<div class="am-flexbox-item"> 
-							盘点时间：<span>{{ value.date }}</span> 
-						</div>
-					</div>
-				</div>
-			</div>
-			<div style="background-color: #f5f5f9; height: 6px;">
-			</div>
+			</li>
 		{{/each}}
 	</ul>
-	
-	
+	<div class="mui-pull-bottom-tips">
+		<div class="mui-pull-bottom-wrapper">
+			<span class="mui-pull-loading">上拉显示更多</span>
+		</div>
+	</div>
 </script>

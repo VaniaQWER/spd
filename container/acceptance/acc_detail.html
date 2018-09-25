@@ -159,6 +159,7 @@
 						}
 						console.log(phValue,'phValue'); // 批准文号
 						console.log(postData,'postData'); // 批号 数据
+						document.activeElement.blur(); // 隐藏软键盘
 						var btnArray = ['否', '是'];
 						mui.confirm('是否确认验收？', '确认', btnArray, function(e) {
 							if (e.index == 1) {
@@ -169,7 +170,7 @@
 						
 					});
 					
-				});
+//				});
 				
 				$.plusReady(function(){
 					var self = plus.webview.currentWebview();
