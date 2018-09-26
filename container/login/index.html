@@ -36,6 +36,7 @@
 		</div>
 		<script src="../../js/mui.min.js"></script>
 		<script src="../../js/common.js"></script>
+		<script type="text/javascript" src="../../js/request.js" ></script>
 		<script>
 			(function($, doc) {
 				$.init({
@@ -46,12 +47,50 @@
 					var loginButton = doc.getElementById('login');
 					var accountBox = doc.getElementById('account');
 					var passwordBox = doc.getElementById('password');
+					var btnArray = ['确认'];
 					loginButton.addEventListener('tap', function(event) {
-						var loginInfo = {
-							account: accountBox.value,
-							password: passwordBox.value
-						};
-						if(loginInfo.account === 'admin' && loginInfo.password === 'admin'){
+						document.activeElement.blur(); // 隐藏软键盘
+						mui(this).button('loading');
+						var _this = this;
+						mui.ajaxRequest('/a/entryPass/entryptPassword',{
+							type: 'POST',
+							data: {
+								password: passwordBox.value
+							},
+							success: function(data){
+								if(data.code === 200){
+									let entryPwd = data.data.password;
+									mui.ajaxRequest('/a/login',{
+										type: 'POST',
+										data: {
+											username: accountBox.value,
+											password: entryPwd
+										},
+										success: function(res){
+											mui(_this).button('reset');
+											if(res.code === 200){
+												setUser(res.data);
+												common.openwin('../home/index',{})
+											}
+																					
+										},
+										error: function(xhr,type,errorThrown){
+											alert(xhr.responseText)
+										}
+									})
+								}else{
+										mui.alert('账号或密码错误', '', btnArray, function(e) {
+										if (e.index == 0) {
+											alert('你点击了是');
+										}
+									},'div')
+								}
+							},
+							error: function(xhr,type,errorThrown){
+								alert(xhr.responseText)
+							}
+						})
+						/*if(loginInfo.account === 'admin' && loginInfo.password === 'admin'){
 				            mui(this).button('loading');
 				            document.activeElement.blur(); // 隐藏软键盘
 				            setTimeout(function() {
@@ -59,11 +98,32 @@
 				                common.openwin('../home/index',{})
 				            }.bind(this), 2000);
 						}else{
-							alert('账号或密码错误')
-						}
+							mui.alert('账号或密码错误', '', btnArray, function(e) {
+							if (e.index == 0) {
+								alert('你点击了是');
+								
+							}
+						},'div')
+						}*/
 					});
 				});
 			}(mui, document));
+			function setUser(res){
+				var deptInfo = res.deptInfo;
+				var deptList = [];
+				mui.each(deptInfo,function(index,item){
+					if(item.deptType === "3" || item.deptType === '4'|| item.deptType === '5'){
+						var deptItem = {
+							deptId: item.deptId,
+							deptType: item.deptType,
+							deptName: item.deptName
+						}
+						deptList.push(deptItem);
+					}
+				});
+				plus.storage.setItem('currDept',JSON.stringify(deptList[0]));
+				plus.storage.setItem('deptList',JSON.stringify(deptList));
+			}
 		</script>
 	</body>
 

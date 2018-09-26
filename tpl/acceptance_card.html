@@ -7,16 +7,16 @@
 					<div class="am-card-header">
 						<div class="am-card-header-content">
 							<span style="font-size: 18px; color: rgb(51, 51, 51); font-weight: bold;">
-							{{ value.supplierName}}</span>
+							{{ value.supplierName? value.supplierName: '' }}</span>
 						</div>
 						<div class="am-card-header-extra">
-							<span>{{ value.type }}</span>
+							<span>{{ value.statusName }}</span>
 						</div>
 					</div>
 					<div class="am-card-body">
 						<div class="am-flexbox am-flexbox-align-center">
 							<div class="am-flexbox-item"> 
-								配送单号：<span>{{ value.distributionNo }}</span> 
+								配送单号：<span>{{ value.distributeCode }}</span> 
 							</div>
 							<div class="am-flexbox-item"> 
 								品相数：<span>{{ value.total }}</span> 
@@ -24,10 +24,10 @@
 						</div>
 						<div class="am-flexbox am-flexbox-align-center">
 							<div class="am-flexbox-item"> 
-								计划单号：<span>{{ value.planNo }}</span> 
+								计划单号：<span>{{ value.orderCode }}</span> 
 							</div>
 							<div class="am-flexbox-item">
-							 制单时间：<span>{{ value.date }}</span>
+							 制单时间：<span>{{ value.createDate }}</span>
 							 </div>
 						</div>
 					</div>

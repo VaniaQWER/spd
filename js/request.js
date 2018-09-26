@@ -3,7 +3,8 @@
  * 封装mui.ajax请求，调用方式与一致
  */
 (function($, doc) {
-	var baseUrl = 'https://www.easy-mock.com/mock/5b8d3b510ab8991436ebd336/spd';
+//	var baseUrl = 'https://www.easy-mock.com/mock/5b8d3b510ab8991436ebd336/spd';
+	var baseUrl = "http://192.168.31.200:8099/medicinal-web"
     mui.extend({
         ajaxRequest: function(url , options){
             var defaults = commonDefaules(options);
@@ -22,6 +23,7 @@
             type: "post",
             timeout: 10000,
             wait: true,
+            contentType: "application/x-www-form-urlencoded",
             waitMessage: "努力奔跑中，等等我...",
             onBeforeSend : function(xhr){
                 if(defaults.wait == true){
