@@ -27,15 +27,22 @@
 					<div id="item1mobile" class="mui-slider-item mui-control-content mui-active">
 						<div id="scroll1" class="mui-scroll-wrapper">
 							<div class="mui-scroll" id="mui-table-view-tab1">
-								
-								
+								<ul class="mui-table-view">
+									<li class="mui-table-view-cell mui-tab1" style="padding: 0;">
+										
+									</li>
+								</ul>
 							</div>
 						</div>
 					</div>
 					<div id="item2mobile" class="mui-slider-item mui-control-content">
 						<div id="scroll2" class="mui-scroll-wrapper">
 							<div class="mui-scroll" id="mui-table-view-tab2">
-								
+								<ul class="mui-table-view">
+									<li class="mui-table-view-cell mui-tab2" style="padding: 0;">
+										
+									</li>
+								</ul>
 							</div>
 						</div>
 
@@ -45,8 +52,6 @@
 		</div>
 		
 		<script src="../../js/mui.min.js"></script>
-		<script src="../../js/mui.pullToRefresh.js"></script>
-		<script src="../../js/mui.pullToRefresh.material.js"></script>
 		<script src="../../js/template-web.js" type="text/javascript" charset="utf-8"></script>
 		<script src="../../js/utils.js" type="text/javascript" charset="utf-8"></script>
 		<script src="../../js/common.js" type="text/javascript" charset="utf-8"></script>
@@ -58,10 +63,6 @@
                 document.addEventListener('plusready', plusready, false);
             }
             function plusready() {
-                var w = plus.webview.currentWebview();
-                var data = w.targetId;
-				console.log(data,'data')
-                //处理返回事件
                 plus.key.addEventListener('backbutton',function(){
                     plus.webview.currentWebview().close();
                 })
@@ -77,123 +78,118 @@
 					indicators: true, //是否显示滚动条
 					deceleration:deceleration
 				});
-				var utils = new Utils();
-				utils.appendModule('#list_tpl');
+				
 				
 				/* 渲染模板   */
-				var selected = undefined,hasChecked = false,url = undefined;
-				currSelected();
-				
-            	function template(selected, data, insertType){
-        			utils.innerTplHtml('list_tpl_view', selected, data, insertType);
-            	}
-            	
-            	function currSelected(){
-					var item1mobile = document.querySelector('#item1mobile');
-					var item2mobile = document.querySelector('#item2mobile');
-					if(item1mobile.className.indexOf('mui-active')>0){
-						selected = '#mui-table-view-tab1';
-						hasChecked = false;
-					}else{
-						selected = '#mui-table-view-tab2';
-						hasChecked = true;
-					}
-            	}
-            	/*
-            	 	下拉刷新
-            	 * */
-            	function pulldownRefresh(){
-					url = !hasChecked ? '/acceptanceList': '/acceptanceList2';
-					var self = this;
+				var checkType, type, auditStatus// 验收单类型 // 验收状态   1 待验收  2 已验收 
+				var nullDataHtml = '<div class="mui-pull-bottom-tips"><div class="mui-pull-bottom-wrapper">'+
+										'<span class="mui-pull-loading">暂无数据</span></div></div>'
+				var detailData = {
+						unVerfiyList: { list: [] },
+						verifyList: { list: [] }
+					};
+				var utils = new Utils();
+				utils.appendModule('#list_tpl');
+				/*
+				  获取列表数据
+				 * */
+				function genData(url){
 					mui.ajaxRequest(url,{
                 		type: 'GET',
+                		showWaiting: true,
                 		success: function(data){
-                			data.acceptance = !hasChecked ? true: false;
-                			self.endPullDownToRefresh(true);
-							return template(selected,data,false)
-                			
+                			if(data.code === 200){
+                				detailData.unVerfiyList.list = data.data.unVerfiyList;
+                				detailData.unVerfiyList.acceptance = true;
+                				detailData.verifyList.list = data.data.verifyList;
+                				detailData.verifyList.acceptance = false;
+                				showData(detailData)
+                			}else{
+                				mui.alert(data.msg)
+                			}
                 		},
                 		error: function(xhr,type,errorThrown){
 							alert(xhr.responseText)
                 		}
             		});
 				}
-            	/*
-					 
-				 *  上拉加载更多
+				/*
+				 展示数据
 				 * */
-				function pullupRefresh(){
-					url = !hasChecked ? '/acceptanceList': '/acceptanceList2';
-					var self = this;
-					mui.ajaxRequest(url,{
-                		type: 'GET',
-                		success: function(data){
-                			self.endPullUpToRefresh();
-                			data.acceptance = !hasChecked ? true: false;
-							return template(selected,data,true)
-                			
-                		},
-                		error: function(xhr,type,errorThrown){
-							alert(xhr.responseText)
-                		}
-            		});
+				function showData(data){
+					var acceptanceTab1 = document.querySelector('.mui-tab1');
+					var html1 = template('list_tpl_view',data.unVerfiyList);
+					if(!html1){
+						html1 = nullDataHtml;
+					}
+					acceptanceTab1.innerHTML = html1;
 				}
             	
 				// 模板加载
 				$.plusReady(function(){
-					//循环初始化所有下拉刷新，上拉加载。
-					$.each(document.querySelectorAll('.mui-slider-group .mui-scroll'), function(index, pullRefreshEl) {
-						
-						$(pullRefreshEl).pullToRefresh({
-							down: {
-								style:'circle',
-								contentdown : "下拉可以刷新",
-								contentover : "释放立即刷新",
-								contentrefresh : "正在刷新...",
-								callback: pulldownRefresh
-							},
-							up: {
-								contentrefresh : "正在加载...",//可选，正在加载状态时，上拉加载控件上显示的标题内容
-	      						contentnomore:'没有更多数据了',
-								callback: pullupRefresh
-							}
-						});
-					});
-					// 第一个tab 默认加载一次数据
-					mui(".mui-slider-group .mui-scroll").pullToRefresh()[0].pullDownLoading();
-					
-					var item2 = document.getElementById('item2mobile');
-					document.getElementById('slider').addEventListener('slide', function(e) {
-						currSelected();
-						if (e.detail.slideNumber === 1) {
-							mui(".mui-slider-group .mui-scroll").pullToRefresh()[1].pullDownLoading();
+					var params, distributeCode
+					var self = plus.webview.currentWebview();
+				    params = self.params;//获得参数
+				    console.log(JSON.parse(params))
+				    distributeCode = JSON.parse(params).distributecode;
+				    var checkUrl = '/a/checkacceptdetail/checkList';
+				    var url = '/a/checkaccept/detail?distributeCode='+ distributeCode;
+				    genData(url);
+					if(plus.storage.getItem('currDept')){
+						type = JSON.parse(plus.storage.getItem('currDept')).deptType;
+						switch(type){
+							case '3':
+								checkType = 1; // 药库
+								break;
+							case '4':
+								checkType = 2; // 药房
+								break;
+							case '5':
+								checkType = 3; // 基数药
+								break;
+							default:
+								break;
 						}
-					});
-				
+					}
+							
 					//tab页切的点击事件
-					var sliderSegmentedControl = document.getElementById('sliderSegmentedControl');
+					/*var sliderSegmentedControl = document.getElementById('sliderSegmentedControl');
 					$('.mui-input-group').on('change', 'input', function() {
 						if (this.checked) {
 							sliderSegmentedControl.className = 'mui-slider-indicator mui-segmented-control mui-segmented-control-inverted mui-segmented-control-' + this.value;
 							//force repaint
 							sliderProgressBar.setAttribute('style', sliderProgressBar.getAttribute('style'));
 						}
+					});*/
+					var item2 = document.getElementById('item2mobile');
+					document.getElementById('slider').addEventListener('slide', function(e) {
+						if (e.detail.slideNumber === 1) {
+							if (!item2.querySelector('.am-card')) {
+								var acceptanceTab2 = document.querySelector('.mui-tab2');
+								var html2 = template('list_tpl_view',detailData.verifyList);
+								if(!html2){
+									html2 = nullDataHtml;
+								}
+								console.log(acceptanceTab2)
+								acceptanceTab2.innerHTML = html2;
+							}
+						}
 					});
-					
 					// 展开编辑
 					$('#slider').on('tap','.edit',function(){
 						this.innerHTML = this.innerHTML === '展开编辑' ? '收起编辑':'展开编辑' ;
-						let id = this.getAttribute('data-id');
-						let index = this.getAttribute('data-index');
+						let id = this.dataset.id;
+						let index = this.dataset.index;
+						let data = detailData.unVerfiyList.list[index];
 						var addDiv = document.createElement('div');
 						addDiv.className = 'editForm';
 						addDiv.innerHTML = '<div class="am-flexbox am-flexbox-align-center">'+
 						'<div class="am-flexbox-item">' + 
 						'<div class="am-list-item am-input-item am-list-item-middle">' + 
 						'<div class="am-list-line">'+
-						'<div class="am-input-label am-input-label-4">实到数量:</div>'+
+						'<div class="am-input-label am-input-label-4 font-warning">实到数量:</div>'+
 						'<div class="am-input-control">'+
-						'<input pattern="[0-9]*" type="number" placeholder="请输入" class="realNum"/>'+
+						'<input pattern="[0-9]*" type="number" placeholder="请输入" class="realReceiveQuantity"/>'+
 						'</div>'+
 						'</div>'+
 						'</div>'+
@@ -201,9 +197,9 @@
 						'<div class="am-flexbox-item">' + 
 						'<div class="am-list-item am-input-item am-list-item-middle">' + 
 						'<div class="am-list-line">'+
-						'<div class="am-input-label am-input-label-4">生产日期:</div>'+
+						'<div class="am-input-label am-input-label-4 font-warning">生产日期:</div>'+
 						'<div class="am-input-control">'+
-						'<input pattern="[0-9]*" type="date" placeholder="请输入" class="productDate"/>'+
+						'<input pattern="[0-9]*" type="date" placeholder="请输入" class="realProductTime"/>'+
 						'</div>'+
 						'</div>'+
 						'</div>'+
@@ -213,9 +209,9 @@
 						'<div class="am-flexbox-item">' + 
 						'<div class="am-list-item am-input-item am-list-item-middle">' + 
 						'<div class="am-list-line">'+
-						'<div class="am-input-label am-input-label-4">生产批号:</div>'+
+						'<div class="am-input-label am-input-label-4 font-warning">生产批号:</div>'+
 						'<div class="am-input-control">'+
-						'<input pattern="[0-9]*" type="text" placeholder="请输入" class="producterPh"/>'+
+						'<input pattern="[0-9]*" type="text" placeholder="请输入" class="productBatchNo"/>'+
 						'</div>'+
 						'</div>'+
 						'</div>'+
@@ -223,9 +219,9 @@
 						'<div class="am-flexbox-item">' + 
 						'<div class="am-list-item am-input-item am-list-item-middle">' + 
 						'<div class="am-list-line">'+
-						'<div class="am-input-label am-input-label-4">有效期至:</div>'+
+						'<div class="am-input-label am-input-label-4 font-warning">有效期至:</div>'+
 						'<div class="am-input-control">'+
-						'<input pattern="[0-9]*" type="date" placeholder="请输入" class="userfulDate"/>'+
+						'<input pattern="[0-9]*" type="date" placeholder="请输入" class="realValidEndDate"/>'+
 						'</div>'+
 						'</div>'+
 						'</div>'+
@@ -233,9 +229,20 @@
 						'</div>'+
 						'<div class="am-flexbox am-flexbox-align-center">'+
 						'<div class="am-flexbox-item">批准文号：'+
-						'<span>ffdaxx2342ssdfs</span>'+
+						'<span>'+ data.approvalNo +'</span>'+
 						'</div>'+
-						'</div>';
+						'<div class="am-flexbox-item">' + 
+						'<div class="am-list-item am-input-item am-list-item-middle">' + 
+						'<div class="am-list-line">'+
+						'<div class="am-input-label am-input-label-4 font-warning">验收温度:</div>'+
+						'<div class="am-input-control">'+
+						'<input pattern="[0-9]*" type="number" placeholder="请输入" class="realAcceptanceTemperature"/>'+
+						'</div>'+
+						'</div>'+
+						'</div>'+
+						'</div>'+
+						'</div>'
+						;
 						if($('.am-card-body')[index].querySelectorAll('.editForm').length === 0){
 							$('.am-card-body')[index].appendChild(addDiv);
 						}else{
@@ -247,37 +254,82 @@
 					//绑定点击事件  - 进入详情页
 						
 					$('#slider').on('tap','.moreDetail',function(){
-						let id = this.getAttribute('data-id');
-						console.log(id,'id');
+						let id = this.dataset.id;
+						let index = this.dataset.index;
+						var item1mobile = document.querySelector('#item1mobile');
+						var hasAcceptance = item1mobile.className.indexOf('mui-active')>0 ? true: false;
+						let data = hasAcceptance ? detailData.unVerfiyList.list[index]: detailData.verifyList.list[index];
+						data.hasAcceptance = hasAcceptance; // 判断 详情页面是否有验收按钮
+						let newData = Object.assign({},data,JSON.parse(params));
+						newData.statusname = hasAcceptance ? '待验收':'已验收';
 						document.activeElement.blur(); // 隐藏软键盘
-						common.openwin('acc_detail',{ targetId: id },{
+						common.openwin('acc_detail',{ details: JSON.stringify(newData) },{
 							titleText: '验收详情'
 						})
 					});
 					
 					// 绑定事件 --确认验收
 					$('#slider').on('tap','.acceptance',function(){
-						let id = this.getAttribute('data-id');
-						let index = this.getAttribute('data-index');
-						console.log(id,'id');
-						console.log(index,'index');
-						document.activeElement.blur(); // 隐藏软键盘
-						if(document.querySelectorAll('.realNum')[index]){
-							var postData = {};
-							postData.realNum = document.querySelectorAll('.realNum')[index].value;
-							postData.productDate = document.querySelectorAll('.productDate')[index].value;
-							postData.producterPh = document.querySelectorAll('.producterPh')[index].value;
-							postData.userfulDate = document.querySelectorAll('.userfulDate')[index].value;
-							console.log(postData,'postData')
-						}
-						var btnArray = ['否', '是'];
-						mui.confirm('是否确认验收？', '确认', btnArray, function(e) {
-							if (e.index == 1) {
-								alert('你点击了是')
-							} else {
-								alert('你点击了否')
+						
+						let id = this.dataset.id;
+						let index = this.dataset.index;
+						if(document.querySelectorAll('.am-card')[index].querySelector('.editForm')){
+							var editForm = document.querySelectorAll('.am-card')[index].querySelector('.editForm');
+							var realReceiveQuantity = editForm.querySelector('.realReceiveQuantity').value;
+							var realProductTime = editForm.querySelector('.realProductTime').value;
+							var productBatchNo = editForm.querySelector('.productBatchNo').value;
+							var realValidEndDate = editForm.querySelector('.realValidEndDate').value;
+							var realAcceptanceTemperature = editForm.querySelector('.realAcceptanceTemperature').value;
+							if(realReceiveQuantity && realProductTime && productBatchNo && realValidEndDate &&realAcceptanceTemperature){
+								var _this_node = document.querySelectorAll('.am-card')[index];
+								var postData = {}, detailList = [], submitData = {};
+								postData.drugCode = _this_node.dataset.drugcode;
+								postData.id = _this_node.dataset.id;
+								postData.parerntId = _this_node.dataset.parentid;
+								postData.realReceiveQuantity = realReceiveQuantity;
+								postData.realProductTime = realProductTime;
+								postData.productBatchNo = productBatchNo;
+								postData.realValidEndDate = realValidEndDate;
+								postData.realAcceptanceTemperature = realAcceptanceTemperature;
+								detailList.push(postData);
+								submitData.detailList = detailList;
+								submitData.distributeCode = distributeCode;
+								console.log(JSON.stringify(submitData));
+								document.activeElement.blur(); // 隐藏软键盘
+								var btnArray = ['否', '是'];
+								mui.confirm('是否确认验收？', '确认', btnArray, function(e) {
+									if (e.index == 1) {
+										mui.ajaxRequest(checkUrl,{
+											type: 'POST',
+											data: submitData,
+											showWaiting: true,
+											contentType: "application/json",
+											success: function(data){
+												if(data.code === 200){
+													mui.toast('验收成功');
+													genData(url)
+												}
+											},
+											error: function(xhr,type,errorThrown){
+												alert(xhr.responseText)
+					                		}
+										})
+									} else {
+										alert('你点击了否')
+									}
+								},'div')
+								
+							}else{
+								return mui.alert('请将数据编辑完整再继续操作', '提示', ['确认'],function(e){
+								
+								},'div');
 							}
-						},'div')
+						}else{
+							return mui.alert('请编辑相关数据再继续操作', '提示', ['确认'],function(e){
+								
+							},'div');
+						}
+						
 					});
 					
 				});

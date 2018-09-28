@@ -6,36 +6,28 @@
 				<a class="mui-navigate-right" href="#">单据信息</a>
 				<div class="mui-collapse-content">
 						<div class="mui-input-row">
-							<label>盘点单号</label>
-							<p class="detailRow_content">{{value.distributionNo}}</p>
+							<label>配送单号</label>
+							<p class="detailRow_content">{{value.distributecode}}</p>
+						</div>
+						<div class="mui-input-row">
+							<label>订单号</label>
+							<p class="detailRow_content">{{value.ordercode}}</p>
+						</div>
+						<div class="mui-input-row">
+							<label>状态</label>
+							<p class="detailRow_content">{{value.statusname}}</p>
 						</div>
 						<div class="mui-input-row">
 							<label>类型</label>
-							<p class="detailRow_content">{{value.type}}</p>
+							<p class="detailRow_content">{{value.typename}}</p>
 						</div>
 						<div class="mui-input-row">
-							<label>部门</label>
-							<p class="detailRow_content">{{value.deptName}}</p>
+							<label>供应商</label>
+							<p class="detailRow_content">{{value.suppliername}}</p>
 						</div>
 						<div class="mui-input-row">
-							<label>制单人</label>
-							<p class="detailRow_content">{{value.createrUser}}</p>
-						</div>
-						<div class="mui-input-row">
-							<label>制单时间</label>
-							<p class="detailRow_content">{{value.date}}</p>
-						</div>
-						<div class="mui-input-row">
-							<label>盘点周期</label>
-							<p class="detailRow_content">{{value.distributionNo}}</p>
-						</div>
-						<div class="mui-input-row">
-							<label>盘点人</label>
-							<p class="detailRow_content">{{value.pdPerson}}</p>
-						</div>
-						<div class="mui-input-row">
-							<label>提交时间</label>
-							<p class="detailRow_content">{{value.updateTime}}</p>
+							<label>收货地址</label>
+							<p class="detailRow_content">{{value.deptaddress}}</p>
 						</div>
 				</div>
 			</li>
@@ -46,63 +38,89 @@
 				<div class="mui-collapse-content">
 						<div class="mui-input-row">
 							<label>通用名称</label>
-							<p class="detailRow_content">{{value.distributionNo}}</p>
+							<p class="detailRow_content">{{value.ctmmGenericName}}</p>
 						</div>
 						<div class="mui-input-row">
 							<label>商品名</label>
-							<p class="detailRow_content">{{value.type}}</p>
+							<p class="detailRow_content">{{value.ctmmTradeName}}</p>
 						</div>
 						<div class="mui-input-row">
 							<label>规格</label>
-							<p class="detailRow_content">{{value.deptName}}</p>
+							<p class="detailRow_content">{{value.ctmmSpecification}}</p>
 						</div>
 						<div class="mui-input-row">
 							<label>剂型</label>
-							<p class="detailRow_content">{{value.createrUser}}</p>
+							<p class="detailRow_content">{{value.ctmmDosageFormDesc}}</p>
 						</div>
 						<div class="mui-input-row">
 							<label>生产厂家</label>
-							<p class="detailRow_content">{{value.date}}</p>
+							<p class="detailRow_content">{{value.ctmmManufacturerName}}</p>
 						</div>
 						<div class="mui-input-row">
 							<label>批准文号</label>
-							<input class="mui-input" style="color: red;" value={{ value.distributionNo }} />
+							<input class="mui-input" style="color: red;" value={{ value.approvalNo }} />
 						</div>
 						<div class="mui-input-row">
 							<label>包装规格</label>
-							<p class="detailRow_content">{{value.pdPerson}}</p>
+							<p class="detailRow_content">{{value.packageSpecification}}</p>
 						</div>
 						<div class="mui-input-row">
 							<label>单位</label>
-							<p class="detailRow_content">{{value.updateTime}}</p>
+							<p class="detailRow_content">{{value.unit}}</p>
 						</div>
 						<div class="mui-input-row">
-							<label>生产批号</label>
-							<p class="detailRow_content">{{value.updateTime}}</p>
+							{{ if checkType === 1 }}
+								<label class="font-warning">生产批号</label>
+								<input class="mui-input editInput" value={{ value.productBatchNo }} />
+								{{ else }}
+									<label>生产批号</label>
+									<p class="detailRow_content">{{value.productBatchNo}}</p>
+							{{ /if }}
 						</div>
 						<div class="mui-input-row">
-							<label>生产日期</label>
-							<p class="detailRow_content">{{value.updateTime}}</p>
+							{{ if checkType === 1 }}
+								<label class="font-warning">生产日期</label>
+								<input class="mui-input editInput" type='date' value={{ value.realProductTime }} />
+								{{ else }}
+									<label>生产日期</label>
+									<p class="detailRow_content">{{value.realProductTime}}</p>
+							{{ /if }}
+							
 						</div>
 						<div class="mui-input-row">
-							<label>有效期至</label>
-							<p class="detailRow_content">{{value.updateTime}}</p>
+							{{ if checkType === 1 }}
+								<label class="font-warning">有效期至</label>
+								<input class="mui-input editInput" type='date' value={{ value.realValidEndDate }} />
+								{{ else }}
+									<label>有效期至</label>
+									<p class="detailRow_content">{{value.realValidEndDate}}</p>
+							{{ /if }}
 						</div>
 							<div class="mui-input-row">
-							<label>验收温度（℃）</label>
-							<p class="detailRow_content">{{value.temp}}</p>
+							{{ if checkType === 1 }}
+								<label class="font-warning">验收温度（℃）</label>
+								<input class="mui-input editInput" />
+								{{ else }}
+									<label>验收温度（℃）</label>
+									<p class="detailRow_content">{{value.temp}}</p>
+							{{ /if }}
 						</div>
 						<div class="mui-input-row">
 							<label>配送数量</label>
-							<p class="detailRow_content">{{value.total}}</p>
+							<p class="detailRow_content">{{value.realDeliveryQuantiry}}</p>
 						</div>
 						<div class="mui-input-row">
-							<label>实到数量</label>
-							<p class="detailRow_content">{{value.realNum}}</p>
+							{{ if checkType === 1 }}
+								<label class="font-warning">实到数量</label>
+								<input class="mui-input editInput" type="number"  pattern="[0-9]*" value={{ value.realReceiveQuantity?value.realReceiveQuantity: 0 }} />
+								{{ else }}
+									<label>实到数量</label>
+									<p class="detailRow_content">{{value.realReceiveQuantity}}</p>
+							{{ /if }}
 						</div>
 						<div class="mui-input-row">
 							<label>供应商</label>
-							<p class="detailRow_content">{{value.producter}}</p>
+							<p class="detailRow_content">{{value.supplierName}}</p>
 						</div>
 				</div>
 			</li>

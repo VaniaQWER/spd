@@ -23,11 +23,7 @@
 						<li class="mui-table-view-cell mui-collapse">
 							<a class="mui-navigate-right" href="#">产品信息</a>
 							<div class="mui-collapse-content">
-									<div class="mui-input-row">
-										<label>通用名</label>
-										<p class="detailRow_content">131312313131231313123131312313131231313123</p>
-										<span class="detailRow_right">25</span>
-									</div>
+									
 							</div>
 						</li>
 					</ul>
@@ -38,65 +34,92 @@
 		<script src="../../js/mui.js"></script>
 		<script src="../../js/template-web.js" type="text/javascript" charset="utf-8"></script>
 		<script src="../../js/utils.js" type="text/javascript" charset="utf-8"></script>
+		<script src="../../js/request.js" type="text/javascript" charset="utf-8"></script>
 		<script type="text/javascript">
 			(function($) {
-			$.init();
 				
-			$.plusReady(function(){
-				var self = plus.webview.currentWebview();
-				var name = self.name;
-				console.log(name,'name')
-			})
-
-			var deceleration = mui.os.ios?0.003:0.0009;
-			$('.mui-scroll-wrapper').scroll({
-				bounce: false,
-				indicators: true, //是否显示滚动条
-				deceleration:deceleration
-			});
-			
-			$.ready(function(){
-
-				var data = {
-					list: [{
-						"id":"1",
-						"supplierName": "静注人免疫球蛋白",
-						"drugName": "西咪替丁",
-						"producter": "北京汉典制药有限公司",
-						"distributionNo": "AADKSF1OOSKDF2",
-						"spec":"80mg/瓶",
-						"date": "2018-08-08",
-						"goodsList":[
-							{
-								"goodsType":'补货货位',
-								"num":'200',
-								"unit":'支',
-								"producePerson":'华润药业集团',
-								"pihaoNo":'PH123333',
-								"createDate":'2018-08-02',
-								"limimtDate":'2018-08-02'
-							},
-							{
-								"goodsType":'补货货位',
-								"num":'200',
-								"unit":'支',
-								"producePerson":'华润药业集团',
-								"pihaoNo":'PH123333',
-								"createDate":'2018-08-02',
-								"limimtDate":'2018-08-02'
-							},
-						]
-					}]
-				};
-			
-				var utils = new Utils();
-				utils.appendModule('#card_view');
-				var html = template('deitail_view', data);
-				document.getElementById('detailContent').innerHTML = html;
-			
-			
-			})
-			
+				$.plusReady(function(){
+					
+					var params, hisDrugCode = undefined, drugCode = undefined;
+					var self = plus.webview.currentWebview();
+				    params = self.params;//获得参数
+					hisDrugCode = JSON.parse(params).hisdrugcode;
+					drugCode = JSON.parse(params).drugcode;
+					var baseUrl = '/a/StoreDetail/getRoomRepertoryDetail';
+					var tableUrl = '/a/StoreDetail/getRoomRepertoryDetailList';
+					var renderData = { };
+					genDetailData(baseUrl,hisDrugCode)
+					genTableData(tableUrl,drugCode);
+					var utils = new Utils();
+					utils.appendModule('#card_view');
+					setTimeout(function(){
+						var html = template('deitail_view', renderData);
+						document.getElementById('detailContent').innerHTML = html;
+					},2000)
+//					var html = template('deitail_view', data);
+//					console.log(html)
+					
+					
+				/*
+				  获取列表数据
+				 * */
+					function genDetailData(baseUrl,hisDrugCode){
+						// 详情 数据
+						mui.ajaxRequest(baseUrl,{
+	                		type: 'POST',
+	                		data: {
+	                			hisDrugCode: hisDrugCode
+	                		},
+	                		showWaiting: true,
+	                		success: function(data){
+	                			if(data.code === 200){
+	                				var list = [];
+	                				list.push(data.data);
+	                				renderData.list = list;
+	                			}else{
+	                				mui.alert(data.msg)
+	                			}
+	                		},
+	                		error: function(xhr,type,errorThrown){
+								alert(xhr.responseText)
+	                		}
+	            		});
+					}
+					
+					function genTableData(tableUrl,drugCode){
+						// 列表数据
+	            		mui.ajaxRequest(tableUrl,{
+	                		type: 'post',
+	                		data: {
+	                			drugCode: drugCode
+	                		},
+	                		showWaiting: true,
+	                		success: function(data){
+	                			if(data.code === 200){
+	                				var tablist = data.data.list;
+	                				renderData.tablist = tablist;
+	                				console.log(JSON.stringify(renderData))
+	                			}else{
+	                				mui.alert(data.msg)
+	                			}
+	                		},
+	                		error: function(xhr,type,errorThrown){
+								alert(xhr.responseText)
+	                		}
+	            		});
+					}
+					/*
+					 展示数据
+					 * */
+					function showData(data){
+						var acceptanceTab1 = document.querySelector('.mui-tab1');
+						var html1 = template('list_tpl_view',data.unVerfiyList);
+						if(!html1){
+							html1 = nullDataHtml;
+						}
+						acceptanceTab1.innerHTML = html1;
+					}
+				})
 			
 		})(mui);
 		

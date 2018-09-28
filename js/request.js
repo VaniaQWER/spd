@@ -4,7 +4,8 @@
  */
 (function($, doc) {
 //	var baseUrl = 'https://www.easy-mock.com/mock/5b8d3b510ab8991436ebd336/spd';
-	var baseUrl = "http://192.168.31.200:8099/medicinal-web"
+//	var baseUrl = "http://192.168.31.200:8099/medicinal-web" // 测试地址
+	var baseUrl = 'http://39.105.75.193:8080/medicinal-web'; // 线上地址
     mui.extend({
         ajaxRequest: function(url , options){
             var defaults = commonDefaules(options);
@@ -21,11 +22,15 @@
         var defaults = {
             dataType: "json",
             type: "post",
-            timeout: 10000,
+//          timeout: 10000,
             wait: true,
             contentType: "application/x-www-form-urlencoded",
             waitMessage: "努力奔跑中，等等我...",
             onBeforeSend : function(xhr){
+            	if(options.showWaiting){
+            		plus.nativeUI.showWaiting();
+            	}
+            	
                 if(defaults.wait == true){
                     showLoading(defaults.waitMessage);
                 }
@@ -34,7 +39,9 @@
                 }
             },
             onSuccess : function(data){
-
+            	if(options.showWaiting){
+            		plus.nativeUI.closeWaiting();
+            	}
                 if(defaults.wait == true){
                     hideLoading();
                 }
@@ -48,6 +55,10 @@
                 }
             },
             onError : function(a , b , c){
+            	mui.toast("网络异常,请稍候再试");
+            	if(options.showWaiting){
+            		plus.nativeUI.closeWaiting();
+            	}
                 hideLoading();
                 if(options.error){
                     options.error(a , b , c);

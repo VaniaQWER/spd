@@ -14,20 +14,25 @@
 
 	<body>
 		
-		<!--<header class="mui-bar mui-bar-nav theme_back">
-		   	<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
-		   	<a class="mui-pull-left theme_back_font">返回</a>
-		    <h1 class="mui-title">药品信息</h1>
-		</header>-->
-		<div class="mui-content">
-			
-			<!--<div class="qrcode" id="qrcode" onclick="clicked('../commonPages/qrcode.html',true,true)">
-				<img src="../../assest/qrcode.png" />
-			</div>-->
+		<div class="mui-content" style='padding-top: 44px;'>
+			<header class="mui-bar mui-bar-nav themes_bg_color">
+			   	<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left">
+			   		<label class="mui-pull-right theme_back_font">返回</label>
+			   	</a>
+			    <h1 class="mui-title themes_title">药品信息</h1>
+			    <a href="#modal" class="mui-pull-right"  style="height: 45px;padding-top: 12px;">
+			    	<div class="qrcode" id="qrcode" onclick="clicked('../commonPages/qrcode',true,true)">
+						<img src="../../assest/qrcode.png" width="24" height="24"/>
+					</div>
+			    </a>
+			</header>
 		    <div class="mui-input-row mui-search search_head">
 				<input type="search" class="mui-input-clear" placeholder="商品名/生产厂家/货位">
 			</div>
-			<div id="slider" class="mui-slider themes_tab mui-fullscreen">
+			<div class="main-content">
+				
+			</div>
+			<!--<div id="slider" class="mui-slider themes_tab mui-fullscreen">
 				<div id="sliderSegmentedControl" class="mui-slider-indicator mui-segmented-control mui-segmented-control-inverted">
 					<a class="mui-control-item themes_font_color_tab" href="#item1mobile">未提交</a>
 					<a class="mui-control-item themes_font_color_tab" href="#item2mobile">已提交</a>
@@ -57,7 +62,7 @@
 
 					</div>
 				</div>
-			</div>
+			</div>-->
 
 		</div>
 		
@@ -70,9 +75,24 @@
 		<script src="../../js/qrcode.js" type="text/javascript" charset="utf-8"></script>
 		<script src="../../js/request.js" type="text/javascript" charset="utf-8"></script>
 		<script type="text/javascript">
+			if(window.plus) {
+                plusready();
+            } else {
+                document.addEventListener('plusready', plusready, false);
+            }
+            function plusready() {
+                plus.key.addEventListener('backbutton',function(){
+                    plus.webview.currentWebview().close();
+                })
+            }
+			
 			/*获取二维码返回值*/
 			function scaned(t, r, f) {
 				console.log(r);//返回二维码读取的数据
+			}
+			
+			function clicked(){
+				common.openwin('../commonPages/qrcode',true,{ titleText: '扫一扫' })
 			}
 			
 			(function($) {
@@ -82,116 +102,70 @@
 					indicators: true, //是否显示滚动条
 					deceleration:deceleration
 				});
+				
 				var utils = new Utils();
 				utils.appendModule('#card_view');
 				
-				var selected = undefined,hasChecked = false,url = undefined;
-				currSelected();
+				var nullDataHtml = '<div class="mui-pull-bottom-tips"><div class="mui-pull-bottom-wrapper">'+
+										'<span class="mui-pull-loading">暂无数据</span></div></div>'
+				
+				var checkStatus, detailData = {};
+				function showData(data){
+					var content = document.querySelector('.main-content');
+					var html1 = template('check_list_tpl',data);
+					if(!html1){
+						html1 = nullDataHtml;
+					}
+					content.innerHTML = html1;
+				}
+				
+				function genData(url,checkBillNo,checkStatus){
+					mui.ajaxRequest(url,{
+                		type: 'POST',
+                		data: {
+                			checkBillNo: checkBillNo
+                		},
+                		showWaiting: true,
+                		success: function(data){
+                			if(data.code === 200){
+                				detailData = data.data;
+                				mui.each(detailData.list,function(index,item){
+                					item.checkStatus = checkStatus;
+                				})
+                				showData(detailData)
+                			}else{
+                				mui.alert(data.msg)
+                			}
+                		},
+                		error: function(xhr,type,errorThrown){
+							alert(xhr.responseText)
+                		}
+            		});
+				}
 				
 				/* 渲染模板   */
 					
-            	function template(selected, data,insertType){
-                    utils.innerTplHtml('check_list_tpl', selected, data, insertType)
-            	}
-            	
-            	function currSelected(){
-					var item1mobile = document.querySelector('#item1mobile');
-					var item2mobile = document.querySelector('#item2mobile');
-					if(item1mobile.className.indexOf('mui-active')>0){
-						selected = '#mui-table-view-tab1';
-						hasChecked = false;
-					}else{
-						selected = '#mui-table-view-tab2';
-						hasChecked = true;
-					}
-            	}
-				/*
-            	 	下拉刷新
-            	 * */
-            	function pulldownRefresh(){
-					url = !hasChecked ? '/inventory1': '/inventory2';
-					var self = this;
-					mui.ajaxRequest(url,{
-                		type: 'GET',
-                		success: function(data){
-                			data.hasChecked = hasChecked
-                			self.endPullDownToRefresh(true);
-							return template(selected,data,false)
-                			
-                		},
-                		error: function(xhr,type,errorThrown){
-							alert(xhr.responseText)
-                		}
-            		});
-				}
-            	/*
-					 
-				 *  上拉加载更多
-				 * */
-				function pullupRefresh(){
-					url = !hasChecked ? '/inventory1': '/inventory2';
-					var self = this;
-					mui.ajaxRequest(url,{
-                		type: 'GET',
-                		success: function(data){
-                			self.endPullUpToRefresh();
-							data.hasChecked = hasChecked
-							return template(selected,data,true)
-                			
-                		},
-                		error: function(xhr,type,errorThrown){
-							alert(xhr.responseText)
-                		}
-            		});
-				}
 				$.plusReady(function(){
 					
-					//循环初始化所有下拉刷新，上拉加载。
-					$.each(document.querySelectorAll('.mui-slider-group .mui-scroll'), function(index, pullRefreshEl) {
-						
-						$(pullRefreshEl).pullToRefresh({
-							down: {
-								style:'circle',
-								contentdown : "下拉可以刷新",
-								contentover : "释放立即刷新",
-								contentrefresh : "正在刷新...",
-								callback: pulldownRefresh
-							},
-							up: {
-								contentrefresh : "正在加载...",//可选，正在加载状态时，上拉加载控件上显示的标题内容
-	      						contentnomore:'没有更多数据了',
-								callback: pullupRefresh
-							}
-						});
-					});
-					// 第一个tab 默认加载一次数据
-					mui(".mui-slider-group .mui-scroll").pullToRefresh()[0].pullDownLoading();
+					var params, checkBillNo, flag = false
+					var self = plus.webview.currentWebview();
+				    params = self.params;//获得参数
+				    console.log(params)
+				    checkBillNo = JSON.parse(params).checkbillno;
+				    checkStatus = JSON.parse(params).checkStatus
+				    
+				    var checkUrl = '/a/checkbill/submitCheck';
+				    var url = '/a/checkbilldetail/getListByBillNo';
+				    genData(url,checkBillNo,checkStatus);
 					
-					var item2 = document.getElementById('item2mobile');
-					document.getElementById('slider').addEventListener('slide', function(e) {
-						currSelected();
-						if (e.detail.slideNumber === 1) {
-							if (item2.querySelector('.mui-loading')) {
-								mui(".mui-slider-group .mui-scroll").pullToRefresh()[1].pullDownLoading();
-							}
-						}
-					});
-					//tab页切的点击事件
-					var sliderSegmentedControl = document.getElementById('sliderSegmentedControl');
-					$('.mui-input-group').on('change', 'input', function() {
-						if (this.checked) {
-							sliderSegmentedControl.className = 'mui-slider-indicator mui-segmented-control mui-segmented-control-inverted mui-segmented-control-' + this.value;
-							//force repaint
-							sliderProgressBar.setAttribute('style', sliderProgressBar.getAttribute('style'));
-						}
-					});
 					
-					 
 					 // 展开编辑
-					$('#slider').on('tap','.eidtRow',function(){
+					$('.main-content').on('tap','.eidtRow',function(){
+						flag = flag === true ? false: true;
 						this.innerHTML = this.innerHTML === '展开编辑' ? '收起编辑':'展开编辑' ;
-						let id = this.getAttribute('data-id');
-						let index = this.getAttribute('data-index');
+						let id = this.dataset.id;
+						let index = this.dataset.index;
+						var producter = detailData.list[index].ctmmManufacturerName;
 						var numNode = document.querySelectorAll('.am-flex-num')[index];
 						var childText;
 						if(numNode.querySelector('span')){
@@ -202,7 +176,7 @@
 						var numInputHtml =  '<div class="am-flexbox-item">' + 
 						'<div class="am-list-item am-input-item am-list-item-middle">' + 
 						'<div class="am-list-line">'+
-						'<div class="am-input-label am-input-label-4">数量:</div>'+
+						'<div class="am-input-label am-input-label-4 font-warning">数量:</div>'+
 						'<div class="am-input-control">'+
 						'<input pattern="[0-9]*" type="number" value='+ childText +' placeholder="请输入" class="relNum"/>'+
 						'</div>'+
@@ -217,7 +191,7 @@
 						'<div class="am-flexbox-item">' + 
 						'<div class="am-list-item am-input-item am-list-item-middle">' + 
 						'<div class="am-list-line">'+
-						'<div class="am-input-label am-input-label-4">生产日期:</div>'+
+						'<div class="am-input-label am-input-label-4 font-warning">生产日期:</div>'+
 						'<div class="am-input-control">'+
 						'<input pattern="[0-9]*" type="date" placeholder="请输入" class="productDate"/>'+
 						'</div>'+
@@ -227,7 +201,7 @@
 						'<div class="am-flexbox-item">' + 
 						'<div class="am-list-item am-input-item am-list-item-middle">' + 
 						'<div class="am-list-line">'+
-						'<div class="am-input-label am-input-label-4">生产批号:</div>'+
+						'<div class="am-input-label am-input-label-4 font-warning">生产批号:</div>'+
 						'<div class="am-input-control">'+
 						'<input pattern="[0-9]*" type="text" placeholder="请输入" class="producterPh"/>'+
 						'</div>'+
@@ -239,7 +213,7 @@
 						'<div class="am-flexbox-item">' + 
 						'<div class="am-list-item am-input-item am-list-item-middle">' + 
 						'<div class="am-list-line">'+
-						'<div class="am-input-label am-input-label-4">有效期至:</div>'+
+						'<div class="am-input-label am-input-label-4 font-warning">有效期至:</div>'+
 						'<div class="am-input-control">'+
 						'<input pattern="[0-9]*" type="date" placeholder="请输入" class="userfulDate"/>'+
 						'</div>'+
@@ -247,7 +221,7 @@
 						'</div>'+
 						'</div>' +
 						'<div class="am-flexbox-item">生产厂家：'+
-						'<span>ffdaxx2342ssdfs</span>'+
+						'<span>'+ producter +'</span>'+
 						'</div>'+
 						'</div>'+
 						'</div>';
@@ -263,17 +237,74 @@
 					});
 					//绑定点击事件  - 进入详情页
 					
-					$('#slider').on('tap','.toPage',function(){
+					$('.main-content').on('tap','.toPage',function(){
+						let index = this.dataset.index;
+						let data = detailData.list[index];
+						let newData = Object.assign({},data,JSON.parse(params));
+						console.log(JSON.stringify(newData))
 						document.activeElement.blur();
-						common.openwin('checkDetails',{},{
+						common.openwin('checkDetails',{ details: JSON.stringify(newData) },{
 							titleText:'详情'
 						})
 					})
-					$('#slider').on('tap','.submitButton',function(){
+					
+					// 提交
+					$('.main-content').on('tap','.submitButton',function(){
+						if(flag){
+							var index = this.dataset.index;
+							var _this_card = document.querySelectorAll('.am-card')[index];
+							var currData = detailData.list[index];
+							var postData = {}, detailList = [], submitData = {}
+							console.log(index)
+							postData.accountBatchNo = currData.accountBatchNo;
+							postData.accountEndTime = currData.accountEndTime;
+							postData.accountProductTime = currData.accountProductTime;
+							postData.accountStoreNum = currData.accountStoreNum;
+							postData.bigDrugCode = currData.bigDrugCode;
+							postData.drugCode = currData.drugCode;
+							postData.id = currData.id;
+							postData.locCode = currData.locCode;
+							postData.pId = currData.pId;
+							postData.practicalBatch = currData.practicalBatch;
+							postData.practicalRepertory = currData.practicalRepertory;
+							postData.realProductTime = currData.realProductTime;
+							postData.referencePrice = currData.referencePrice;
+							postData.unitCode = currData.unitCode;
+							postData.validEndTime = currData.validEndTime;
+							postData.supplierCode = currData.supplierCode;
+							
+							
+							detailList.push(postData);
+							submitData.detailList = detailList;
+							submitData.checkBillNo = checkBillNo;
+							console.log(JSON.stringify(submitData));
+							
+							mui.ajaxRequest(checkUrl,{
+								type: 'POST',
+								data: submitData,
+								showWaiting: true,
+								contentType: "application/json",
+								success: function(data){
+									if(data.code === 200){
+										mui.toast('提交成功');
+//										genData(url)
+									}
+								},
+								error: function(xhr,type,errorThrown){
+									alert(xhr.responseText)
+		                		}
+							})
+							
+						}else{
+							return mui.alert('请编辑相关数据再继续操作', '提示', ['确认'],function(e){
+								
+							},'div');
+						}
 						document.activeElement.blur();
 						var btnArray = ['否', '是'];
 						$.confirm('确定要执行此操作吗？', '确认提交', btnArray, function(e) {
 							if (e.index == 1) {
+								
 							} else {
 							}
 						})

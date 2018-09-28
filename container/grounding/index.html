@@ -37,14 +37,18 @@
 					<div id="item1mobile" class="mui-slider-item mui-control-content mui-active">
 						<div id="scroll1" class="mui-scroll-wrapper">
 							<div class="mui-scroll" id='mui-table-view-tab1'>
-								
+								<ul class="mui-table-view">
+									<li class="mui-table-view-cell mui-tab1" style="padding: 0;"></li>
+								</ul>
 							</div>
 						</div>
 					</div>
 					<div id="item2mobile" class="mui-slider-item mui-control-content">
 						<div id="scroll2" class="mui-scroll-wrapper">
 							<div class="mui-scroll" id='mui-table-view-tab2'>
-								
+								<ul class="mui-table-view">
+									<li class="mui-table-view-cell mui-tab2" style="padding: 0;"></li>
+								</ul>
 							</div>
 						</div>
 
@@ -91,7 +95,12 @@
 				utils.appendModule('#card_view');
 				
 				/* 渲染模板   */
-				var selected = undefined,hasChecked = false,url = undefined;
+				var selected = undefined,hasChecked = false,page = undefined, pageSize = 10,totalPage = undefined;
+				
+				var checkType, type, shelfStatus// 上架类型 // 上架状态  1 待上架  2 已上架 
+				var requestUrl =  '/a/checkaccept/shelfList'; // 请求地址
+				
+				var pageLeft = 1, pageRight = 1, totalPageLeft, totalPageRight;
 				currSelected();
 				
             	function template(selected, data, insertType){
@@ -103,10 +112,10 @@
 					var item1mobile = document.querySelector('#item1mobile');
 					var item2mobile = document.querySelector('#item2mobile');
 					if(item1mobile.className.indexOf('mui-active')>0){
-						selected = '#mui-table-view-tab1';
+						selected = '.mui-tab1';
 						hasChecked = false;
 					}else{
-						selected = '#mui-table-view-tab2';
+						selected = '.mui-tab2';
 						hasChecked = true;
 					}
             	}
@@ -114,14 +123,38 @@
             	 	下拉刷新
             	 * */
             	function pulldownRefresh(){
-					url = !hasChecked ? '/groundList': '/groundList2';
+//					url = !hasChecked ? '/groundList': '/groundList2';
+					if(!hasChecked){
+						pageLeft  = 1
+					}else{
+						pageRight = 1;
+					}
+					shelfStatus = !hasChecked ? '2': '3';
+					page = !hasChecked ? pageLeft: pageRight;
 					var self = this;
-					mui.ajaxRequest(url,{
-                		type: 'GET',
+					mui.ajaxRequest(requestUrl,{
+                		type: 'POST',
+                		data: {
+                			shelfStatus: shelfStatus,
+                			pageNo: page
+                		},
                 		success: function(data){
-                			self.endPullDownToRefresh(true);
-                			data.hasGrounding = hasChecked
-							return template(selected,data,false)
+                			var resData = data.data;
+                			var total = resData.totalPage;
+                			if(!hasChecked){
+                				totalPageLeft = total;
+                			}else{
+                				totalPageRight = total;
+                			}
+                			if(resData.list.length === 0){
+                				console.log(JSON.stringify(self))
+                				document.querySelector('.mui-pull-loading').innerHTML = '没有更多数据';
+                			}
+                			self.refresh(true);
+                			self.endPullDownToRefresh();
+                			console.log(totalPageRight)
+                			
+							return template(selected,resData,false)
                 			
                 		},
                 		error: function(xhr,type,errorThrown){
@@ -134,20 +167,39 @@
 				 *  上拉加载更多
 				 * */
 				function pullupRefresh(){
-					url = !hasChecked ? '/groundList': '/groundList2';
+					if(!hasChecked){
+						pageLeft ++
+					}else{
+						pageRight ++;
+					}
+					page = !hasChecked ? pageLeft: pageRight;
+					totalPage = !hasChecked ? totalPageLeft: totalPageRight;
+					console.log(page);
+					console.log(totalPage)
+					shelfStatus = !hasChecked ? '2': '3';
 					var self = this;
-					mui.ajaxRequest(url,{
-                		type: 'GET',
-                		success: function(data){
-                			self.endPullUpToRefresh();
-                			data.hasGrounding = hasChecked
-							return template(selected,data,self,true)
-                			
-                		},
-                		error: function(xhr,type,errorThrown){
-							alert(xhr.responseText)
-                		}
-            		});
+					if(page <= totalPage){
+						mui.ajaxRequest(requestUrl,{
+							type: 'POST',
+	                		data: {
+	                			shelfStatus: shelfStatus,
+	                			pageNo: page
+	                		},
+	                    	contentType: "application/json",
+	                		success: function(data){
+	                			var resData = data.data;
+	                			if(page = totalPage){
+	                				self.endPullUpToRefresh(true);
+	                			}else{
+	                				self.endPullUpToRefresh(false);
+	                			}
+	                			return page < resData.totalPage ? template(selected,resData,false): template(selected,resData,true)	
+	                		},
+	                		error: function(xhr,type,errorThrown){
+								alert(xhr.responseText)
+	                		}
+	            		});
+					}
 				}
 				
 				$.plusReady(function(){
@@ -156,10 +208,9 @@
 					document.getElementById('slider').addEventListener('slide', function(e) {
 						currSelected();
 						if (e.detail.slideNumber === 1) {
-							mui(".mui-slider-group .mui-scroll").pullToRefresh()[1].pullDownLoading();
-//							if (item2.querySelector('.mui-loading')) {
-//								mui(".mui-slider-group .mui-scroll").pullToRefresh()[1].pullDownLoading();
-//							}
+							if (!item2.querySelector('.am-card')) {
+								mui(".mui-slider-group .mui-scroll").pullToRefresh()[1].pullDownLoading();
+							}
 						}
 					});
 					
@@ -198,9 +249,11 @@
 						
 					$('#slider').on('tap','.am-card',function(){
 						let id = this.getAttribute('data-id');
-						document.activeElement.blur();
+						let itemData = this.dataset;
+						console.log(JSON.stringify(itemData))
+						document.activeElement.blur(); // 隐藏软键盘
 						console.log(id,'id');
-						common.openwin('ground_list',{ targetId: id }, {
+						common.openwin('ground_list',{ params: JSON.stringify(itemData) }, {
 							titleText: '药品信息'
 						})
 					})

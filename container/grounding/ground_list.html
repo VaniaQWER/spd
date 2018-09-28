@@ -27,14 +27,22 @@
 					<div id="item1mobile" class="mui-slider-item mui-control-content mui-active">
 						<div id="scroll1" class="mui-scroll-wrapper">
 							<div class="mui-scroll" id="mui-table-view-tab1">
-								
+								<ul class="mui-table-view">
+									<li class="mui-table-view-cell mui-tab1" style="padding: 0;">
+										
+									</li>
+								</ul>
 							</div>
 						</div>
 					</div>
 					<div id="item2mobile" class="mui-slider-item mui-control-content">
 						<div id="scroll2" class="mui-scroll-wrapper">
 							<div class="mui-scroll" id="mui-table-view-tab2">
-								
+								<ul class="mui-table-view">
+									<li class="mui-table-view-cell mui-tab2" style="padding: 0;">
+										
+									</li>
+								</ul>
 							</div>
 						</div>
 					</div>
@@ -50,6 +58,18 @@
 		<script src="../../js/common.js" type="text/javascript" charset="utf-8"></script>
 		<script src="../../js/request.js" type="text/javascript" charset="utf-8"></script>
 		<script type="text/javascript">
+			
+			if(window.plus) {
+                plusready();
+            } else {
+                document.addEventListener('plusready', plusready, false);
+            }
+            function plusready() {
+                plus.key.addEventListener('backbutton',function(){
+                    plus.webview.currentWebview().close();
+                })
+            }
+			
 			(function($) {
 				
 				var deceleration = mui.os.ios?0.003:0.0009;
@@ -59,99 +79,75 @@
 					deceleration:deceleration
 				});
 				
+				/* 渲染模板   */
+				var checkType, type, auditStatus// 验收单类型 // 验收状态   1 待验收  2 已验收 
+				var nullDataHtml = '<div class="mui-pull-bottom-tips"><div class="mui-pull-bottom-wrapper">'+
+										'<span class="mui-pull-loading">暂无数据</span></div></div>'
+				
+				var distributeCode, detailData = {
+						listwsj: { list: [] },
+						listysj: { list: [] }
+					};
+				
 				var utils = new Utils();
 				utils.appendModule('#ground_list_tpl');
 				
-				var selected = undefined,hasChecked = false,url = undefined;
-				currSelected();
-				
-				/* 渲染模板   */
-					
-            	function template(selected, data,insertType){
-                    utils.innerTplHtml('ground_list', selected, data, insertType)
-            	}
-            	
-            	function currSelected(){
-					var item1mobile = document.querySelector('#item1mobile');
-					var item2mobile = document.querySelector('#item2mobile');
-					if(item1mobile.className.indexOf('mui-active')>0){
-						selected = '#mui-table-view-tab1';
-						hasChecked = false;
-					}else{
-						selected = '#mui-table-view-tab2';
-						hasChecked = true;
+				function showData(data){
+					var acceptanceTab1 = document.querySelector('.mui-tab1');
+					var html1 = template('ground_list',data.listwsj);
+					if(!html1){
+						html1 = nullDataHtml;
 					}
-            	}
-            	
-            	/*
-            	 	下拉刷新
-            	 * */
-            	function pulldownRefresh(){
-					url = !hasChecked ? '/acceptanceList': '/acceptanceList2';
-					var self = this;
-					mui.ajaxRequest(url,{
-                		type: 'GET',
-                		success: function(data){
-                			data.hasGrounding = hasChecked
-                			self.endPullDownToRefresh(true);
-							return template(selected,data,false)
-                			
-                		},
-                		error: function(xhr,type,errorThrown){
-							alert(xhr.responseText)
-                		}
-            		});
-				}
-            	/*
-					 
-				 *  上拉加载更多
-				 * */
-				function pullupRefresh(){
-					url = !hasChecked ? '/acceptanceList': '/acceptanceList2';
-					var self = this;
-					mui.ajaxRequest(url,{
-                		type: 'GET',
-                		success: function(data){
-                			self.endPullUpToRefresh();
-							data.hasGrounding = hasChecked
-							return template(selected,data,true)
-                			
-                		},
-                		error: function(xhr,type,errorThrown){
-							alert(xhr.responseText)
-                		}
-            		});
+					acceptanceTab1.innerHTML = html1;
 				}
 				
+				function genData(url){
+					mui.ajaxRequest(url,{
+                		type: 'GET',
+                		showWaiting: true,
+                		success: function(data){
+                			if(data.code === 200){
+                				detailData.listwsj.list = data.data.listwsj;
+                				detailData.listwsj.hasGround = true;
+                				detailData.listysj.list = data.data.listysj;
+                				detailData.listysj.hasGround = false;
+                				showData(detailData)
+                			}else{
+                				mui.alert(data.msg)
+                			}
+                		},
+                		error: function(xhr,type,errorThrown){
+							alert(xhr.responseText)
+                		}
+            		});
+				}
+
+            
 				$.plusReady(function(){
 					
-					//循环初始化所有下拉刷新，上拉加载。
-					$.each(document.querySelectorAll('.mui-slider-group .mui-scroll'), function(index, pullRefreshEl) {
-						
-						$(pullRefreshEl).pullToRefresh({
-							down: {
-								style:'circle',
-								contentdown : "下拉可以刷新",
-								contentover : "释放立即刷新",
-								contentrefresh : "正在刷新...",
-								callback: pulldownRefresh
-							},
-							up: {
-								contentrefresh : "正在加载...",//可选，正在加载状态时，上拉加载控件上显示的标题内容
-	      						contentnomore:'没有更多数据了',
-								callback: pullupRefresh
-							}
-						});
-					});
-					// 第一个tab 默认加载一次数据
-					mui(".mui-slider-group .mui-scroll").pullToRefresh()[0].pullDownLoading();
+					var params, distributeCode, flag = false
+					var self = plus.webview.currentWebview();
+				    params = self.params;//获得参数
+				    console.log(params)
+				    distributeCode = JSON.parse(params).distributecode;
+				    var groundUrl = '/a/checkacceptdetail/finish';
+				    var url = '/a/checkacceptdetail/shelfInfo?distributeCode='+ distributeCode;
+				    genData(url);
 					
 					
 	            	var item2 = document.getElementById('item2mobile');
 					document.getElementById('slider').addEventListener('slide', function(e) {
-						currSelected();
 						if (e.detail.slideNumber === 1) {
-							mui(".mui-slider-group .mui-scroll").pullToRefresh()[1].pullDownLoading();
+							if (!item2.querySelector('.am-card')) {
+								var acceptanceTab2 = document.querySelector('.mui-tab2');
+								var html2;
+								if(detailData.listysj.list.length === 0){
+									html2 = nullDataHtml
+								}else{
+									html2 = template('ground_list',detailData.listysj);
+								}
+								acceptanceTab2.innerHTML = html2;
+							}
 						}
 					});
 					
@@ -164,28 +160,126 @@
 							sliderProgressBar.setAttribute('style', sliderProgressBar.getAttribute('style'));
 						}
 					});
+	            	// 展开编辑
+	            	$('#slider').on('tap','.groundEdit',function(){
+	            		flag = flag === true ? false: true;
+	            		var index = this.dataset.index;
+	            		console.log(index);
+	            		this.innerHTML = this.innerHTML === '展开编辑' ? '收起编辑':'展开编辑' ;
+	            		var realNum = document.querySelectorAll('.realNum')[index].querySelector('span') ? document.querySelectorAll('.realNum')[index].querySelector('span').innerText : document.querySelector('.realInputNum').value;
+	            		
+	            		var actualStore = document.querySelectorAll('.actualStore')[index].querySelector('span') ? document.querySelectorAll('.actualStore')[index].querySelector('span').innerText : detailData.listwsj.list[index].actualStore
+	            		var realNumNode = '<div class="am-list-item am-input-item am-list-item-middle">' + 
+						'<div class="am-list-line">'+
+						'<div class="am-input-label am-input-label-5 font-warning">实际上架数量：</div>'+
+						'<div class="am-input-control">'+
+						'<input pattern="[0-9]*" type="number" value='+ realNum +' placeholder="请输入" class="realInputNum"/>'+
+						'</div>'+
+						'</div>'+
+						'</div>'+
+						'</div>';
+						var optionsDataSource = detailData.listwsj.list[index].acceptoodsVo;
+						var select = document.createElement('select');
+						select.className = 'select_actualStore';
+						mui.each(optionsDataSource,function(ind,item){
+							if(item.positionName === detailData.listwsj.list[index].actualStore){
+								select.value = item.id;
+							}
+						})
+						for( var i=0; i<optionsDataSource.length; i++ ){
+							var option = document.createElement('option');
+							option.value = optionsDataSource[i].id;
+							option.innerHTML = optionsDataSource[i].positionName;
+							select.appendChild(option);
+						}
+						var parentNode = document.createElement('div');
+						var childNode = document.createElement('div');
+						var subChildNode = document.createElement('div');
+						var controlNode = document.createElement('div');
+						parentNode.className = 'am-list-item am-input-item am-list-item-middle';
+						childNode.className = 'am-list-line';
+						subChildNode.className = 'am-input-label am-input-label-4 font-warning';
+						subChildNode.innerText = '货位：';
+						controlNode.className = 'am-input-control';
+						controlNode.appendChild(select);
+						childNode.appendChild(subChildNode);
+						childNode.appendChild(controlNode);
+						parentNode.appendChild(childNode);
+	            		if(flag){
+	            			document.querySelectorAll('.actualStore')[index].innerHTML = '';
+	            			document.querySelectorAll('.actualStore')[index].appendChild(parentNode);
+	            			document.querySelectorAll('.realNum')[index].innerHTML = realNumNode
+	            		}else{
+	            			document.querySelectorAll('.actualStore')[index].innerHTML = '货位：<span>'+ actualStore +'</span> '
+	            			document.querySelectorAll('.realNum')[index].innerHTML = '实际上架数量：<span>'+ realNum +'</span>'
+	            		}
+	            		
+	            	})
 	            	
 	            	//绑定点击事件  - 进入详情页
 						
 					$('#slider').on('tap','.moreDetail',function(){
 						let id = this.getAttribute('data-id');
+						let index = this.dataset.index;
+						console.log(index)
+						var item1mobile = document.querySelector('#item1mobile');
+						var hasGround = item1mobile.className.indexOf('mui-active')>0 ? true: false;
+						let data = hasGround ? detailData.listwsj.list[index]: detailData.listysj.list[index];
+						data.hasGround = hasGround; // 判断 详情页面是否有上架按钮
+						let newData = Object.assign({},data,JSON.parse(params));
+						newData.statusname = hasGround ? '待上架':'已上架';
 						document.activeElement.blur();
-						console.log(id,'id');
-						common.openwin('ground_detail',{ targetId: id },{
+						common.openwin('ground_detail',{ details: JSON.stringify(newData) },{
 							titleText: '详情'
 						})
 					});
 					
 					// 绑定事件 --确认上架
 					$('#slider').on('tap','.ground',function(){
-						let id = this.getAttribute('data-id');
-						console.log(id,'id')
+						document.activeElement.blur(); // 隐藏软键盘
+						let index = this.dataset.index;
+						var _this_card = document.querySelectorAll('.am-card')[index];
+						let id = _this_card.dataset.id;
+						var realNum = flag ? _this_card.querySelector('.realInputNum').value: _this_card.querySelector('.realNum').querySelector('span').innerText;
+						var realReceiveStore =  flag ?  _this_card.querySelector('.select_actualStore').value : _this_card.querySelector('.actualStore').querySelector('span').innerText;
+						console.log(realNum);
+						console.log(realReceiveStore)
+						if(realNum <= 0 ){
+							return mui.toast('实际上架数量不能小于或等于0')
+						}
+						if(realNum > _this_card.querySelector('.groundNum').innerText){
+							return mui.toast('实际数量不得大于指示数量');
+						}
 						var btnArray = ['否', '是'];
 						mui.confirm('是否确认上架？', '确认', btnArray, function(e) {
 							if (e.index == 1) {
-								alert('你点击了是')
+								var detailListVo = [],postData = {},submitData = {};
+									postData.id = id;
+									postData.realNum = realNum;
+									postData.realReceiveStore = realReceiveStore;
+									detailListVo.push(postData);
+									submitData.detailListVo = detailListVo;
+									submitData.distributeCode = distributeCode;
+									console.log(JSON.stringify(submitData));
+									mui.ajaxRequest(groundUrl,{
+				                		type: 'POST',
+				                		data: submitData,
+				                		contentType: "application/json",
+				                		showWaiting: true,
+				                		success: function(data){
+				                			if(data.code === 200){
+				                				mui.toast('上架成功');
+				                				genData(url)
+				                			}else{
+				                				mui.alert(data.msg)
+				                			}
+				                		},
+				                		error: function(xhr,type,errorThrown){
+											alert(xhr.responseText)
+				                		}
+				            		});
 							} else {
-								alert('你点击了否')
+								
 							}
 						},'div')
 					});

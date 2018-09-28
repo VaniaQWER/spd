@@ -87,24 +87,10 @@
 								}
 							},
 							error: function(xhr,type,errorThrown){
+								mui(_this).button('reset');
 								alert(xhr.responseText)
 							}
 						})
-						/*if(loginInfo.account === 'admin' && loginInfo.password === 'admin'){
-				            mui(this).button('loading');
-				            document.activeElement.blur(); // 隐藏软键盘
-				            setTimeout(function() {
-				                mui(this).button('reset');
-				                common.openwin('../home/index',{})
-				            }.bind(this), 2000);
-						}else{
-							mui.alert('账号或密码错误', '', btnArray, function(e) {
-							if (e.index == 0) {
-								alert('你点击了是');
-								
-							}
-						},'div')
-						}*/
 					});
 				});
 			}(mui, document));

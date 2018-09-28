@@ -36,17 +36,22 @@
 					<div id="item1mobile" class="mui-slider-item mui-control-content mui-active">
 						<div id="scroll1" class="mui-scroll-wrapper">
 							<div class="mui-scroll"  id='mui-table-view-tab1'>
-								
+								<ul class="mui-table-view">
+									<li class="mui-table-view-cell mui-tab1" style="padding: 0;">
+										
+									</li>
+								</ul>
 							</div>
 						</div>
 					</div>
 					<div id="item2mobile" class="mui-slider-item mui-control-content">
 						<div id="scroll2" class="mui-scroll-wrapper">
 							<div class="mui-scroll" id='mui-table-view-tab2'> 
-								<div class="mui-loading">
-									<div class="mui-spinner">
-									</div>
-								</div>
+								<ul class="mui-table-view">
+									<li class="mui-table-view-cell mui-tab2" style="padding: 0;">
+										
+									</li>
+								</ul>
 							</div>
 						</div>
 
@@ -57,8 +62,6 @@
 		</div>
 		
 		<script src="../../js/mui.min.js"></script>
-		<script src="../../js/mui.pullToRefresh.js"></script>
-		<script src="../../js/mui.pullToRefresh.material.js"></script>
 		<script src="../../js/template-web.js" type="text/javascript" charset="utf-8"></script>
 		<script src="../../js/utils.js" type="text/javascript" charset="utf-8"></script>
 		<script src="../../js/common.js" type="text/javascript" charset="utf-8"></script>
@@ -76,92 +79,78 @@
 			var utils = new Utils();
 			utils.appendModule('#list_tpl');
 			
-			var selected = undefined,hasChecked = false,url = undefined;
-			currSelected();
-			
-			function template(selected, data, insertType){
-    			utils.innerTplHtml('picking_tpl', selected, data, insertType);
-        	}
-        	
-        	function currSelected(){
-				var item1mobile = document.querySelector('#item1mobile');
-				var item2mobile = document.querySelector('#item2mobile');
-				if(item1mobile.className.indexOf('mui-active')>0){
-					selected = '#mui-table-view-tab1';
-					hasChecked = false;
-				}else{
-					selected = '#mui-table-view-tab2';
-					hasChecked = true;
+			var nullDataHtml = '<div class="mui-pull-bottom-tips"><div class="mui-pull-bottom-wrapper">'+
+										'<span class="mui-pull-loading">暂无数据</span></div></div>'
+			var detailData = {
+					notDetail: { list: [] },
+					existDetail: { list: [] }
+			}, resData = undefined;
+			/*
+				  获取列表数据
+				 * */
+				function genData(url){
+					mui.ajaxRequest(url,{
+                		type: 'GET',
+                		showWaiting: true,
+                		success: function(data){
+                			if(data.code === 200){
+                				resData = data.data;
+                				mui.each(data.data.notDetail,function(index,item){
+                					item.type = '待拣货'
+                				});
+                				mui.each(data.data.existDetail,function(index,item){
+                					item.type = '已拣货'
+                				});
+                				detailData.notDetail.list = data.data.notDetail;
+	            				detailData.notDetail.hasPicked = true;
+	            				detailData.existDetail.list = data.data.existDetail;
+	            				detailData.existDetail.hasPicked = false;
+	                			showData(detailData)
+                			}else{
+                				mui.alert(data.msg)
+                			}
+                		},
+                		error: function(xhr,type,errorThrown){
+							alert(xhr.responseText)
+                		}
+            		});
 				}
-        	}
-        	/*
-        	 	下拉刷新
-        	 * */
-        	function pulldownRefresh(){
-				url = !hasChecked ? '/undercarriage': '/undercarriage1';
-				var self = this;
-				mui.ajaxRequest(url,{
-            		type: 'GET',
-            		success: function(data){
-            			self.endPullDownToRefresh(true);
-            			data.picking = hasChecked
-						return template(selected,data,false)
-            			
-            		},
-            		error: function(xhr,type,errorThrown){
-						alert(xhr.responseText)
-            		}
-        		});
-			}
-        	/*
-				 
-			 *  上拉加载更多
-			 * */
-			function pullupRefresh(){
-				url = !hasChecked ? '/undercarriage': '/undercarriage1';
-				var self = this;
-				mui.ajaxRequest(url,{
-            		type: 'GET',
-            		success: function(data){
-            			self.endPullUpToRefresh();
-            			data.picking = hasChecked
-						return template(selected,data,true)
-            			
-            		},
-            		error: function(xhr,type,errorThrown){
-						alert(xhr.responseText)
-            		}
-        		});
-			}
 			
+			
+			function showData(data){
+				var acceptanceTab1 = document.querySelector('.mui-tab1');
+				var html1 = undefined;
+				if(data.notDetail.list.length === 0){
+					html1 = nullDataHtml
+				}else{
+					html1 = template('picking_tpl',data.notDetail);
+				}
+				acceptanceTab1.innerHTML = html1;
+			}
+        	
 			$.plusReady(function(){
-				
-				//循环初始化所有下拉刷新，上拉加载。
-				$.each(document.querySelectorAll('.mui-slider-group .mui-scroll'), function(index, pullRefreshEl) {
-					
-					$(pullRefreshEl).pullToRefresh({
-						down: {
-							style:'circle',
-							contentdown : "下拉可以刷新",
-							contentover : "释放立即刷新",
-							contentrefresh : "正在刷新...",
-							callback: pulldownRefresh
-						},
-						up: {
-							contentrefresh : "正在加载...",//可选，正在加载状态时，上拉加载控件上显示的标题内容
-      						contentnomore:'没有更多数据了',
-							callback: pullupRefresh
-						}
-					});
-				});
-				// 第一个tab 默认加载一次数据
-				mui(".mui-slider-group .mui-scroll").pullToRefresh()[0].pullDownLoading();
+				var params, pickingOrderNo
+				var self = plus.webview.currentWebview();
+				params = self.params;//获得参数
+				pickingOrderNo = JSON.parse(params).pickingorderno;
+			    console.log(pickingOrderNo)
+			    var url = '/a/common/pickingorderdetail/getPickingDetail?pickingOrderNo='+ pickingOrderNo;
+			    var pickUrl = '/a/common/pickingorder/finishPicking';
+				genData(url);
 				
             	var item2 = document.getElementById('item2mobile');
 				document.getElementById('slider').addEventListener('slide', function(e) {
-					currSelected();
 					if (e.detail.slideNumber === 1) {
-						mui(".mui-slider-group .mui-scroll").pullToRefresh()[1].pullDownLoading();
+						if (!item2.querySelector('.am-card')) {
+								var acceptanceTab2 = document.querySelector('.mui-tab2');
+								var html2;
+								if(detailData.existDetail.list.length === 0){
+									html2 = nullDataHtml
+								}else{
+									html2 = template('picking_tpl',detailData.existDetail);
+								}
+								acceptanceTab2.innerHTML = html2;
+							}
 					}
 				});
 					
@@ -178,23 +167,56 @@
             	
             	//绑定点击事件  - 进入详情页
 				$('#slider').on('tap','.toPage',function(){
-					console.log(123)
+					let index = this.dataset.index;
+					var item1mobile = document.querySelector('#item1mobile');
+					var hasPicked = item1mobile.className.indexOf('mui-active')>0 ? true: false;
+					let data = hasPicked ? detailData.notDetail.list[index]: detailData.existDetail.list[index];
+					data.hasPicked = hasPicked; // 判断 详情页面是否有上架按钮
+					let newData = Object.assign({},data,JSON.parse(params));
+					newData.statusname = hasPicked ? '待拣货':'已拣货';
+					console.log(JSON.stringify(newData))
 					document.activeElement.blur();
-					common.openwin('pickingOffDetails',{name:123},{
+					common.openwin('pickingOffDetails',{ details: JSON.stringify(newData) },{
 						titleText: '详情'
 					})
 				})
 				
-				// 绑定事件 --确认上架
+				// 绑定事件 --确认拣货
 				$('#slider').on('tap','.submitButton',function(){
+					var index = this.dataset.index;
+					var _this_card = document.querySelectorAll('.am-card')[index];
 					document.activeElement.blur();
 					var btnArray = ['否', '是'];
 					$.confirm('确定要执行此操作吗？', '确认拣货', btnArray, function(e) {
 						if (e.index == 1) {
-							alert('你点击了是')
-						} else {
-							alert('你点击了否')
+							var pickingDetail = [],postData = {},submitData = {};
+							postData.drugCode = detailData.notDetail.list[index].drugCode;
+							postData.id = detailData.notDetail.list[index].id;
+							postData.pickingNum = detailData.notDetail.list[index].allocationNum;
+							pickingDetail.push(postData);
+							submitData.pickingDetail = pickingDetail;
+							submitData.applyNo = resData.applyOrder;
+							submitData.pickingOrderNo = pickingOrderNo;
+							console.log(JSON.stringify(submitData));
+							mui.ajaxRequest(pickUrl,{
+		                		type: 'POST',
+		                		data: submitData,
+		                		contentType: "application/json",
+		                		showWaiting: true,
+		                		success: function(data){
+		                			if(data.code === 200){
+		                				mui.toast('拣货成功');
+		                				genData(url)
+		                			}else{
+		                				mui.alert(data.msg)
+		                			}
+		                		},
+		                		error: function(xhr,type,errorThrown){
+									alert(xhr.responseText)
+		                		}
+		            		});
 						}
+						
 					},'div')
 				})
 			});

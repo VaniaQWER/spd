@@ -1,63 +1,58 @@
 
 <script type="text/html" id='ground_list'>
-	<ul class="mui-table-view">
-		<li>
-			{{ each list value i}}
-			<div class="am-card scrollList-item am-card-full" data-id={{ value.id }}>
-				<div class="am-card-header">
-					<div class="am-card-header-content">
-						<span style="font-size: 18px; color: rgb(51, 51, 51); font-weight: bold;">
-						{{ value.drugName}}</span>
-					</div>
-					<div class="am-card-header-extra">
-						{{ if hasGrounding }}
-							<span class="hasGround ground-tag">已上架</span>
-							{{ else }}
-								<span class="before-ground ground-tag">待上架</span>
-						{{ /if }}
-					</div>
+	{{ each list value i}}
+		<div class="am-card scrollList-item am-card-full" 
+			data-id={{ value.id }}
+			>
+			<div class="am-card-header">
+				<div class="am-card-header-content">
+					<span style="font-size: 18px; color: rgb(51, 51, 51); font-weight: bold;">
+					{{ value.ctmmTradeName }}</span>
 				</div>
-				<div class="am-card-body">
-					<div class="am-flexbox am-flexbox-align-center">
-						<div class="am-flexbox-item"> 
-							单位：<span>{{ value.replanUnit }}</span> 
-						</div>
-						<div class="am-flexbox-item"> 
-							货位：<span>95</span> 
-						</div>
-					</div>
-					<div class="am-flexbox am-flexbox-align-center">
-						<div class="am-flexbox-item"> 
-							数量：<span>{{ value.total }}</span> 
-						</div>
-						<div class="am-flexbox-item">
-						 规格：<span>{{ value.spec }}</span>
-						</div>
-					</div>
-					<div class="am-flexbox am-flexbox-align-center">
-						<div class="am-flexbox-item">
-						 生产厂家：<span>{{ value.producter }}</span>
-						 </div>
-					</div>
+				<div class="am-card-header-extra">
+					<span>{{ value.type }}</span>
 				</div>
-				<div class="am-card-footer">
-					<div class="am-card-footer-content"></div>
-					<div class="am-card-footer-extra">
-						<button type="button" class="mui-btn mui-btn-blue mui-btn-outlined moreDetail" data-id={{ value.id }} style="margin: 0 5px;">更多详情</button>
-						{{ if !hasGrounding }}
-							<button type="button" class="mui-btn mui-btn-danger ground" data-id={{ value.id }}>确认上架</button>
-						{{ /if }}
-					</div>
-				</div>
-			</div>	
-			<div style="background-color: #f5f5f9; height: 6px;">
 			</div>
-		{{/each}}
-		</li>
-	</ul>
-	<div class="mui-pull-bottom-tips">
-		<div class="mui-pull-bottom-wrapper">
-			<span class="mui-pull-loading">上拉显示更多</span>
+			<div class="am-card-body">
+				<div class="am-flexbox am-flexbox-align-center">
+					<div class="am-flexbox-item"> 
+						单位：<span>{{ value.replanUnit }}</span> 
+					</div>
+					<div class="am-flexbox-item actualStore"> 
+						货位：<span>{{ value.actualStore }}</span> 
+					</div>
+				</div>
+				<div class="am-flexbox am-flexbox-align-center">
+					<div class="am-flexbox-item"> 
+						数量：<span class="groundNum">{{ value.realNum }}</span> 
+					</div>
+					<div class="am-flexbox-item realNum">
+					 实际上架数量：<span>{{ value.realNum }}</span>
+					</div>
+				</div>
+				<div class="am-flexbox am-flexbox-align-center">
+					<div class="am-flexbox-item">
+					 规格：<span>{{ value.ctmmSpecification }}</span>
+					</div>
+					<div class="am-flexbox-item">
+					 生产厂家：<span>{{ value.ctmmManufacturerName }}</span>
+					 </div>
+				</div>
+			</div>
+			<div class="am-card-footer">
+				<div class="am-card-footer-content"></div>
+				<div class="am-card-footer-extra">
+					{{ if hasGround }}
+						<button type="button" class="mui-btn mui-btn-blue mui-btn-outlined groundEdit" data-id={{ value.id }} data-index={{ i }} >展开编辑</button>
+					{{ /if }}
+					<button type="button" class="mui-btn mui-btn-blue mui-btn-outlined moreDetail" data-id={{ value.id }} data-index={{ i }} style="margin: 0 5px;">更多详情</button>
+					{{ if hasGround }}
+						<button type="button" class="mui-btn mui-btn-danger ground" data-id={{ value.id }} data-index={{ i }} >确认上架</button>
+					{{ /if }}
+				</div>
+			</div>
+		</div>	
+		<div style="background-color: #f5f5f9; height: 6px;">
 		</div>
-	</div>
+	{{/each}}
 </script>

@@ -1,82 +1,64 @@
 
 <script type="text/html" id='check_list_tpl'>
-	<div>
-		{{ each list value i}}
-			<div class="am-card scrollList-item am-card-full" data-id={{ value.id }}>
-				<div class="am-card-header">
-					<div class="am-card-header-content">
-						<span style="font-size: 18px; color: rgb(51, 51, 51); font-weight: bold;">
-						{{ value.drugName}}</span>
-					</div>
-					<div class="am-card-header-extra">
-						{{ if hasChecked }}
-							<span class="hasGround ground-tag">已提交</span>
-							{{ else }}
-								<span class="before-ground ground-tag">未提交</span>
-						{{ /if }}
-					</div>
+	{{ each list value i}}
+		<div class="am-card scrollList-item am-card-full" data-id={{ value.id }}>
+			<div class="am-card-header">
+				<div class="am-card-header-content">
+					<span style="font-size: 18px; color: rgb(51, 51, 51); font-weight: bold;">
+					{{ value.ctmmTradeName }}</span>
 				</div>
-				<div class="am-card-body">
-					<div class="am-flexbox am-flexbox-align-center">
-						<div class="am-flexbox-item"> 
-							单位：<span>{{ value.replanUnit }}</span> 
-						</div>
-						<div class="am-flexbox-item"> 
-							货位：<span>A1231</span> 
-						</div>
-					</div>
-					
-					<div class="am-flexbox am-flexbox-align-center">
-						<div class="am-flexbox-item am-flex-num"> 
-							数量：<span>{{ value.total }}</span>
-						</div>
-						<div class="am-flexbox-item">
-						 	规格：<span>{{ value.spec }}</span>
-						 </div>
-					</div>
-					{{if value.isEdit}}
-					<div class="am-flexbox am-flexbox-align-center">
-						<div class="am-flexbox-item"> 
-							生产日期：<span>{{ value.date }}</span> 
-						</div>
-						<div class="am-flexbox-item">
-						 	生产批号：
-						 	{{if !value.isEdit}}
-								<span>{{value.planNo}}</span> 
-							{{else if value.isEdit}}
-								<span><input type="text" name="planNo" id="planNo" class="inline-Input"/></span> 
-							{{/if}}
-						 </div>
-					</div>
-					<div class="am-flexbox am-flexbox-align-center">
-						<div class="am-flexbox-item"> 
-							有效期至：<span>{{ value.date }}</span> 
-						</div>
-						<div class="am-flexbox-item"> 
-							生产厂家：<span>{{ value.producter }}</span> 
-						</div>
-					</div>
-					{{/if}}
-				</div>
-				<div class="am-card-footer">
-					<div class="am-card-footer-extra">
-						
-						{{if !hasChecked}}
-							<button type="button" class="mui-btn mui-btn-blue mui-btn-outlined eidtRow" style="margin: 0 5px;" data-id={{ value.id }} data-index={{ i }}>展开编辑</button>
-						{{/if}}
-						<button type="button" class="mui-btn mui-btn-blue mui-btn-outlined toPage" style="margin: 0 5px;">更多详情</button>
-						{{ if !hasChecked }}
-							<button type="button" class="mui-btn mui-btn-blue mui-btn-danger submitButton" data-id={{ value.id }} data-index={{ i }}>提交</button>
-						{{ /if }}
-					</div>
+				<div class="am-card-header-extra">
+					<span>{{ value.checkDetailStatusName }}</span>
 				</div>
 			</div>
-		{{/each}}
-	</div>
-	<div class="mui-pull-bottom-tips">
-		<div class="mui-pull-bottom-wrapper">
-			<span class="mui-pull-loading">上拉显示更多</span>
+			<div class="am-card-body">
+				<div class="am-flexbox am-flexbox-align-center">
+					<div class="am-flexbox-item"> 
+						单位：<span>{{ value.unit }}</span> 
+					</div>
+					<div class="am-flexbox-item"> 
+						货位：<span>{{ value.locName }}</span> 
+					</div>
+				</div>
+				
+				<div class="am-flexbox am-flexbox-align-center">
+					<div class="am-flexbox-item am-flex-num"> 
+						数量：<span>{{ value.practicalRepertory }}</span>
+					</div>
+					<div class="am-flexbox-item">
+					 	规格：<span>{{ value.ctmmSpecification }}</span>
+					 </div>
+				</div>
+				{{if value.isEdit}}
+				<div class="am-flexbox am-flexbox-align-center">
+					<div class="am-flexbox-item"> 
+						生产日期：<span>{{ value.accountProductTime }}</span> 
+					</div>
+					<div class="am-flexbox-item">
+					 	生产批号：<span>{{value.accountBatchNo}}</span>
+					 </div>
+				</div>
+				<div class="am-flexbox am-flexbox-align-center">
+					<div class="am-flexbox-item"> 
+						有效期至：<span>{{ value.accountEndTime }}</span> 
+					</div>
+					<div class="am-flexbox-item"> 
+						生产厂家：<span>{{ value.ctmmManufacturerName }}</span> 
+					</div>
+				</div>
+				{{/if}}
+			</div>
+			<div class="am-card-footer">
+				<div class="am-card-footer-extra">
+					{{if value.checkDetailStatus === 1 }}
+						<button type="button" class="mui-btn mui-btn-blue mui-btn-outlined eidtRow" style="margin: 0 5px;" data-id={{ value.id }} data-index={{ i }}>展开编辑</button>
+					{{/if}}
+					<button type="button" class="mui-btn mui-btn-blue mui-btn-outlined toPage" style="margin: 0 5px;" data-index={{ i }}>更多详情</button>
+					{{ if value.checkDetailStatus === 1 }}
+						<button type="button" class="mui-btn mui-btn-blue mui-btn-danger submitButton" data-id={{ value.id }} data-index={{ i }}>提交</button>
+					{{ /if }}
+				</div>
+			</div>
 		</div>
-	</div>
-	
+	{{/each}}
 </script>

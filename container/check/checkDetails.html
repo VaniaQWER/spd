@@ -24,7 +24,7 @@
 		</header>-->
 		
 		<div class="mui-content detailRow">
-			<div class="detail-header-flex">
+			<!--<div class="detail-header-flex">
 				<div class="am-action">
 					<a class="mui-icon mui-icon-arrowleft"></a>
 					<a class="theme_back_font">上一个</a>
@@ -34,29 +34,17 @@
 					<a class="theme_next_font">下一个</a>
 					<a class="mui-icon mui-icon-arrowright"></a>
 				</div>
-			</div>
+			</div>-->
 			<form class="mui-input-group" id="detailContent" style="background:none;">
 				<ul class="mui-table-view" style="margin-bottom:12px;">
 					<li class="mui-table-view-cell mui-collapse">
 						<a class="mui-navigate-right" href="#">产品信息</a>
 						<div class="mui-collapse-content">
-								<div class="mui-input-row">
-									<label>通用名</label>
-									<p class="detailRow_content">131312313131231313123131312313131231313123</p>
-									<span class="detailRow_right">25</span>
-								</div>
+								
 						</div>
 					</li>
 				</ul>
 			</form>
-			
-			<div id="List"></div>
-			<div id="addBtn">
-				<button class="mui-btn mui-btn-block btn">+ 增加批号</button>
-			</div>
-			
-			
-			<button type="button" class="mui-btn mui-btn-warning mui-btn-block" style="margin-bottom:20px;">确认提交</button>
 		</div>
 		<script src="../js/mui.min.js"></script>
 		<script type="text/javascript">
@@ -67,33 +55,28 @@
 			$.init()
 			
 			// 模板加载
-			$.ready(function(){
+			$.plusReady (function(){
 				//console.log("当前页面URL："+plus.webview.currentWebview().getURL());
-				var data = {
-					list: [{
-						"id":"1",
-						"type":"待拣货",
-						"deptName":"部门1",
-						"createrUser":"王大雷",
-						"pdPerson":"王磊",
-						"supplier:Name": "静注人免疫球蛋白",
-						"drugName": "西咪替丁",
-						"producter": "北京汉典制药有限公司",
-						"distributionNo": "AADKSF1OOSKDF2",
-						"spec":"80mg/瓶",
-						"date": "2018-08-08",
-						"updateTime":'2018-08-10'
-					}]
-				};
+				var self = plus.webview.currentWebview();
+				var details = JSON.parse(self.details);//获得参数
+
+				var data = {}, checkUrl = '/a/checkacceptdetail/finish';
+				data.list = [];
+				data.list.push(details);
+				if(details.checkstatus === '2'){
+						var node = '<div id="List"></div><div id="addBtn"><button class="mui-btn mui-btn-block btn">+ 增加批号</button></div>';
+						var acceptanceBtn = '<button type="button" id="acceptance" class="mui-btn mui-btn-warning mui-btn-block" style="margin-bottom: 20px;" data-loading-text = "提交中" data-loading-icon-position="right">确认提交</button>'
+						document.querySelector('#detailContent').insertAdjacentHTML('afterEnd',node);
+						document.querySelector('.detailRow').insertAdjacentHTML("beforeEnd",acceptanceBtn);
+					}
+				
 				var utils = new Utils();
 				utils.appendModule('#acc_detail_tpl');
 				var html = template('detail_tpl', data);
 				document.getElementById('detailContent').innerHTML = html;
 				
-			});
-			
-			
-			/*
+				
+				/*
 			 *2 点击添加按钮 增加选填项    开始
 			 * 
 			 * 拖拽后显示操作图标，点击操作图标删除元素
@@ -105,6 +88,7 @@
 				mui('.slide-main').off('tap', '.mui-btn').on('tap', '.mui-btn', function(event) {
 					var elem = this;
 					var li = elem.parentNode.parentNode;
+					var btnArray = ['确认', '取消'];
 					mui.confirm('确认删除该条记录？', '操作提醒', btnArray, function(e) {
 						if(e.index == 0) {
 							itemNum--;
@@ -125,32 +109,36 @@
 						}
 					});
 				});
-				var btnArray = ['确认', '取消'];
 			}
-
-			mui("#addBtn").on('tap', '.mui-btn', function() {
-				var ParentDiv = document.createElement("div")
-				ParentDiv.className = "mui-table-view-cell slide-main";
-				ParentDiv.setAttribute('data-index', itemNum);
-				ParentDiv.innerHTML = '<div class="mui-slider-handle">' +
-					'<div class="mui-input-group">' +
-					'<div class="mui-input-row">' +
-					'<label>生产批号</label>' +
-					'<input type="text" name="buycontent" class="mui-input-clear mui-input" placeholder="请输入" >' +
-					'</div>' +
-					'<div class="mui-input-row">' +
-					'<label>数量</label>' +
-					'<input type="text" name="buycontent" class="mui-input-clear mui-input" placeholder="请输入" >' +
-					'</div>' +
-					'</div>' +
-					'</div>' +
-					'<div class="mui-slider-right mui-disabled">' +
-					'<a class="mui-btn mui-btn-red">删除</a>' +
-					'</div>';
-				document.getElementById("List").appendChild(ParentDiv);
-				itemNum++;
-				addSlideDelete(); //添加侧滑删除
-			})
+			if(details.checkstatus === '2'){
+				mui("#addBtn").on('tap', '.mui-btn', function() {
+					console.log(1111)
+					var ParentDiv = document.createElement("div")
+					ParentDiv.className = "mui-table-view-cell slide-main";
+					ParentDiv.setAttribute('data-index', itemNum);
+					ParentDiv.innerHTML = '<div class="mui-slider-handle">' +
+						'<div class="mui-input-group">' +
+						'<div class="mui-input-row">' +
+						'<label class="font-warning">生产批号</label>' +
+						'<input type="text" name="buycontent" class="mui-input-clear mui-input" placeholder="请输入" >' +
+						'</div>' +
+						'<div class="mui-input-row">' +
+						'<label class="font-warning">数量</label>' +
+						'<input type="text" name="buycontent" class="mui-input-clear mui-input" placeholder="请输入" >' +
+						'</div>' +
+						'</div>' +
+						'</div>' +
+						'<div class="mui-slider-right mui-disabled">' +
+						'<a class="mui-btn mui-btn-red">删除</a>' +
+						'</div>';
+					document.getElementById("List").appendChild(ParentDiv);
+					itemNum++;
+					addSlideDelete(); //添加侧滑删除
+				});
+			}
+				
+				
+			});
 			
 		})(mui);
 		

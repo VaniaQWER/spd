@@ -1,45 +1,48 @@
 
 <script type="text/html" id='acceptance'>
-	<ul class="mui-table-view">
-		<li>
-			{{ each list value i}}
-				<div class="am-card scrollList-item am-card-full" data-id={{ value.id }}>
-					<div class="am-card-header">
-						<div class="am-card-header-content">
-							<span style="font-size: 18px; color: rgb(51, 51, 51); font-weight: bold;">
-							{{ value.supplierName? value.supplierName: '' }}</span>
-						</div>
-						<div class="am-card-header-extra">
-							<span>{{ value.statusName }}</span>
-						</div>
+	{{ each list value i}}
+		<div class="am-card scrollList-item am-card-full" 
+			data-distributeCode={{ value.distributeCode ? value.distributeCode: '--' }}
+			data-orderCode={{ value.orderCode ? value.orderCode: '--' }}
+			data-statusName={{ value.statusName ? value.statusName: '--' }}
+			data-typeName={{ value.typeName ? value.typeName: "--" }} 
+			data-supplierName={{ value.supplierName }}
+			data-deptAddress={{ value.deptAddress ? value.deptAddress: '--' }}
+		>
+			<div class="am-card-header">
+				<div class="am-card-header-content">
+					<span style="font-size: 18px; color: rgb(51, 51, 51); font-weight: bold;">
+					{{ value.supplierName? value.supplierName: '' }}</span>
+				</div>
+				<div class="am-card-header-extra">
+					<span>{{ value.statusName }}</span>
+				</div>
+			</div>
+			<div class="am-card-body">
+				<div class="am-flexbox am-flexbox-align-center">
+					<div class="am-flexbox-item"> 
+						配送单号：<span>{{ value.distributeCode }}</span> 
 					</div>
-					<div class="am-card-body">
-						<div class="am-flexbox am-flexbox-align-center">
-							<div class="am-flexbox-item"> 
-								配送单号：<span>{{ value.distributeCode }}</span> 
-							</div>
-							<div class="am-flexbox-item"> 
-								品相数：<span>{{ value.total }}</span> 
-							</div>
-						</div>
-						<div class="am-flexbox am-flexbox-align-center">
-							<div class="am-flexbox-item"> 
-								计划单号：<span>{{ value.orderCode }}</span> 
-							</div>
-							<div class="am-flexbox-item">
-							 制单时间：<span>{{ value.createDate }}</span>
-							 </div>
-						</div>
+					<div class="am-flexbox-item"> 
+						品相数：<span>{{ value.total }}</span> 
 					</div>
 				</div>
-				<div style="background-color: #f5f5f9; height: 6px;">
+				<div class="am-flexbox am-flexbox-align-center">
+					<div class="am-flexbox-item"> 
+						计划单号：<span>{{ value.orderCode }}</span> 
+					</div>
+					<div class="am-flexbox-item">
+					 制单时间：<span>{{ value.createDate }}</span>
+					 </div>
 				</div>
-			{{/each}}
-		</li>
-	</ul>
-	<div class="mui-pull-bottom-tips">
+			</div>
+		</div>
+		<div style="background-color: #f5f5f9; height: 6px;">
+		</div>
+	{{/each}}
+	<!--<div class="mui-pull-bottom-tips">
 		<div class="mui-pull-bottom-wrapper">
 			<span class="mui-pull-loading">上拉显示更多</span>
 		</div>
-	</div>
+	</div>-->
 </script>

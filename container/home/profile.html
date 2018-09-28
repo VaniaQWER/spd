@@ -63,6 +63,7 @@
 								var url = '/a/cacheCurrentDept/'+ currentDept.deptId
 								mui.ajaxRequest(url,{
 			                		type: 'get',
+			                		showWaiting: true,
 			                		success: function(data){
 			                			if(data.code === 200){
 			                				mui.toast('切换系统成功');

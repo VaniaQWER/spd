@@ -6,36 +6,24 @@
 				<a class="mui-navigate-right" href="#">单据信息</a>
 				<div class="mui-collapse-content">
 						<div class="mui-input-row">
-							<label>盘点单号</label>
-							<p class="detailRow_content">{{value.distributionNo}}</p>
+							<label>验收单号</label>
+							<p class="detailRow_content">{{value.distributecode}}</p>
 						</div>
 						<div class="mui-input-row">
-							<label>类型</label>
-							<p class="detailRow_content">{{value.type}}</p>
+							<label>状态</label>
+							<p class="detailRow_content">{{ value.statusname }}</p>
 						</div>
 						<div class="mui-input-row">
-							<label>部门</label>
-							<p class="detailRow_content">{{value.deptName}}</p>
+							<label>验收时间</label>
+							<p class="detailRow_content">{{value.updatedate}}</p>
 						</div>
 						<div class="mui-input-row">
-							<label>制单人</label>
-							<p class="detailRow_content">{{value.createrUser}}</p>
+							<label>上架人</label>
+							<p class="detailRow_content">{{value.createname}}</p>
 						</div>
 						<div class="mui-input-row">
-							<label>制单时间</label>
-							<p class="detailRow_content">{{value.date}}</p>
-						</div>
-						<div class="mui-input-row">
-							<label>盘点周期</label>
-							<p class="detailRow_content">{{value.distributionNo}}</p>
-						</div>
-						<div class="mui-input-row">
-							<label>盘点人</label>
-							<p class="detailRow_content">{{value.pdPerson}}</p>
-						</div>
-						<div class="mui-input-row">
-							<label>提交时间</label>
-							<p class="detailRow_content">{{value.updateTime}}</p>
+							<label>上架时间</label>
+							<p class="detailRow_content">{{value.upuserdate}}</p>
 						</div>
 				</div>
 			</li>
@@ -46,59 +34,72 @@
 				<div class="mui-collapse-content">
 						<div class="mui-input-row">
 							<label>通用名称</label>
-							<p class="detailRow_content">{{value.distributionNo}}</p>
-						</div>
-						<div class="mui-input-row">
-							<label>商品名</label>
-							<p class="detailRow_content">{{value.type}}</p>
+							<p class="detailRow_content">{{ value.ctmmGenericName }}</p>
 						</div>
 						<div class="mui-input-row">
 							<label>规格</label>
-							<p class="detailRow_content">{{value.deptName}}</p>
-						</div>
-						<div class="mui-input-row">
-							<label>剂型</label>
-							<p class="detailRow_content">{{value.createrUser}}</p>
+							<p class="detailRow_content">{{value.ctmmSpecification}}</p>
 						</div>
 						<div class="mui-input-row">
 							<label>生产厂家</label>
-							<p class="detailRow_content">{{value.date}}</p>
-						</div>
-						<div class="mui-input-row">
-							<label>批准文号</label>
-							<p class="detailRow_content">{{value.distributionNo}}</p>
-						</div>
-						<div class="mui-input-row">
-							<label>包装规格</label>
-							<p class="detailRow_content">{{value.pdPerson}}</p>
-						</div>
-						<div class="mui-input-row">
-							<label>单位</label>
-							<p class="detailRow_content">{{value.updateTime}}</p>
+							<p class="detailRow_content">{{value.ctmmManufacturerName}}</p>
 						</div>
 						<div class="mui-input-row">
 							<label>生产批号</label>
-							<p class="detailRow_content">{{value.updateTime}}</p>
+							<p class="detailRow_content">{{value.productBatchNo}}</p>
 						</div>
 						<div class="mui-input-row">
 							<label>生产日期</label>
-							<p class="detailRow_content">{{value.updateTime}}</p>
+							<p class="detailRow_content">{{value.realProductTime}}</p>
 						</div>
 						<div class="mui-input-row">
 							<label>有效期至</label>
-							<p class="detailRow_content">{{value.updateTime}}</p>
+							<p class="detailRow_content">{{value.realValidEndDate}}</p>
 						</div>
 						<div class="mui-input-row">
-							<label>验收温度（℃）</label>
-							<p class="detailRow_content">{{value.updateTime}}</p>
+							<label>包装规格</label>
+							<p class="detailRow_content">{{value.packageSpecification}}</p>
 						</div>
 						<div class="mui-input-row">
-							<label>配送数量</label>
-							<p class="detailRow_content">{{value.updateTime}}</p>
+							<label>单位</label>
+							<p class="detailRow_content">{{value.unit}}</p>
 						</div>
 						<div class="mui-input-row">
-							<label>实到数量</label>
-							<p class="detailRow_content">{{value.updateTime}}</p>
+							<label>指示货位</label>
+							<p class="detailRow_content">{{value.actualStore}}</p>
+						</div>
+						<div class="mui-input-row">
+							{{ if hasGround }}
+								<label class="font-warning">实际货位</label>
+								<select class="editInput realReceiveStore" value={{ value.actualStore }}>
+									{{ each value.acceptoodsVo item i }}
+									<option value={{ item.id }}>{{ item.positionName }}</option>
+									{{ /each }}
+								</select>
+							{{ else }}
+								<label>实际货位</label>
+								<p class="detailRow_content">{{value.actualStore}}</p>
+							{{ /if }}
+							
+						</div>
+						
+						<div class="mui-input-row">
+							<label>批准文号</label>
+							<p class="detailRow_content">{{value.approvalNo}}</p>
+						</div>
+						<div class="mui-input-row">
+							<label>数量</label>
+							<p class="detailRow_content">{{value.realNum}}</p>
+						</div>
+						<div class="mui-input-row">
+							{{ if hasGround }}
+								<label class="font-warning">实际上架数量</label>
+								<input class="mui-input editInput relNum" type="number" pattern="[0-9]*" value={{ value.realNum  }} />
+								{{ else }}
+								<label>实际上架数量</label>
+								<p class="detailRow_content">{{value.realNum}}</p>
+							{{ /if }}
+							
 						</div>
 				</div>
 			</li>

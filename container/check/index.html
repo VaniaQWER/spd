@@ -34,7 +34,9 @@
 			
 			<div id="check_scroll1" class="mui-scroll-wrapper">
 				<div class="mui-scroll" id='scroll'>
-					
+					<ul class="mui-table-view">
+						<li class="mui-table-view-cell mui-tab2" style="padding: 0;"></li>
+					</ul>
 				</div>
 			</div>
 			<div id="modal" class="mui-modal">
@@ -86,6 +88,8 @@
 					deceleration:deceleration
 				});
 				
+				var url = '/a/checkbill/list';
+				var page = 1, totalPage = undefined;
 				var utils = new Utils();
 				utils.appendModule('#card_view');
 
@@ -94,12 +98,18 @@
             	 * */
             	function pulldownRefresh(){
 					var self = this;
-					mui.ajaxRequest('/inventory1',{
-                		type: 'GET',
+					page = 1;
+					mui.ajaxRequest(url,{
+                		type: 'POST',
+                		data: {
+                			pageNo: page
+                		},
                 		success: function(data){
+                			var resData = data.data;
+                			totalPage = data.totalPage;
 							self.endPullDownToRefresh(true);
-							return template(data, false)
-                			
+							self.refresh(true);
+							return template(resData, false)
                 		},
                 		error: function(xhr,type,errorThrown){
 							alert(xhr.responseText)
@@ -113,17 +123,25 @@
 				 * */
 				function pullupRefresh(){
 					var self = this;
-					mui.ajaxRequest('/inventory1',{
-                		type: 'GET',
-                		success: function(data){
-                			self.endPullUpToRefresh();
-							return template(data, true)
-                			
-                		},
-                		error: function(xhr,type,errorThrown){
-							alert(xhr.responseText)
-                		}
-            		});
+					page++;
+					if( page <= totalPage ){
+						mui.ajaxRequest(url,{
+	                		type: 'POST',
+	                		data:{
+	                			pageNo: page
+	                		},
+	                		success: function(data){
+	                			var resData = data.data;
+	                			self.endPullUpToRefresh(page >= totalPage);
+								return template(resData, true)
+	                			
+	                		},
+	                		error: function(xhr,type,errorThrown){
+								alert(xhr.responseText)
+	                		}
+	            		});
+					}
+					
 				}
             	
 				/* 渲染模板   */
@@ -135,7 +153,6 @@
 				 	
 				 	//循环初始化所有下拉刷新，上拉加载。
 					$.each(document.querySelectorAll('.mui-scroll'), function(index, pullRefreshEl) {
-						console.log(pullRefreshEl,'pullRefreshEl')
 						$(pullRefreshEl).pullToRefresh({
 							down: {
 								style:'circle',
@@ -151,14 +168,12 @@
 							}
 						});
 					});
-					console.log(mui(".mui-scroll").pullToRefresh())
 					mui(".mui-scroll").pullToRefresh().pullDownLoading();
-				 	
-	            	$('#check_scroll1').on('tap','.am-card-body',function(){
+	            	$('#scroll').on('tap','.am-card',function(){
+	            		let itemData = this.dataset;
+	            		console.log(JSON.stringify(itemData))
 	            		document.activeElement.blur();
-				 		common.openwin('checkList',{},{
-				 			titleText:'药品信息'
-				 		})
+				 		common.openwin('checkList',{ params: JSON.stringify(itemData) });
 				 	})
 				})
 		})(mui);

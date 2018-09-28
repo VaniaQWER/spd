@@ -7,27 +7,27 @@
 				<div class="mui-collapse-content">
 						<div class="mui-input-row">
 							<label>拣货单号</label>
-							<p class="detailRow_content">{{value.distributionNo}}</p>
+							<p class="detailRow_content">{{value.pickingorderno ? value.pickingorderno: '--'}}</p>
 						</div>
 						<div class="mui-input-row">
 							<label>申领单号</label>
-							<p class="detailRow_content">{{value.distributionNo}}</p>
+							<p class="detailRow_content">{{value.applyorderno ? value.applyorderno: '--'}}</p>
 						</div>
 						<div class="mui-input-row">
 							<label>申领部门</label>
-							<p class="detailRow_content">{{value.deptName}}</p>
+							<p class="detailRow_content">{{value.deptname ? value.deptname: '--'}}</p>
 						</div>
 						<div class="mui-input-row">
 							<label>状态</label>
-							<p class="detailRow_content">{{value.type}}</p>
+							<p class="detailRow_content">{{ value.statusname }}</p>
 						</div>
 						<div class="mui-input-row">
 							<label>拣货人</label>
-							<p class="detailRow_content">{{value.createrUser}}</p>
+							<p class="detailRow_content">{{ value.pickingusername }}</p>
 						</div>
 						<div class="mui-input-row">
 							<label>拣货时间</label>
-							<p class="detailRow_content">{{value.date}}</p>
+							<p class="detailRow_content">{{ value.updatedate? value.updatedate: '--'}}</p>
 						</div>
 				</div>
 			</li>
@@ -38,49 +38,52 @@
 				<div class="mui-collapse-content">
 						<div class="mui-input-row">
 							<label>通用名</label>
-							<p class="detailRow_content">{{value.distributionNo}}</p>
+							<p class="detailRow_content">{{value.ctmmGenericName}}</p>
 						</div>
 						<div class="mui-input-row">
 							<label>规格</label>
-							<p class="detailRow_content">{{value.deptName}}</p>
+							<p class="detailRow_content">{{value.ctmmSpecification}}</p>
 						</div>
 						<div class="mui-input-row">
 							<label>生产厂家</label>
-							<p class="detailRow_content">{{value.date}}</p>
+							<p class="detailRow_content">{{value.ctmmManufacturerName}}</p>
 						</div>
 						<div class="mui-input-row">
 							<label>生产批号</label>
-							<p class="detailRow_content">{{value.date}}</p>
+							<p class="detailRow_content">{{value.productBatchNo}}</p>
 						</div>
 						<div class="mui-input-row">
 							<label>生产日期</label>
-							<p class="detailRow_content">{{value.date}}</p>
+							<p class="detailRow_content">{{value.realProductTime}}</p>
 						</div>
 						<div class="mui-input-row">
 							<label>有效期至</label>
-							<p class="detailRow_content">{{value.date}}</p>
+							<p class="detailRow_content">{{value.realValidEndDate}}</p>
 						</div>
 						<div class="mui-input-row">
 							<label>包装规格</label>
-							<p class="detailRow_content">{{value.pdPerson}}</p>
+							<p class="detailRow_content">{{value.packageSpecification}}</p>
 						</div>
 						<div class="mui-input-row">
 							<label>单位</label>
-							<p class="detailRow_content">{{value.updateTime}}</p>
+							<p class="detailRow_content">{{value.unit}}</p>
 						</div>
 						<div class="mui-input-row">
 							<label>指示货位</label>
-							<p class="detailRow_content">A668</p>
+							<p class="detailRow_content">{{value.actualStore}}</p>
 						</div>
 						<div class="mui-input-row">
 							<label>数量</label>
-							<p class="detailRow_content">{{value.num}}</p>
+							<p class="detailRow_content">{{value.allocationNum}}</p>
 						</div>
 						<div class="mui-input-row">
-							<label>实际上架数量</label>
-							<p class="detailRow_content">
-								<input value="100" placeholder="请输入" style="height: 20px;"/>
-							</p>
+							{{ if hasPicked }}
+								<label class='font-warning'>实际上架数量</label>
+								<input class="mui-input editInput relNum" type="number" pattern="[0-9]*" value={{ value.allocationNum  }} />
+								{{ else }}
+									<label>实际上架数量</label>
+									<p class="detailRow_content">{{ value.allocationNum }}</p>
+							{{ /if }}
 						</div>
 				</div>
 			</li>

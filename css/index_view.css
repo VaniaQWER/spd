@@ -298,6 +298,9 @@ input{
 	color: red;
 	font-size: 12px;
 }
+.font-warning{
+	color: #f5222d !important;
+}
 
 .inline-Input{
     width: 57% !important;
@@ -336,4 +339,11 @@ input{
 .hasGround{
 	background-color: limegreen;
 	color: #fff;
+}
+.editInput{
+	color: #ccc;
+}
+.select_actualStore{
+	margin: 0 !important;
+	padding: 0 !important;
 }

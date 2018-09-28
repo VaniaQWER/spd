@@ -9,6 +9,7 @@
 		<link href="../../css/mui.min.css" rel="stylesheet" />
 		<link href="../../css/themes.css" rel="stylesheet" />
 		<link href="../../css/index_view.css" rel="stylesheet" />
+		<link rel="stylesheet" href="../../css/check.css" />
 		<script src="../../js/mui.min.js"></script>
 		<script src="../../js/template-web.js" type="text/javascript" charset="utf-8"></script>
 		<script src="../../js/utils.js" type="text/javascript" charset="utf-8"></script>
@@ -23,7 +24,7 @@
 		</header>-->
 		
 		<div class="mui-content detailRow">
-			<div class="detail-header-flex">
+			<!--<div class="detail-header-flex">
 				<div class="am-action">
 					<a class="mui-icon mui-icon-arrowleft"></a>
 					<a class="theme_back_font">上一个</a>
@@ -33,22 +34,19 @@
 					<a class="theme_next_font">下一个</a>
 					<a class="mui-icon mui-icon-arrowright"></a>
 				</div>
-			</div>
+			</div>-->
 			<form class="mui-input-group" id="detailContent" style="background:none;">
 				<ul class="mui-table-view" style="margin-bottom:12px;">
 					<li class="mui-table-view-cell mui-collapse">
 						<a class="mui-navigate-right" href="#">产品信息</a>
 						<div class="mui-collapse-content">
 								<div class="mui-input-row">
-									<label>通用名</label>
-									<p class="detailRow_content">131312313131231313123131312313131231313123</p>
-									<span class="detailRow_right">25</span>
+									
 								</div>
 						</div>
 					</li>
 				</ul>
 			</form>
-			<button type="button" class="mui-btn mui-btn-warning mui-btn-block">确认拣货</button>
 		</div>
 		<script src="../js/mui.min.js"></script>
 		<script type="text/javascript">
@@ -56,31 +54,65 @@
 
 			(function($) {
 				
-			$.init()
-			
 			// 模板加载
-			$.ready(function(){
+			$.plusReady(function(){
 				//console.log("当前页面URL："+plus.webview.currentWebview().getURL());
-				var data = {
-					list: [{
-						"id":"1",
-						"type":"待拣货",
-						"deptName":"部门1",
-						"createrUser":"王大雷",
-						"pdPerson":"王磊",
-						"supplier:Name": "静注人免疫球蛋白",
-						"drugName": "西咪替丁",
-						"producter": "北京汉典制药有限公司",
-						"distributionNo": "AADKSF1OOSKDF2",
-						"spec":"80mg/瓶",
-						"date": "2018-08-08",
-						"updateTime":'2018-08-10'
-					}]
-				};
+				var self = plus.webview.currentWebview();
+				var details = JSON.parse(self.details);//获得参数
+
+				var data = {}, pickUrl = '/a/common/pickingorder/finishPicking';
+				data.hasPicked = details.hasPicked;
+				data.list = [];
+				data.list.push(details);
+				if(details.hasPicked){
+					var groundBtn = '<button type="button" id="picking" class="mui-btn mui-btn-warning mui-btn-block" style="margin-bottom: 20px;" data-loading-text = "提交中" data-loading-icon-position="right">确认拣货</button>'
+					document.querySelector('.detailRow').insertAdjacentHTML("beforeEnd",groundBtn);
+				}
 				var utils = new Utils();
 				utils.appendModule('#acc_detail_tpl');
 				var html = template('detail_tpl', data);
 				document.getElementById('detailContent').innerHTML = html;
+				if(details.hasPicked){
+					var picking = document.querySelector('#picking');
+					picking.addEventListener('tap',function(e){
+						var num = details.allocationNum;
+						var realInputNum = document.querySelector('.relNum').value;
+						if(realInputNum > num){
+							return mui.toast('实际上架数量不得大于指示数量');
+						}
+						if(realInputNum <=0){
+							return mui.toast('实际上架数量不得小于或等于0');
+						}
+						var btnArray = ['否', '是'];
+							mui.confirm('是否确认拣货？', '操作提示', btnArray, function(e) {
+								if (e.index == 1) {
+									var pickingDetail = [],postData = {},submitData = {};
+									postData.drugCode = details.drugCode;
+									postData.id = details.id;
+									postData.pickingNum = realInputNum
+									pickingDetail.push(postData);
+									submitData.pickingDetail = pickingDetail;
+									console.log(JSON.stringify(submitData));
+									mui.ajaxRequest(groundUrl,{
+				                		type: 'POST',
+				                		data: submitData,
+				                		contentType: "application/json",
+				                		showWaiting: true,
+				                		success: function(data){
+				                			if(data.code === 200){
+				                				mui.toast('拣货成功');
+				                			}else{
+				                				mui.alert(data.msg)
+				                			}
+				                		},
+				                		error: function(xhr,type,errorThrown){
+											alert(xhr.responseText)
+				                		}
+				            		});
+								}
+							},'div')
+					})
+				}
 				
 			});
 		})(mui);
