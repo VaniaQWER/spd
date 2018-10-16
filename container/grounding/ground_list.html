@@ -13,10 +13,16 @@
 	</head>
 
 	<body>
+		<header class="mui-bar mui-bar-nav themes_bg_color">
+		   	<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left">
+		   		<label class="mui-pull-right theme_back_font">返回</label>
+		   	</a>
+		    <h1 class="mui-title themes_title">药品信息</h1>
+		    <a href="#" class="mui-pull-right batchAccetpance" style="height: 45px;padding-top: 12px;">
+		    	批量上架
+		    </a>
+		</header>
 		<div class="mui-content">
-		    <div class="mui-input-row mui-search search_head">
-				<input type="search" class="mui-input-clear" placeholder="供应商名称">
-			</div>
 			<div id="slider" class="mui-slider themes_tab mui-fullscreen">
 				<div id="sliderSegmentedControl" class="mui-slider-indicator mui-segmented-control mui-segmented-control-inverted">
 					<a class="mui-control-item themes_font_color_tab" href="#item1mobile">待上架</a>
@@ -24,7 +30,7 @@
 				</div>
 				<div id="sliderProgressBar" class="mui-slider-progress-bar mui-col-xs-6"></div>
 				<div class="mui-slider-group">
-					<div id="item1mobile" class="mui-slider-item mui-control-content mui-active">
+					<div id="item1mobile" class="mui-slider-item mui-control-content">
 						<div id="scroll1" class="mui-scroll-wrapper">
 							<div class="mui-scroll" id="mui-table-view-tab1">
 								<ul class="mui-table-view">
@@ -51,8 +57,6 @@
 		</div>
 		
 		<script src="../../js/mui.min.js"></script>
-		<script src="../../js/mui.pullToRefresh.js"></script>
-		<script src="../../js/mui.pullToRefresh.material.js"></script>
 		<script src="../../js/template-web.js" type="text/javascript" charset="utf-8"></script>
 		<script src="../../js/utils.js" type="text/javascript" charset="utf-8"></script>
 		<script src="../../js/common.js" type="text/javascript" charset="utf-8"></script>
@@ -92,26 +96,48 @@
 				var utils = new Utils();
 				utils.appendModule('#ground_list_tpl');
 				
-				function showData(data){
-					var acceptanceTab1 = document.querySelector('.mui-tab1');
-					var html1 = template('ground_list',data.listwsj);
-					if(!html1){
-						html1 = nullDataHtml;
+				function showData(data,selected){
+					if(selected === 'left'){
+						var acceptanceTab1 = document.querySelector('.mui-tab1');
+						var html1;
+						if(data.listwsj.list.length === 0){
+							html1 = nullDataHtml;
+							document.querySelector('.batchAccetpance').style.display = 'none';
+						}else{
+							mui.each(data.listwsj.list,function(index,item){
+								item.editable = true;
+							})
+							html1 = template('ground_list',data.listwsj);
+							document.querySelector('.batchAccetpance').style.display = 'block';
+						}
+						acceptanceTab1.innerHTML = html1;
+					}else{
+						var acceptanceTab2 = document.querySelector('.mui-tab2');
+						var html2;
+						if(data.listysj.list.length === 0){
+							html2 = nullDataHtml
+						}else{
+							html2 = template('ground_list',data.listysj);
+						}
+						acceptanceTab2.innerHTML = html2;
+						document.querySelector('.batchAccetpance').style.display = 'none';
 					}
-					acceptanceTab1.innerHTML = html1;
+					
 				}
 				
-				function genData(url){
+				function genData(url,selected){
+					plus.nativeUI.showWaiting();
 					mui.ajaxRequest(url,{
                 		type: 'GET',
                 		showWaiting: true,
                 		success: function(data){
+                			plus.nativeUI.closeWaiting();
                 			if(data.code === 200){
                 				detailData.listwsj.list = data.data.listwsj;
                 				detailData.listwsj.hasGround = true;
                 				detailData.listysj.list = data.data.listysj;
                 				detailData.listysj.hasGround = false;
-                				showData(detailData)
+                				showData(detailData,selected)
                 			}else{
                 				mui.alert(data.msg)
                 			}
@@ -125,16 +151,36 @@
             
 				$.plusReady(function(){
 					
-					var params, distributeCode, flag = false
+					window.addEventListener('pagefresh',function(event){
+						var query = JSON.parse(event.detail.params);
+						var genUrl = '/a/checkacceptdetail/shelfInfo?distributeCode='+ query.distributecode;
+						genData(url,query.currentSelected);
+					})
+					
+					var params, distributeCode, currentSelected = undefined
 					var self = plus.webview.currentWebview();
-				    params = self.params;//获得参数
+				    params = JSON.parse(self.params);//获得参数
 				    console.log(params)
-				    distributeCode = JSON.parse(params).distributecode;
+				    distributeCode = params.distributecode;
+				    currentSelected = params.currentSelected; // 当前选中tabs 
+				    console.log(currentSelected)
+				    if(currentSelected === 'left'){
+				    	document.querySelector('#sliderProgressBar').style.transform = 'translate3d(0px,0px,0px) translateZ(0px)';
+				    	document.querySelector('.mui-slider-group').style.transform = 'translate3d(0px,0px,0px) translateZ(0px)';
+				    	document.querySelectorAll('.themes_font_color_tab')[0].className = 'mui-control-item themes_font_color_tab mui-active';
+				    	document.querySelector('#item1mobile').className = 'mui-slider-item mui-control-content mui-active';
+				    }else{
+				    	document.querySelector('#sliderProgressBar').style.transform = 'translate3d(267px,0px,0px) translateZ(0px)';
+				    	document.querySelector('.mui-slider-group').style.transform = 'translate3d(-534px,0px,0px) translateZ(0px)';
+				    	document.querySelectorAll('.themes_font_color_tab')[1].className = 'mui-control-item themes_font_color_tab mui-active';
+				    	document.querySelector('#item2mobile').className = 'mui-slider-item mui-control-content mui-active';
+				    }
+				    
 				    var groundUrl = '/a/checkacceptdetail/finish';
 				    var url = '/a/checkacceptdetail/shelfInfo?distributeCode='+ distributeCode;
-				    genData(url);
+				    genData(url,currentSelected);
 					
-					
+					var item1 = document.getElementById('item1mobile');
 	            	var item2 = document.getElementById('item2mobile');
 					document.getElementById('slider').addEventListener('slide', function(e) {
 						if (e.detail.slideNumber === 1) {
@@ -148,6 +194,19 @@
 								}
 								acceptanceTab2.innerHTML = html2;
 							}
+							document.querySelector('.batchAccetpance').style.display = 'none';
+						}else if(e.detail.slideNumber === 0){
+							if (!item1.querySelector('.am-card')) {
+								var acceptanceTab1 = document.querySelector('.mui-tab1');
+								var html;
+								if(detailData.listysj.list.length === 0){
+									html = nullDataHtml
+								}else{
+									html = template('ground_list',detailData.listysj);
+								}
+								acceptanceTab1.innerHTML = html;
+							}
+							document.querySelector('.batchAccetpance').style.display = 'block';
 						}
 					});
 					
@@ -162,58 +221,10 @@
 					});
 	            	// 展开编辑
 	            	$('#slider').on('tap','.groundEdit',function(){
-	            		flag = flag === true ? false: true;
-	            		var index = this.dataset.index;
-	            		console.log(index);
-	            		this.innerHTML = this.innerHTML === '展开编辑' ? '收起编辑':'展开编辑' ;
-	            		var realNum = document.querySelectorAll('.realNum')[index].querySelector('span') ? document.querySelectorAll('.realNum')[index].querySelector('span').innerText : document.querySelector('.realInputNum').value;
-	            		
-	            		var actualStore = document.querySelectorAll('.actualStore')[index].querySelector('span') ? document.querySelectorAll('.actualStore')[index].querySelector('span').innerText : detailData.listwsj.list[index].actualStore
-	            		var realNumNode = '<div class="am-list-item am-input-item am-list-item-middle">' + 
-						'<div class="am-list-line">'+
-						'<div class="am-input-label am-input-label-5 font-warning">实际上架数量：</div>'+
-						'<div class="am-input-control">'+
-						'<input pattern="[0-9]*" type="number" value='+ realNum +' placeholder="请输入" class="realInputNum"/>'+
-						'</div>'+
-						'</div>'+
-						'</div>'+
-						'</div>';
-						var optionsDataSource = detailData.listwsj.list[index].acceptoodsVo;
-						var select = document.createElement('select');
-						select.className = 'select_actualStore';
-						mui.each(optionsDataSource,function(ind,item){
-							if(item.positionName === detailData.listwsj.list[index].actualStore){
-								select.value = item.id;
-							}
-						})
-						for( var i=0; i<optionsDataSource.length; i++ ){
-							var option = document.createElement('option');
-							option.value = optionsDataSource[i].id;
-							option.innerHTML = optionsDataSource[i].positionName;
-							select.appendChild(option);
-						}
-						var parentNode = document.createElement('div');
-						var childNode = document.createElement('div');
-						var subChildNode = document.createElement('div');
-						var controlNode = document.createElement('div');
-						parentNode.className = 'am-list-item am-input-item am-list-item-middle';
-						childNode.className = 'am-list-line';
-						subChildNode.className = 'am-input-label am-input-label-4 font-warning';
-						subChildNode.innerText = '货位：';
-						controlNode.className = 'am-input-control';
-						controlNode.appendChild(select);
-						childNode.appendChild(subChildNode);
-						childNode.appendChild(controlNode);
-						parentNode.appendChild(childNode);
-	            		if(flag){
-	            			document.querySelectorAll('.actualStore')[index].innerHTML = '';
-	            			document.querySelectorAll('.actualStore')[index].appendChild(parentNode);
-	            			document.querySelectorAll('.realNum')[index].innerHTML = realNumNode
-	            		}else{
-	            			document.querySelectorAll('.actualStore')[index].innerHTML = '货位：<span>'+ actualStore +'</span> '
-	            			document.querySelectorAll('.realNum')[index].innerHTML = '实际上架数量：<span>'+ realNum +'</span>'
-	            		}
-	            		
+	            		this.innerHTML = this.innerHTML === '收起编辑' ? '展开编辑':'收起编辑' ;
+						let index = this.dataset.index;
+						var editForm = document.querySelectorAll('.editForm')[index];
+						editForm.style.display = editForm.style.display === 'block' ? 'none': 'block';	
 	            	})
 	            	
 	            	//绑定点击事件  - 进入详情页
@@ -224,15 +235,30 @@
 						console.log(index)
 						var item1mobile = document.querySelector('#item1mobile');
 						var hasGround = item1mobile.className.indexOf('mui-active')>0 ? true: false;
-						let data = hasGround ? detailData.listwsj.list[index]: detailData.listysj.list[index];
-						data.hasGround = hasGround; // 判断 详情页面是否有上架按钮
-						let newData = Object.assign({},data,JSON.parse(params));
+						
+						let newData = {};
+						newData.index = index;
 						newData.statusname = hasGround ? '待上架':'已上架';
+						newData.hasGround = hasGround;
+						newData.allData = hasGround ? detailData.listwsj.list: detailData.listysj.list;
+						newData.orderInfo = params;
 						document.activeElement.blur();
 						common.openwin('ground_detail',{ details: JSON.stringify(newData) },{
 							titleText: '详情'
 						})
 					});
+					
+					/* 批量上架 */
+					$('.mui-bar').on('tap','.batchAccetpance',function(){
+						var paramsData = {};
+						paramsData.list = detailData.listwsj.list;
+						paramsData.distributeCode = distributeCode;
+						paramsData.itemData = params;
+						console.log(paramsData)
+						common.openwin('ground_batch',{ params: JSON.stringify(paramsData) },{
+							titleText: '药品信息'
+						})
+					})
 					
 					// 绑定事件 --确认上架
 					$('#slider').on('tap','.ground',function(){
@@ -240,15 +266,15 @@
 						let index = this.dataset.index;
 						var _this_card = document.querySelectorAll('.am-card')[index];
 						let id = _this_card.dataset.id;
-						var realNum = flag ? _this_card.querySelector('.realInputNum').value: _this_card.querySelector('.realNum').querySelector('span').innerText;
-						var realReceiveStore =  flag ?  _this_card.querySelector('.select_actualStore').value : _this_card.querySelector('.actualStore').querySelector('span').innerText;
+						var realNum = _this_card.querySelector('.realInputNum').value
+						var realReceiveStore = _this_card.querySelector('.select_actualStore').value
 						console.log(realNum);
 						console.log(realReceiveStore)
 						if(realNum <= 0 ){
-							return mui.toast('实际上架数量不能小于或等于0')
+							return mui.alert('实际上架数量不能小于或等于0','警告',['确定'],function(){},'div')
 						}
 						if(realNum > _this_card.querySelector('.groundNum').innerText){
-							return mui.toast('实际数量不得大于指示数量');
+							return mui.alert('实际数量不得大于指示数量','警告',['确定'],function(){},'div')
 						}
 						var btnArray = ['否', '是'];
 						mui.confirm('是否确认上架？', '确认', btnArray, function(e) {
@@ -269,7 +295,15 @@
 				                		success: function(data){
 				                			if(data.code === 200){
 				                				mui.toast('上架成功');
-				                				genData(url)
+				                				var parmasData = {};
+												parmasData.finishUrl = '../grounding/index';
+												parmasData.keepUrl = 'ground_list';
+												parmasData.resultType = 'ground';
+												parmasData.itemData = params;
+												common.openwin('../result/index',{ parmas: JSON.stringify(parmasData) },{
+													titleText: '结果',
+													autoBackButton: false
+												})
 				                			}else{
 				                				mui.alert(data.msg)
 				                			}

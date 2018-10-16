@@ -4,20 +4,7 @@
 			<img src="../../assest/success.svg" width="128" height="128"/>
 		</div>
 		<div class="am-result-title">
-			{{ if acceptance }}
-				<div>验收完成</div>
-				{{ else }}
-				<div>上架完成</div>
-			{{ /if }}
-		</div>
-		<div class="am-result-message">
-			{{ if acceptance }}
-				<div style='margin: 12px 0;'>验收单号：'111111122'</div>
-				<div>验收时间:" 2018-09-10"</div>
-				{{ else }}
-				<div style='margin: 12px 0;'>上架单号：'xxxxxxsss23'</div>
-				<div>上架时间：'2018-09-07'</div>
-			{{ /if }}
+			<div><span>{{ resultType }}</span>完成</div>
 		</div>
 	</div>
 </script>

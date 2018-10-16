@@ -18,6 +18,7 @@
 		<script src="../../js/mui.js"></script>
 		<script src="../../js/template-web.js" type="text/javascript" charset="utf-8"></script>
 		<script src="../../js/utils.js" type="text/javascript" charset="utf-8"></script>
+		<script src="../../js/request.js" type="text/javascript" charset="utf-8"></script>
 		<script type="text/javascript">
 			(function($, doc) {
 				// 挂载模板
@@ -27,8 +28,28 @@
 					$.init();
 					plus.screen.lockOrientation("portrait-primary");
 					var self = plus.webview.currentWebview();
-					console.log(JSON.parse(self.tipId))
-					template(JSON.parse(self.tipId));
+					
+					var params = JSON.parse(self.tipId);
+					console.log(params)
+					var detialData = { list: [] };
+					plus.nativeUI.showWaiting()
+					mui.ajaxRequest('/a/pad/drugreminddetail/findDrugRemindDetail',{
+						data: { id: params.id },
+						success: function(data){
+							plus.nativeUI.closeWaiting()
+							var result = data.data;
+							detialData.list.push(result)
+							detialData.title = params.title;
+							detialData.tipdate = params.tipdate;
+							detialData.remindType = params.remindType;
+							console.log(detialData)
+							template(detialData);
+						},
+						error: function(xhr,type,errorThrown){
+							alert(xhr.responseText)
+                		}
+					})
+					
 					
 				});
 				function template(data){

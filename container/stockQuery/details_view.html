@@ -44,17 +44,17 @@
 					
 					<a class="mui-navigate-right" href="#">
 						<label class="detailRow_label head_minheight">货位</label> 
-						<p class="detailRow_content head_minheight">A1210</p>
-						<span class="detailRow_right theme_font_danger head_minheight">200</span>
+						<p class="detailRow_content head_minheight">{{ itemValue.storeLocName }}</p>
+						<span class="detailRow_right theme_font_danger head_minheight">{{ itemValue.totalQuantity }}</span>
 					</a>
 					<div class="mui-collapse-content">
 							<div class="mui-input-row">
 								<label>货位类型</label>
-								<p class="detailRow_content">{{itemValue.goodsType}}</p>
+								<p class="detailRow_content">{{itemValue.storeType}}</p>
 							</div>
 							<div class="mui-input-row">
 								<label>数量</label>
-								<p class="detailRow_content">{{itemValue.num}}</p>
+								<p class="detailRow_content">{{itemValue.usableQuantity}}</p>
 							</div>
 							<div class="mui-input-row">
 								<label>单位</label>
@@ -62,19 +62,19 @@
 							</div>
 							<div class="mui-input-row">
 								<label>供应商</label>
-								<p class="detailRow_content">{{itemValue.producePerson}}</p>
+								<p class="detailRow_content">{{itemValue.supplierName}}</p>
 							</div>
 							<div class="mui-input-row">
 								<label>生产批号</label>
-								<p class="detailRow_content">{{itemValue.pihaoNo}}</p>
+								<p class="detailRow_content">{{itemValue.lot}}</p>
 							</div>
 							<div class="mui-input-row">
 								<label>生产日期</label>
-								<p class="detailRow_content">{{itemValue.createDate}}</p>
+								<p class="detailRow_content">{{itemValue.productDate}}</p>
 							</div>
 							<div class="mui-input-row">
 								<label>有效期至</label>
-								<p class="detailRow_content">{{itemValue.limimtDate}}</p>
+								<p class="detailRow_content">{{itemValue.validEndDate}}</p>
 							</div>
 					</div>
 				</li>

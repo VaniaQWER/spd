@@ -1,4 +1,4 @@
-<!--库存查询  - 列表页 - yuweI-->
+ <!--库存查询  - 列表页 - yuweI-->
 <!doctype html>
 <html>
 
@@ -21,9 +21,9 @@
 		</header>
 		<div class="mui-content">
 		    <div class="mui-input-row mui-search search_head">
-				<input type="search" class="mui-input-clear" placeholder="通用名/商品名/生产厂家" onclick="toSearchPage()">
+				<input type="search" class="mui-input-clear" id="search" placeholder="通用名/商品名" onclick="toSearchPage()"> 
 			</div>
-			<div id="slider" class="mui-slider themes_tab mui-fullscreen">
+			<div id="slider" class="mui-slider themes_tab mui-fullscreen" style="top: 102px;">
 				<div id="sliderSegmentedControl" class="mui-slider-indicator mui-segmented-control mui-segmented-control-inverted">
 					<a class="mui-control-item themes_font_color_tab" href="#item1mobile">全部</a>
 					<a class="mui-control-item themes_font_color_tab" href="#item2mobile">更多筛选</a>
@@ -39,17 +39,6 @@
 							</div>
 						</div>
 					</div>
-					<!--<div id="item2mobile" class="mui-slider-item mui-control-content">
-						<div id="scroll2" class="mui-scroll-wrapper">
-							<div class="mui-scroll" id='mui-table-view-tab2'> 
-								<div class="mui-loading">
-									<div class="mui-spinner">
-									</div>
-								</div>
-							</div>
-						</div>
-
-					</div>-->
 				</div>
 			</div>
 
@@ -64,15 +53,25 @@
 		<script src="../../js/request.js" type="text/javascript" charset="utf-8"></script>
 		<script type="text/javascript">
 			
+			
 			//去搜索页面
 			function toSearchPage (){
-				common.openwin('../commonPages/searchPage',true,true)
+				var params = {};
+				params.key = 'material';
+				params.route = '../stockQuery/index';
+				common.openwin('../commonPages/searchPage',{ params: JSON.stringify(params) },false)
 			}
 			
 			(function($) {
-				$.init();
-					
-	
+				$.init({
+					beforeback:function(){
+						var list = plus.webview.currentWebview().opener();
+						 mui.fire(list, 'refresh');
+						 return true;
+					}
+				});
+				
+				
 				var deceleration = mui.os.ios?0.003:0.0009;
 				$('.mui-scroll-wrapper').scroll({
 					bounce: false,
@@ -84,7 +83,7 @@
 				utils.appendModule('#card_view');
 				
 				var url = '/a/StoreDetail/list';
-				var page = 1, totalPage = undefined;
+				var page = 1, totalPage = undefined, pageSize = 10, isMore = true, query = {};
             	
             	/* 渲染模板   */
 				function template(data, insertType){
@@ -96,17 +95,28 @@
             	function pulldownRefresh(){
 					var self = this;
 					page = 1;
+					var postData = {
+						pageNo: page,
+                		pageSize: pageSize
+					};
+					if(query.bigDrugCode){
+						postData.hisDrugCodeList = [ query.bigDrugCode ]
+					}
+					query = {};
 					mui.ajaxRequest(url,{
                 		type: 'POST',
-                		data: {
-                			pageNo: page,
-                			pageSize: 10
-                		},
+                		data: postData,
                 		contentType: "application/json",
                 		success: function(data){
                 			var resData = data.data;
                 			totalPage = data.totalPage;
-							self.endPullDownToRefresh(true);
+                			if(resData.list.length <= pageSize){
+                				document.querySelector('.mui-pull-loading').innerHTML = '没有更多数据';
+                				isMore = false;
+                				self.endPullDownToRefresh(true);
+                			}else{
+                				self.endPullDownToRefresh();
+                			}
 							self.refresh(true);
 							return template(resData, false)
                 		},
@@ -122,30 +132,46 @@
 				 * */
 				function pullupRefresh(){
 					var self = this;
-					page++;
-					if( page <= totalPage ){
-						mui.ajaxRequest(url,{
-	                		type: 'POST',
-	                		data:{
-	                			pageNo: page,
-	                			pageSize: 10
-	                		},
-	                		contentType: "application/json",
-	                		success: function(data){
-	                			var resData = data.data;
-	                			self.endPullUpToRefresh(page >= totalPage);
-								return template(resData, true)
-	                			
-	                		},
-	                		error: function(xhr,type,errorThrown){
-								alert(xhr.responseText)
-	                		}
-	            		});
+					if(isMore){
+						page++;
+						if( page <= totalPage ){
+							mui.ajaxRequest(url,{
+		                		type: 'POST',
+		                		data:{
+		                			pageNo: page,
+		                			pageSize: pageSize
+		                		},
+		                		contentType: "application/json",
+		                		success: function(data){
+		                			var resData = data.data;
+		                			self.endPullUpToRefresh(page >= totalPage);
+		                			
+									return template(resData, true)
+		                			
+		                		},
+		                		error: function(xhr,type,errorThrown){
+									alert(xhr.responseText)
+		                		}
+		            		});
+						}
+					}else{
+						document.querySelector('.mui-pull-loading').innerHTML = '没有更多数据';
+						self.endPullUpToRefresh(true);
 					}
 					
 				}
 				
 				$.plusReady(function(){
+					
+					// 触发刷新 搜索页面搜的值
+					window.addEventListener('search',function(event){
+						query.bigDrugCode = JSON.parse(event.detail.drugInfo).bigDrugCode;
+						query.ctmmParam = JSON.parse(event.detail.drugInfo).ctmmParam;
+						document.querySelector('.mui-input-clear').placeholder = '';
+						document.querySelector('.mui-placeholder').style.display = 'none';
+						document.querySelector('.mui-input-clear').value = query.ctmmParam;
+						mui(".mui-scroll").pullToRefresh().pullDownLoading();
+					})
 					
 					//循环初始化所有下拉刷新，上拉加载。
 					$.each(document.querySelectorAll('.mui-scroll'), function(index, pullRefreshEl) {
@@ -159,19 +185,12 @@
 							},
 							up: {
 								contentrefresh : "正在加载...",//可选，正在加载状态时，上拉加载控件上显示的标题内容
-	      						contentnomore:'没有更多数据了',
+	      						contentnomore:'没有更多数据',
 								callback: pullupRefresh
 							}
 						});
 					});
 					mui(".mui-scroll").pullToRefresh().pullDownLoading();
-					
-					/*var item2 = document.getElementById('item2mobile');
-					document.getElementById('slider').addEventListener('slide', function(e) {
-						if (e.detail.slideNumber === 1) {
-							
-						}
-					});*/
 					
 					//tab页切的点击事件
 					var sliderSegmentedControl = document.getElementById('sliderSegmentedControl');
@@ -192,17 +211,10 @@
 						common.openwin('details',{ params: JSON.stringify(itemData) },{
 							titleText:'详情'
 						})
-					})
-				
-				})
-			
-			
+					});
+				});
 				
 		})(mui);
-		
-//		function toSearchPage (){
-//			common.openwin('../commonPages/searchPage')
-//		}
 		</script>
 	</body>
 

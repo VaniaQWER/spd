@@ -26,6 +26,10 @@ body {
 	vertical-align: middle;
 	margin-top: 0px;	
 }
+/* 单选框 复选框 选中样式 颜色 */
+.mui-checkbox input[type=checkbox]:checked:before, .mui-radio input[type=radio]:checked:before{
+	color: #f2a11c;
+}
 
 /*返回文字样式*/
 .theme_back a{
@@ -44,7 +48,7 @@ body {
 }
 /* mui content 内容区 距顶部距离 */
 .mui-bar-nav~.mui-content .mui-slider.mui-fullscreen{
-	top: 102px;
+	/*top: 102px;*/
 }
 /*tab页切里面的文字颜色*/
 /*tab被选中的当前横线颜色*/
@@ -57,7 +61,7 @@ body {
 /*tab 页切内容高度 */
 
 .mui-fullscreen{
-	top: 60px;
+	/*top: 60px;*/
 }
 .mui-slider-indicator.mui-segmented-control{
 	background: #fff;
@@ -72,6 +76,9 @@ body {
 }
 .search_head{
 	padding:10px;
+	position: relative;
+	overflow: visible;
+	
 }
 .search_head input[type="search"]{
 	margin-bottom: 0 !important;

@@ -3,9 +3,10 @@
  * 封装mui.ajax请求，调用方式与一致
  */
 (function($, doc) {
-//	var baseUrl = 'https://www.easy-mock.com/mock/5b8d3b510ab8991436ebd336/spd';
-//	var baseUrl = "http://192.168.31.200:8099/medicinal-web" // 测试地址
-	var baseUrl = 'http://39.105.75.193:8080/medicinal-web'; // 线上地址
+	var baseUrl = "http://192.168.31.200:8888/medicinal-web" // 测试地址
+//	var baseUrl = 'http://39.105.75.193:8080/medicinal-web'; // 线上地址
+//	var baseUrl = 'http://39.105.75.193:8088/medicinal-web'; // 演示地址
+//	var baseUrl = 'http://116.62.143.29:8080/medicinal-web'; // 线上地址2（快）
     mui.extend({
         ajaxRequest: function(url , options){
             var defaults = commonDefaules(options);
@@ -24,6 +25,9 @@
             type: "post",
 //          timeout: 10000,
             wait: true,
+            xhrFields: {
+                withCredentials: true // 携带 cookie
+            },
             contentType: "application/x-www-form-urlencoded",
             waitMessage: "努力奔跑中，等等我...",
             onBeforeSend : function(xhr){
@@ -61,6 +65,7 @@
             	}
                 hideLoading();
                 if(options.error){
+                	
                     options.error(a , b , c);
                 }
             }

@@ -9,7 +9,7 @@
 			<div class="am-card-header">
 				<div class="am-card-header-content">
 					<span style="font-size: 18px; color: rgb(51, 51, 51); font-weight: bold;">
-					{{ value.ctmmTradeName }}</span>
+					{{ value.ctmmGenericName ? value.ctmmGenericName:value.ctmmTradeName ? value.ctmmTradeName: '' }}</span>
 				</div>
 				<div class="am-card-header-extra">
 					<span>{{ value.type }}</span>
@@ -23,47 +23,108 @@
 					<div class="am-flexbox-item"> 
 						规格：<span>{{ value.ctmmSpecification }}</span> 
 					</div>
-				</div>
-				<div class="am-flexbox am-flexbox-align-center">
 					<div class="am-flexbox-item"> 
 						数量：<span>{{ value.realDeliveryQuantiry }}</span> 
 					</div>
-					<div class="am-flexbox-item">
-					 生产厂家：<span>{{ value.ctmmManufacturerName }}</span>
-					 </div>
 				</div>
 				{{ if acceptance }}
 					{{ if value.editable }}
-						<div class="am-flexbox am-flexbox-align-center">
-							<div class="am-flexbox-item"> 
-								实到数量：<input />
+						<div class="editForm" style="display: block;">
+							<div class="am-flexbox am-flexbox-align-center">
+								<div class="am-flexbox-item">
+									<div class="am-list-item am-input-item am-list-item-middle">
+										<div class="am-list-line">
+											<div class="am-input-label am-input-label-4 font-warning">实到数量:</div>
+											<div class="am-input-control">
+												<input pattern="[0-9]*" type="number" value={{ value.realReceiveQuantity?value.realReceiveQuantity: '' }} placeholder="请输入" class="realReceiveQuantity flex-item-input" />
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="am-flexbox-item">
+									<div class="am-list-item am-input-item am-list-item-middle">
+										<div class="am-list-line">
+											<div class="am-input-label am-input-label-5 font-warning">生产日期:</div>
+											<div class="am-input-control">
+												<input pattern="[0-9]*" type="date" value={{ value.realProductTime }} placeholder="请输入" class="realProductTime flex-item-input" />
+											</div>
+										</div>
+									</div>
+								 </div>
+								 <div class="am-flexbox-item">
+									<div class="am-list-item am-input-item am-list-item-middle">
+										<div class="am-list-line">
+											<div class="am-input-label am-input-label-5 font-warning">有效期至:</div>
+											<div class="am-input-control">
+												<input pattern="[0-9]*" type="date" value={{ value.realValidEndDate }} placeholder="请输入" class="realValidEndDate flex-item-input" />
+											</div>
+										</div>
+									</div>
+								 </div>
 							</div>
-							<div class="am-flexbox-item">
-							 	生产日期：<input />
-							 </div>
+							<div class="am-flexbox am-flexbox-align-center">
+								<div class="am-flexbox-item">
+									<div class="am-list-item am-input-item am-list-item-middle">
+										<div class="am-list-line">
+											<div class="am-input-label am-input-label-4 font-warning">生产批号:</div>
+											<div class="am-input-control">
+												<input pattern="[0-9]*" type="text" value={{ value.productBatchNo }} placeholder="请输入" class="productBatchNo flex-item-input"/>
+											</div>
+										</div>
+									</div>
+								 </div>
+								 {{ if isShowTemprature === 1 }}
+									 <div class="am-flexbox-item">
+										<div class="am-list-item am-input-item am-list-item-middle">
+											<div class="am-list-line">
+												<div class="am-input-label am-input-label-4 font-warning">验收温度:</div>
+												<div class="am-input-control">
+													<input pattern="[0-9]*" type="number" value={{ value.realAcceptanceTemperature ? value.realAcceptanceTemperature: '' }} placeholder="请输入" class="realAcceptanceTemperature flex-item-input"/>
+												</div>
+											</div>
+										</div>
+									 </div>
+								 	{{ else }}
+								 		<div class="am-flexbox-item">
+									
+								 		</div>	
+								 {{ /if }}
+								 
+								 <div class="am-flexbox-item">
+									
+								 </div>
+							</div>
 						</div>
+						{{ else }}
+						
 						<div class="am-flexbox am-flexbox-align-center">
 							<div class="am-flexbox-item"> 
-								生产批号：<input />
+								实到数量：<span>{{ value.realReceiveQuantity }}</span>
 							</div>
-							<div class="am-flexbox-item">
-							 	有效期至：<input />
-							 </div>
-						</div>
-						<div class="am-flexbox am-flexbox-align-center">
-							<div class="am-flexbox-item"> 
-								批准文号：<span>{{ value.date }}</span>
+							<div class="am-flexbox-item am-last-flexItem">
+							 	生产日期：<span>{{ value.realProductTime }}</span>
 							</div>
-							
+							<div class="am-flexbox-item am-last-flexItem">
+							 	有效期至：<span>{{ value.realValidEndDate }}</span>
+							</div>
 						</div>
 					{{ /if }}
+						<div class="am-flexbox am-flexbox-align-center">
+							<div class="am-flexbox-item"> 
+								批准文号：<span>{{ value.approvalNo }}</span>
+							</div>
+							<div class="am-flexbox-item am-last-flexItem" style="margin-left: -50px;">
+							 	生产厂家：<span>{{ value.ctmmManufacturerName }}</span>
+							</div>
+						
+						</div>
 				{{ /if }}
 			</div>
 			<div class="am-card-footer">
 				<div class="am-card-footer-content"></div>
 				<div class="am-card-footer-extra">
-					{{ if acceptance }}
-						<button type="button" class="mui-btn mui-btn-blue mui-btn-outlined edit" data-id={{ value.id }} data-index={{ i }}>展开编辑</button>
+					{{ if acceptance && checkType === 1 }}
+						<button type="button" class="mui-btn mui-btn-blue mui-btn-outlined edit" data-id={{ value.id }} data-index={{ i }}>收起编辑</button>
 					{{ /if }}
 					<button type="button" class="mui-btn mui-btn-blue mui-btn-outlined moreDetail" data-id={{ value.id }} data-index={{ i }} style="margin: 0 5px;">更多详情</button>
 					{{ if acceptance }}
@@ -76,10 +137,4 @@
 		<div style="background-color: #f5f5f9; height: 6px;">
 		</div>
 	{{/each}}
-	<!--<div class="mui-pull-bottom-tips">
-		<div class="mui-pull-bottom-wrapper">
-			<span class="mui-pull-loading">上拉显示更多</span>
-		</div>
-	</div>-->
-	
 </script>

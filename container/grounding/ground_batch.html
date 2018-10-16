@@ -1,0 +1,223 @@
+<!--批量上架  - 药品信息 列表页 - wwb-->
+<!doctype html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<link rel="import" href="batch_list_tpl.html" id="batch_tpl"/>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="../../css/mui.min.css" rel="stylesheet" />
+		<link href="../../css/themes.css" rel="stylesheet" />
+		<link href="../../css/index_view.css" rel="stylesheet" />
+		
+	</head>
+
+	<body>
+		<div class="mui-content">
+			<div id="slider" class="themes_tab mui-fullscreen">
+				<ul class="mui-table-view">
+					<li class="mui-tab1">
+						
+					</li>
+				</ul>
+			</div>
+			<div class="fix_bottom-wraper">
+				<div class="fix-bottom-content">
+					<div class="mui-checkbox mui-left">
+					   <label>全选</label>
+					   <input name="checkboxAll" value="1" id="checkall" type="checkbox" style="top: -5px;z-index: 10;">
+					</div>
+					<span style="margin-left: 8px;">已选中  <label class="total"> 0 </label> 项</span>
+				</div>
+				<a href="javascript:;" class="btn acceptance fix-bottom-extra"> 上 架 </a>
+			</div>
+		</div>
+		
+		<script src="../../js/mui.min.js"></script>
+		<script src="../../js/template-web.js" type="text/javascript" charset="utf-8"></script>
+		<script src="../../js/utils.js" type="text/javascript" charset="utf-8"></script>
+		<script src="../../js/common.js" type="text/javascript" charset="utf-8"></script>
+		<script src="../../js/request.js" type="text/javascript" charset="utf-8"></script>
+		<script type="text/javascript">
+			if(window.plus) {
+                plusready();
+            } else {
+                document.addEventListener('plusready', plusready, false);
+            }
+            function plusready() {
+                plus.key.addEventListener('backbutton',function(){
+                    plus.webview.currentWebview().close();
+                })
+            }
+			
+			(function($) {
+				/* 渲染模板   */
+				var checkType, type, auditStatus// 验收单类型 // 验收状态   1 待验收  2 已验收 
+				var nullDataHtml = '<div class="mui-pull-bottom-tips"><div class="mui-pull-bottom-wrapper">'+
+										'<span class="mui-pull-loading">暂无数据</span></div></div>'
+				var detailData = {
+						unVerfiyList: { list: [] },
+						verifyList: { list: [] }
+					};
+				var utils = new Utils();
+				utils.appendModule('#batch_tpl');
+				
+				/*
+				 展示数据
+				 * */
+				function showData(data){
+					var tabContent = document.querySelector('.mui-tab1');
+					var html1;
+					if(data.list.length === 0){
+						html1 = nullDataHtml;
+					}else{
+						mui.each(data.list,function(index,item){
+							item.editable = true;
+						})
+						html1 = template('ground_batch_list',data);
+					}
+					tabContent.innerHTML = html1;
+					if(document.querySelectorAll('.batch-wrapper').length>4){
+						document.querySelector('.mui-tab1').style.paddingBottom = '59px';
+					}
+				}
+            	
+				// 模板加载
+				$.plusReady(function(){
+					var params, distributeCode, selectedRows = [],selecteIndex = [];
+					var self = plus.webview.currentWebview();
+				    params = JSON.parse(self.params);//获得参数
+				    var acceptList = params.list;
+				    distributeCode =  params.distributeCode;
+				    console.log(params)
+				    showData(params);
+				    
+				    var groundUrl = '/a/checkacceptdetail/finish';
+				    
+					
+					// 全选 及反选
+					$('.fix_bottom-wraper').on('click','#checkall',function(){
+						var checkList =  document.querySelectorAll('.checkone');
+						 if (document.querySelector('#checkall').checked){
+						 	// 全选
+						 	mui.each(checkList,function(index,item){
+						 		item.checked = true
+						 	});
+						 	document.querySelector('.total').innerText = checkList.length;
+						 	selectedRows = acceptList;
+					    } else { 
+					    	// 取消全选     
+					        mui.each(checkList,function(index,item){
+						 		item.checked = false
+						 	});
+						 	document.querySelector('.total').innerText = 0;
+						 	selectedRows = [];
+					    }
+					    console.log(selectedRows)
+					});
+					
+					// 复选框选中
+					$('.batch-wrapper').on('click','.checkone',function(){
+						selectedRows = [],selecteIndex = [];
+						
+						var checkList = document.querySelectorAll('.checkone')
+						var checkAll = document.querySelector('#checkall');
+						var checkLen = checkList.length;
+						var len = 0;
+						mui.each(checkList,function(index,item){
+							if(item.checked){
+								len++;
+								selectedRows.push(acceptList[index]);
+								selecteIndex.push(this.dataset.index)
+							}
+						});
+						checkAll.checked = len === checkLen ? true: false;
+						document.querySelector('.total').innerText = len;
+						console.log(selectedRows);
+						console.log(selecteIndex)
+					})
+					
+					
+					// 绑定事件 --确认验收
+					$('.fix_bottom-wraper').on('tap','.acceptance',function(){
+						document.activeElement.blur(); // 隐藏软键盘
+						console.log(document.querySelector('.total').innerText)
+						if(Number(document.querySelector('.total').innerText) === 0){
+							return mui.alert('请至少选中一项','警告',['确认'],function(){},'div')
+						}
+						var cards = document.querySelectorAll('.am-card');
+						var selectedCards = [], cardFactNum = [];
+						mui.each(selecteIndex,function(index,item){
+							selectedCards.push(cards[item]);
+							cardFactNum.push(cards[item].querySelector('.realNum'));
+						});
+						console.log(selectedCards);
+						var flag = true;
+						mui.each(cardFactNum,function(index,item){
+							if(!item.value){
+								flag = false;
+							}
+						})
+						if(!flag){
+							return mui.alert('实到数量不能为空','警告',['确定'],function(){},'div');
+						};
+						let detailListVo = [], submitData = {};
+						mui.each(selectedCards,function(index,item){
+							var postData = {};
+							var id = item.dataset.id;
+							var realNum = item.querySelector('.realNum').value;
+							var realReceiveStore = item.querySelector('.select_actualStore').value;
+							console.log(realNum);
+							console.log(realReceiveStore);
+							if(realNum <= 0 ){
+								return mui.alert('实际上架数量不能小于或等于0','警告',['确定'],function(){},'div')
+							}
+							if(realNum > this.querySelector('.groundNum').innerText){
+								return mui.alert('实际数量不得大于指示数量','警告',['确定'],function(){},'div')
+							}
+							postData.id = id;
+							postData.realNum = realNum;
+							postData.realReceiveStore = realReceiveStore;
+							detailListVo.push(postData);
+						});
+						submitData.detailListVo = detailListVo;
+						submitData.distributeCode = distributeCode;
+						console.log(submitData)
+						var btnArray = ['否', '是'];
+						mui.confirm('确认批量上架选中的药品？', '确认', btnArray, function(e) {
+							if (e.index == 1) {
+								mui.ajaxRequest(groundUrl,{
+									type: 'POST',
+									data: submitData,
+									showWaiting: true,
+									contentType: "application/json",
+									success: function(data){
+										if(data.code === 200){
+											mui.toast('上架成功');
+											var parmasData = {};
+											parmasData.finishUrl = '../grounding/index';
+											parmasData.keepUrl = 'ground_list';
+											parmasData.resultType = 'ground';
+											parmasData.itemData = params.itemData;
+											common.openwin('../result/index',{ parmas: JSON.stringify(parmasData) },{
+												titleText: '结果',
+												autoBackButton: false
+											})
+										}
+									},
+									error: function(xhr,type,errorThrown){
+										alert(xhr.responseText)
+			                		}
+								})
+							}
+						},'div')
+					});
+					
+				});
+				
+			})(mui);
+		
+		</script>
+	</body>
+
+</html>

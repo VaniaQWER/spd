@@ -7,33 +7,33 @@
 				<div class="mui-collapse-content">
 						<div class="mui-input-row">
 							<label>配送单号</label>
-							<p class="detailRow_content">{{value.distributecode}}</p>
+							<p class="detailRow_content">{{ distributecode ? distributecode: '' }}</p>
 						</div>
 						<div class="mui-input-row">
 							<label>订单号</label>
-							<p class="detailRow_content">{{value.ordercode}}</p>
+							<p class="detailRow_content">{{ ordercode ? ordercode: '' }}</p>
 						</div>
 						<div class="mui-input-row">
 							<label>状态</label>
-							<p class="detailRow_content">{{value.statusname}}</p>
+							<p class="detailRow_content">{{ statusname ? statusname: '' }}</p>
 						</div>
 						<div class="mui-input-row">
 							<label>类型</label>
-							<p class="detailRow_content">{{value.typename}}</p>
+							<p class="detailRow_content">{{ typename ? typename: '' }}</p>
 						</div>
 						<div class="mui-input-row">
 							<label>供应商</label>
-							<p class="detailRow_content">{{value.suppliername}}</p>
+							<p class="detailRow_content">{{ suppliername ? suppliername: '' }}</p>
 						</div>
 						<div class="mui-input-row">
 							<label>收货地址</label>
-							<p class="detailRow_content">{{value.deptaddress}}</p>
+							<p class="detailRow_content">{{ deptaddress ? deptaddress: '' }}</p>
 						</div>
 				</div>
 			</li>
 		</ul>
 		<ul class="mui-table-view" style="margin-bottom:8px;">
-			<li class="mui-table-view-cell mui-collapse ">
+			<li class="mui-table-view-cell mui-collapse mui-active">
 				<a class="mui-navigate-right" href="#">产品信息</a>
 				<div class="mui-collapse-content">
 						<div class="mui-input-row">
@@ -58,7 +58,7 @@
 						</div>
 						<div class="mui-input-row">
 							<label>批准文号</label>
-							<input class="mui-input" style="color: red;" value={{ value.approvalNo }} />
+							<p class="detailRow_content">{{value.approvalNo}}</p>
 						</div>
 						<div class="mui-input-row">
 							<label>包装规格</label>
@@ -69,18 +69,18 @@
 							<p class="detailRow_content">{{value.unit}}</p>
 						</div>
 						<div class="mui-input-row">
-							{{ if checkType === 1 }}
+							{{ if checkType === 1 && hasAcceptance }}
 								<label class="font-warning">生产批号</label>
-								<input class="mui-input editInput" value={{ value.productBatchNo }} />
+								<input class="mui-input editInput BatchNo" value={{ value.productBatchNo }} />
 								{{ else }}
 									<label>生产批号</label>
 									<p class="detailRow_content">{{value.productBatchNo}}</p>
 							{{ /if }}
 						</div>
 						<div class="mui-input-row">
-							{{ if checkType === 1 }}
+							{{ if checkType === 1 && hasAcceptance }}
 								<label class="font-warning">生产日期</label>
-								<input class="mui-input editInput" type='date' value={{ value.realProductTime }} />
+								<input class="mui-input editInput realProductTime" type='date' value={{ value.realProductTime }} />
 								{{ else }}
 									<label>生产日期</label>
 									<p class="detailRow_content">{{value.realProductTime}}</p>
@@ -88,31 +88,33 @@
 							
 						</div>
 						<div class="mui-input-row">
-							{{ if checkType === 1 }}
+							{{ if checkType === 1 && hasAcceptance }}
 								<label class="font-warning">有效期至</label>
-								<input class="mui-input editInput" type='date' value={{ value.realValidEndDate }} />
+								<input class="mui-input editInput realValidEndDate" type='date' value={{ value.realValidEndDate }} />
 								{{ else }}
 									<label>有效期至</label>
 									<p class="detailRow_content">{{value.realValidEndDate}}</p>
 							{{ /if }}
 						</div>
+						{{ if isShowTemprature === 1 }}
 							<div class="mui-input-row">
-							{{ if checkType === 1 }}
-								<label class="font-warning">验收温度（℃）</label>
-								<input class="mui-input editInput" />
-								{{ else }}
-									<label>验收温度（℃）</label>
-									<p class="detailRow_content">{{value.temp}}</p>
-							{{ /if }}
-						</div>
+								{{ if checkType === 1 && hasAcceptance }}
+									<label class="font-warning">验收温度（℃）</label>
+									<input class="mui-input editInput realAcceptanceTemperature" type='number' value={{ value.realAcceptanceTemperature}}/>
+									{{ else }}
+										<label>验收温度（℃）</label>
+										<p class="detailRow_content">{{value.realAcceptanceTemperature}}</p>
+								{{ /if }}
+							</div>
+						{{ /if }}
 						<div class="mui-input-row">
 							<label>配送数量</label>
 							<p class="detailRow_content">{{value.realDeliveryQuantiry}}</p>
 						</div>
 						<div class="mui-input-row">
-							{{ if checkType === 1 }}
+							{{ if checkType === 1 && hasAcceptance }}
 								<label class="font-warning">实到数量</label>
-								<input class="mui-input editInput" type="number"  pattern="[0-9]*" value={{ value.realReceiveQuantity?value.realReceiveQuantity: 0 }} />
+								<input class="mui-input editInput realReceiveQuantiry" type="number"  pattern="[0-9]*" value={{ value.realReceiveQuantity?value.realReceiveQuantity: 0 }} />
 								{{ else }}
 									<label>实到数量</label>
 									<p class="detailRow_content">{{value.realReceiveQuantity}}</p>

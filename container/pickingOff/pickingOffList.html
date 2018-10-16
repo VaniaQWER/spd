@@ -9,23 +9,20 @@
 		<link href="../../css/mui.min.css" rel="stylesheet" />
 		<link href="../../css/themes.css" rel="stylesheet" />
 		<link href="../../css/index_view.css" rel="stylesheet" />
-		<script src="../../js/mui.min.js"></script>
-		<script src="../../js/template-web.js" type="text/javascript" charset="utf-8"></script>
-		<script src="../../js/utils.js" type="text/javascript" charset="utf-8"></script>
-		<script src="../../js/common.js" type="text/javascript" charset="utf-8"></script>
 	</head>
 
 	<body>
 		
-		<!--<header class="mui-bar mui-bar-nav theme_back">
-		   	<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
-		   	<a class="mui-pull-left theme_back_font">返回</a>
-		    <h1 class="mui-title">药品信息</h1>
-		</header>-->
+		<header class="mui-bar mui-bar-nav themes_bg_color">
+		   	<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left">
+		   		<label class="mui-pull-right theme_back_font">返回</label>
+		   	</a>
+		    <h1 class="mui-title themes_title">药品信息</h1>
+		    <a href="#" class="mui-pull-right batchAccetpance" style="height: 45px;padding-top: 12px;">
+		    	批量下架
+		    </a>
+		</header>
 		<div class="mui-content">
-		    <div class="mui-input-row mui-search search_head">
-				<input type="search" class="mui-input-clear" placeholder="通用名/商品名/生产厂家" onclick="toSearchPage()">
-			</div>
 			<div id="slider" class="mui-slider themes_tab mui-fullscreen">
 				<div id="sliderSegmentedControl" class="mui-slider-indicator mui-segmented-control mui-segmented-control-inverted">
 					<a class="mui-control-item themes_font_color_tab" href="#item1mobile">待拣货</a>
@@ -33,7 +30,7 @@
 				</div>
 				<div id="sliderProgressBar" class="mui-slider-progress-bar mui-col-xs-6"></div>
 				<div class="mui-slider-group">
-					<div id="item1mobile" class="mui-slider-item mui-control-content mui-active">
+					<div id="item1mobile" class="mui-slider-item mui-control-content">
 						<div id="scroll1" class="mui-scroll-wrapper">
 							<div class="mui-scroll"  id='mui-table-view-tab1'>
 								<ul class="mui-table-view">
@@ -69,6 +66,17 @@
 		
 		<script type="text/javascript">
 			
+			if(window.plus) {
+                plusready();
+            } else {
+                document.addEventListener('plusready', plusready, false);
+            }
+            function plusready() {
+                plus.key.addEventListener('backbutton',function(){
+                    plus.webview.currentWebview().close();
+                })
+            }
+			
 			(function($) {
 				
 			$('.mui-scroll-wrapper').scroll({
@@ -88,11 +96,13 @@
 			/*
 				  获取列表数据
 				 * */
-				function genData(url){
+				function genData(url,selected){
+					plus.nativeUI.showWaiting();
 					mui.ajaxRequest(url,{
                 		type: 'GET',
                 		showWaiting: true,
                 		success: function(data){
+                			plus.nativeUI.closeWaiting();
                 			if(data.code === 200){
                 				resData = data.data;
                 				mui.each(data.data.notDetail,function(index,item){
@@ -105,7 +115,7 @@
 	            				detailData.notDetail.hasPicked = true;
 	            				detailData.existDetail.list = data.data.existDetail;
 	            				detailData.existDetail.hasPicked = false;
-	                			showData(detailData)
+	                			showData(detailData,selected)
                 			}else{
                 				mui.alert(data.msg)
                 			}
@@ -117,27 +127,62 @@
 				}
 			
 			
-			function showData(data){
-				var acceptanceTab1 = document.querySelector('.mui-tab1');
-				var html1 = undefined;
-				if(data.notDetail.list.length === 0){
-					html1 = nullDataHtml
+			function showData(data,selected){
+				if(selected === 'left'){
+					var acceptanceTab1 = document.querySelector('.mui-tab1');
+					var html1;
+					if(data.notDetail.list.length === 0){
+						html1 = nullDataHtml;
+						document.querySelector('.batchAccetpance').style.display = 'none';
+					}else{
+						html1 = template('picking_tpl',data.notDetail);
+						document.querySelector('.batchAccetpance').style.display = 'block';
+					}
+					acceptanceTab1.innerHTML = html1;
 				}else{
-					html1 = template('picking_tpl',data.notDetail);
+					var acceptanceTab2 = document.querySelector('.mui-tab2');
+					var html2;
+					if(data.existDetail.list.length === 0){
+						html2 = nullDataHtml
+					}else{
+						html2 = template('picking_tpl',data.existDetail);
+					}
+					acceptanceTab2.innerHTML = html2;
+					document.querySelector('.batchAccetpance').style.display = 'none';
 				}
-				acceptanceTab1.innerHTML = html1;
 			}
         	
 			$.plusReady(function(){
-				var params, pickingOrderNo
+				
+				window.addEventListener('pagefresh',function(event){
+					var query = JSON.parse(event.detail.params);
+					var genUrl = '/a/common/pickingorderdetail/getPickingDetail?pickingOrderNo='+ query.pickingorderno;
+					genData(url,query.currentSelected);
+				})
+				
+				var params, pickingOrderNo, currentSelected = undefined;
 				var self = plus.webview.currentWebview();
-				params = self.params;//获得参数
-				pickingOrderNo = JSON.parse(params).pickingorderno;
+				params = JSON.parse(self.params);//获得参数
+				pickingOrderNo = params.pickingorderno;
+				currentSelected = params.currentSelected; // 当前选中tabs
+				console.log(currentSelected)
+			    if(currentSelected === 'left'){
+			    	document.querySelector('#sliderProgressBar').style.transform = 'translate3d(0px,0px,0px) translateZ(0px)';
+			    	document.querySelector('.mui-slider-group').style.transform = 'translate3d(0px,0px,0px) translateZ(0px)';
+			    	document.querySelectorAll('.themes_font_color_tab')[0].className = 'mui-control-item themes_font_color_tab mui-active';
+			    	document.querySelector('#item1mobile').className = 'mui-slider-item mui-control-content mui-active';
+			    }else{
+			    	document.querySelector('#sliderProgressBar').style.transform = 'translate3d(267px,0px,0px) translateZ(0px)';
+			    	document.querySelector('.mui-slider-group').style.transform = 'translate3d(-534px,0px,0px) translateZ(0px)';
+			    	document.querySelectorAll('.themes_font_color_tab')[1].className = 'mui-control-item themes_font_color_tab mui-active';
+			    	document.querySelector('#item2mobile').className = 'mui-slider-item mui-control-content mui-active';
+			    }
 			    console.log(pickingOrderNo)
 			    var url = '/a/common/pickingorderdetail/getPickingDetail?pickingOrderNo='+ pickingOrderNo;
 			    var pickUrl = '/a/common/pickingorder/finishPicking';
-				genData(url);
+				genData(url,currentSelected);
 				
+				var item1 = document.getElementById('item1mobile');
             	var item2 = document.getElementById('item2mobile');
 				document.getElementById('slider').addEventListener('slide', function(e) {
 					if (e.detail.slideNumber === 1) {
@@ -151,7 +196,21 @@
 								}
 								acceptanceTab2.innerHTML = html2;
 							}
+						document.querySelector('.batchAccetpance').style.display = 'none';
+					}else if(e.detail.slideNumber === 0){
+						if (!item1.querySelector('.am-card')) {
+							var acceptanceTab1 = document.querySelector('.mui-tab1');
+							var html;
+							if(detailData.notDetail.list.length === 0){
+								html = nullDataHtml
+							}else{
+								html = template('picking_tpl',detailData.notDetail);
+							}
+							acceptanceTab1.innerHTML = html;
+						}
+						document.querySelector('.batchAccetpance').style.display = 'block';
 					}
+					
 				});
 					
 				
@@ -170,16 +229,32 @@
 					let index = this.dataset.index;
 					var item1mobile = document.querySelector('#item1mobile');
 					var hasPicked = item1mobile.className.indexOf('mui-active')>0 ? true: false;
-					let data = hasPicked ? detailData.notDetail.list[index]: detailData.existDetail.list[index];
-					data.hasPicked = hasPicked; // 判断 详情页面是否有上架按钮
-					let newData = Object.assign({},data,JSON.parse(params));
+
+					let newData = {};
 					newData.statusname = hasPicked ? '待拣货':'已拣货';
+					newData.allData = hasPicked ? detailData.notDetail.list: detailData.existDetail.list;
+					newData.index = index;
+					newData.hasPicked = hasPicked;
+					newData.orderInfo = params;
 					console.log(JSON.stringify(newData))
 					document.activeElement.blur();
 					common.openwin('pickingOffDetails',{ details: JSON.stringify(newData) },{
 						titleText: '详情'
 					})
 				})
+				/* 批量下架 */
+					$('.mui-bar').on('tap','.batchAccetpance',function(){
+						var paramsData = {};
+						paramsData.list = detailData.notDetail.list;
+						paramsData.pickingOrderNo = pickingOrderNo;
+						paramsData.applyNo = resData.applyOrder;
+						paramsData.itemData = params;
+						console.log(paramsData)
+						common.openwin('picking_batch',{ params: JSON.stringify(paramsData) },{
+							titleText: '药品信息'
+						})
+					})
+				
 				
 				// 绑定事件 --确认拣货
 				$('#slider').on('tap','.submitButton',function(){
@@ -206,7 +281,15 @@
 		                		success: function(data){
 		                			if(data.code === 200){
 		                				mui.toast('拣货成功');
-		                				genData(url)
+		                				var parmasData = {};
+										parmasData.finishUrl = '../pickingOff/index';
+										parmasData.keepUrl = 'pickingOffList';
+										parmasData.resultType = 'picking';
+										parmasData.itemData = params;
+										common.openwin('../result/index',{ parmas: JSON.stringify(parmasData) },{
+											titleText: '结果',
+											autoBackButton: false
+										})
 		                			}else{
 		                				mui.alert(data.msg)
 		                			}

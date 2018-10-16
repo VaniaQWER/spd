@@ -13,8 +13,7 @@
 	</head>
 
 	<body>
-		
-		<div class="mui-content" style='padding-top: 44px;'>
+		<div class="main-content" style='padding-top: 44px;'>
 			<header class="mui-bar mui-bar-nav themes_bg_color">
 			   	<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left">
 			   		<label class="mui-pull-right theme_back_font">返回</label>
@@ -29,41 +28,13 @@
 		    <div class="mui-input-row mui-search search_head">
 				<input type="search" class="mui-input-clear" placeholder="商品名/生产厂家/货位">
 			</div>
-			<div class="main-content">
-				
+			<div id="refreshContainer" class="mui-scroll-wrapper" style="top: 102px;">
+				<div class="mui-scroll">
+					<ul class="mui-table-view">
+						<li class="mui-table-view-cell mui-tab" style="padding: 0;"></li>
+					</ul>
+				</div>
 			</div>
-			<!--<div id="slider" class="mui-slider themes_tab mui-fullscreen">
-				<div id="sliderSegmentedControl" class="mui-slider-indicator mui-segmented-control mui-segmented-control-inverted">
-					<a class="mui-control-item themes_font_color_tab" href="#item1mobile">未提交</a>
-					<a class="mui-control-item themes_font_color_tab" href="#item2mobile">已提交</a>
-				</div>
-				<div id="sliderProgressBar" class="mui-slider-progress-bar mui-col-xs-6"></div>
-				<div class="mui-slider-group">
-					<div id="item1mobile" class="mui-slider-item mui-control-content mui-active">
-						<div id="scroll1" class="mui-scroll-wrapper">
-							<div class="mui-scroll"  id='mui-table-view-tab1'>
-								<div class="mui-loading">
-									<div class="mui-spinner">
-									</div>
-								</div>
-								
-							</div>
-						</div>
-					</div>
-					<div id="item2mobile" class="mui-slider-item mui-control-content">
-						<div id="scroll2" class="mui-scroll-wrapper">
-							<div class="mui-scroll" id='mui-table-view-tab2'> 
-								<div class="mui-loading">
-									<div class="mui-spinner">
-									</div>
-								</div>
-							</div>
-						</div>
-
-					</div>
-				</div>
-			</div>-->
-
 		</div>
 		
 		<script src="../../js/mui.js"></script>
@@ -109,138 +80,134 @@
 				var nullDataHtml = '<div class="mui-pull-bottom-tips"><div class="mui-pull-bottom-wrapper">'+
 										'<span class="mui-pull-loading">暂无数据</span></div></div>'
 				
-				var checkStatus, detailData = {};
-				function showData(data){
-					var content = document.querySelector('.main-content');
-					var html1 = template('check_list_tpl',data);
-					if(!html1){
-						html1 = nullDataHtml;
-					}
-					content.innerHTML = html1;
-				}
-				
-				function genData(url,checkBillNo,checkStatus){
-					mui.ajaxRequest(url,{
-                		type: 'POST',
-                		data: {
-                			checkBillNo: checkBillNo
-                		},
-                		showWaiting: true,
-                		success: function(data){
-                			if(data.code === 200){
-                				detailData = data.data;
-                				mui.each(detailData.list,function(index,item){
-                					item.checkStatus = checkStatus;
-                				})
-                				showData(detailData)
-                			}else{
-                				mui.alert(data.msg)
-                			}
-                		},
-                		error: function(xhr,type,errorThrown){
-							alert(xhr.responseText)
-                		}
-            		});
-				}
+				var checkStatus, 
+				detailData = { list: [] }, url = '/a/checkbilldetail/getListByBillNo';
+				var page = 0, pageSize = 10, totalPage = 0, checkBillNo = null,isMore = false;
+				checkUrl = '/a/checkbill/submitCheck';
 				
 				/* 渲染模板   */
-					
+				function template(data, insertType){
+					mui.each(data.list,function(index,item){
+						item.checkStatus = checkStatus;
+                		item.editable = item.checkDetailStatus === 1 ? true: false;
+					});
+        			utils.innerTplHtml('check_list_tpl', '.mui-tab', data, insertType);
+            	}
+				
+				function pullupRefresh(){
+					var self = this;
+					if(isMore){
+						page++;
+						var postData = {
+							pageNo: page,
+							pageSize: pageSize,
+							checkBillNo: checkBillNo,
+						}
+		            	mui.ajaxRequest(url,{
+		            		type: 'POST',
+		            		data: postData,
+		            		success: function(data){
+		            			var resData = data.data;
+		            			totalPage = resData.totalPage;
+		            			if(resData.list.length < resData.pageSize){
+		            				isMore = false;
+		            				self.endPullUpToRefresh(true);
+		            			}else{
+		            				isMore = true;
+		            				self.endPullUpToRefresh(false);
+		            			}
+		            			detailData.list = detailData.list.concat(resData.list);
+		            			return template(resData,true)
+		            		},
+		            		error: function(xhr,type,errorThrown){
+								alert(xhr.responseText)
+		            		}
+		            	})
+					}else{
+						document.querySelector('.mui-pull-loading').innerHTML = '没有更多数据';
+						self.endPullUpToRefresh(true);
+					}
+				}
+				
+				
+				function pulldownRefresh(){
+					var self = this;
+					detailData.list = [];
+					page = 1;
+					var postData = {
+						pageNo: page,
+						pageSize: 10,
+						checkBillNo: checkBillNo
+					}
+	            	mui.ajaxRequest(url,{
+	            		type: 'POST',
+	            		data: postData,
+	            		success: function(data){
+	            			var resData = data.data;
+	            			totalPage = resData.totalPage;
+	            			if(resData.list.length < resData.pageSize){
+	            				isMore = false;
+	            				document.querySelector('.mui-pull-loading').innerHTML = '没有更多数据';
+	            				self.endPullDownToRefresh(true);
+	            			}else{
+	            				isMore = true;
+	            				self.endPullDownToRefresh();
+	            			}
+	            			detailData.list = resData.list;
+	            			self.refresh(true);
+	            			return template(resData,false)
+	            		},
+	            		error: function(xhr,type,errorThrown){
+							alert(xhr.responseText)
+	            		}
+	            	})
+				}
+				
 				$.plusReady(function(){
 					
-					var params, checkBillNo, flag = false
+					var params, flag = false
 					var self = plus.webview.currentWebview();
-				    params = self.params;//获得参数
+				    params = JSON.parse(self.params);//获得参数
 				    console.log(params)
-				    checkBillNo = JSON.parse(params).checkbillno;
-				    checkStatus = JSON.parse(params).checkStatus
+				    checkBillNo = params.checkbillno;
+				    checkStatus = params.checkStatus
 				    
-				    var checkUrl = '/a/checkbill/submitCheck';
-				    var url = '/a/checkbilldetail/getListByBillNo';
-				    genData(url,checkBillNo,checkStatus);
-					
-					
+				    
+				    //循环初始化所有下拉刷新，上拉加载。
+					$.each(document.querySelectorAll('.mui-scroll'), function(index, pullRefreshEl) {
+						$(pullRefreshEl).pullToRefresh({
+							down: {
+								style:'circle',
+								contentdown : "下拉可以刷新",
+								contentover : "释放立即刷新",
+								contentrefresh : "正在刷新...",
+								callback: pulldownRefresh
+							},
+							up: {
+								contentrefresh : "正在加载...",//可选，正在加载状态时，上拉加载控件上显示的标题内容
+	      						contentnomore:'没有更多数据',
+								callback: pullupRefresh
+							}
+						});
+					});
+					/*  请求数据  */
+					mui(".mui-scroll").pullToRefresh().pullDownLoading();
+				    
 					 // 展开编辑
 					$('.main-content').on('tap','.eidtRow',function(){
-						flag = flag === true ? false: true;
-						this.innerHTML = this.innerHTML === '展开编辑' ? '收起编辑':'展开编辑' ;
-						let id = this.dataset.id;
-						let index = this.dataset.index;
-						var producter = detailData.list[index].ctmmManufacturerName;
-						var numNode = document.querySelectorAll('.am-flex-num')[index];
-						var childText;
-						if(numNode.querySelector('span')){
-							childText = numNode.querySelector('span').innerText;
-						}else{
-							childText = numNode.querySelector('.relNum').value
-						}
-						var numInputHtml =  '<div class="am-flexbox-item">' + 
-						'<div class="am-list-item am-input-item am-list-item-middle">' + 
-						'<div class="am-list-line">'+
-						'<div class="am-input-label am-input-label-4 font-warning">数量:</div>'+
-						'<div class="am-input-control">'+
-						'<input pattern="[0-9]*" type="number" value='+ childText +' placeholder="请输入" class="relNum"/>'+
-						'</div>'+
-						'</div>'+
-						'</div>'+
-						'</div>' +
-						'</div>';
-						var numHtml = '数量：'+'<span>'+ childText +'</span>';
-						var addDiv = document.createElement('div');
-						addDiv.className = 'editForm';
-						addDiv.innerHTML = '<div class="am-flexbox am-flexbox-align-center">'+
-						'<div class="am-flexbox-item">' + 
-						'<div class="am-list-item am-input-item am-list-item-middle">' + 
-						'<div class="am-list-line">'+
-						'<div class="am-input-label am-input-label-4 font-warning">生产日期:</div>'+
-						'<div class="am-input-control">'+
-						'<input pattern="[0-9]*" type="date" placeholder="请输入" class="productDate"/>'+
-						'</div>'+
-						'</div>'+
-						'</div>'+
-						'</div>' +
-						'<div class="am-flexbox-item">' + 
-						'<div class="am-list-item am-input-item am-list-item-middle">' + 
-						'<div class="am-list-line">'+
-						'<div class="am-input-label am-input-label-4 font-warning">生产批号:</div>'+
-						'<div class="am-input-control">'+
-						'<input pattern="[0-9]*" type="text" placeholder="请输入" class="producterPh"/>'+
-						'</div>'+
-						'</div>'+
-						'</div>'+
-						'</div>' +
-						'</div>' +
-						'<div class="am-flexbox am-flexbox-align-center">'+
-						'<div class="am-flexbox-item">' + 
-						'<div class="am-list-item am-input-item am-list-item-middle">' + 
-						'<div class="am-list-line">'+
-						'<div class="am-input-label am-input-label-4 font-warning">有效期至:</div>'+
-						'<div class="am-input-control">'+
-						'<input pattern="[0-9]*" type="date" placeholder="请输入" class="userfulDate"/>'+
-						'</div>'+
-						'</div>'+
-						'</div>'+
-						'</div>' +
-						'<div class="am-flexbox-item">生产厂家：'+
-						'<span>'+ producter +'</span>'+
-						'</div>'+
-						'</div>'+
-						'</div>';
-						if($('.am-card-body')[index].querySelectorAll('.editForm').length === 0){
-							$('.am-card-body')[index].appendChild(addDiv);
-							numNode.innerHTML = numInputHtml;
-							
-						}else{
-							var child = $('.am-card-body')[index].querySelector('.editForm');
-							$('.am-card-body')[index].removeChild(child);
-							numNode.innerHTML = numHtml;
-						}
+						this.innerHTML = this.innerHTML === '展开编辑' ? '收起编辑':'展开编辑';
+						let index = Number(this.dataset.index);
+						var currCard = document.querySelectorAll('.am-card')[index];
+						var editForm = currCard.querySelector('.editForm');
+						editForm.style.display = editForm.style.display === 'block' ? 'none': 'block';
+						editForm.nextElementSibling.style.display = editForm.nextElementSibling.style.display === 'none'? 'flex':'none';
 					});
 					//绑定点击事件  - 进入详情页
 					
 					$('.main-content').on('tap','.toPage',function(){
 						let index = this.dataset.index;
 						let data = detailData.list[index];
-						let newData = Object.assign({},data,JSON.parse(params));
+						let newData = Object.assign({}, data, params);
 						console.log(JSON.stringify(newData))
 						document.activeElement.blur();
 						common.openwin('checkDetails',{ details: JSON.stringify(newData) },{
@@ -250,56 +217,49 @@
 					
 					// 提交
 					$('.main-content').on('tap','.submitButton',function(){
-						if(flag){
-							var index = this.dataset.index;
-							var _this_card = document.querySelectorAll('.am-card')[index];
-							var currData = detailData.list[index];
-							var postData = {}, detailList = [], submitData = {}
-							console.log(index)
-							postData.accountBatchNo = currData.accountBatchNo;
-							postData.accountEndTime = currData.accountEndTime;
-							postData.accountProductTime = currData.accountProductTime;
-							postData.accountStoreNum = currData.accountStoreNum;
-							postData.bigDrugCode = currData.bigDrugCode;
-							postData.drugCode = currData.drugCode;
-							postData.id = currData.id;
-							postData.locCode = currData.locCode;
-							postData.pId = currData.pId;
-							postData.practicalBatch = currData.practicalBatch;
-							postData.practicalRepertory = currData.practicalRepertory;
-							postData.realProductTime = currData.realProductTime;
-							postData.referencePrice = currData.referencePrice;
-							postData.unitCode = currData.unitCode;
-							postData.validEndTime = currData.validEndTime;
-							postData.supplierCode = currData.supplierCode;
-							
-							
-							detailList.push(postData);
-							submitData.detailList = detailList;
-							submitData.checkBillNo = checkBillNo;
-							console.log(JSON.stringify(submitData));
-							
-							mui.ajaxRequest(checkUrl,{
-								type: 'POST',
-								data: submitData,
-								showWaiting: true,
-								contentType: "application/json",
-								success: function(data){
-									if(data.code === 200){
-										mui.toast('提交成功');
-//										genData(url)
-									}
-								},
-								error: function(xhr,type,errorThrown){
-									alert(xhr.responseText)
-		                		}
-							})
-							
-						}else{
-							return mui.alert('请编辑相关数据再继续操作', '提示', ['确认'],function(e){
-								
-							},'div');
-						}
+						var index = this.dataset.index;
+						var _this_card = document.querySelectorAll('.am-card')[index];
+						var currData = detailData.list[index];
+						var postData = {}, detailList = [], submitData = {}
+						console.log(index)
+						postData.accountBatchNo = currData.accountBatchNo;
+						postData.accountEndTime = currData.accountEndTime;
+						postData.accountProductTime = currData.accountProductTime;
+						postData.accountStoreNum = currData.accountStoreNum;
+						postData.bigDrugCode = currData.bigDrugCode;
+						postData.drugCode = currData.drugCode;
+						postData.id = currData.id;
+						postData.locCode = currData.locCode;
+						postData.pId = currData.pId;
+						postData.practicalBatch = currData.practicalBatch;
+						postData.practicalRepertory = currData.practicalRepertory;
+						postData.realProductTime = currData.realProductTime;
+						postData.referencePrice = currData.referencePrice;
+						postData.unitCode = currData.unitCode;
+						postData.validEndTime = currData.validEndTime;
+						postData.supplierCode = currData.supplierCode;
+						
+						
+						detailList.push(postData);
+						submitData.detailList = detailList;
+						submitData.checkBillNo = checkBillNo;
+						console.log(JSON.stringify(submitData));
+						
+						mui.ajaxRequest(checkUrl,{
+							type: 'POST',
+							data: submitData,
+							showWaiting: true,
+							contentType: "application/json",
+							success: function(data){
+								if(data.code === 200){
+									mui.toast('提交成功');
+									mui(".mui-scroll").pullToRefresh().pullDownLoading();
+								}
+							},
+							error: function(xhr,type,errorThrown){
+								alert(xhr.responseText)
+	                		}
+						})
 						document.activeElement.blur();
 						var btnArray = ['否', '是'];
 						$.confirm('确定要执行此操作吗？', '确认提交', btnArray, function(e) {

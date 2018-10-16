@@ -85,9 +85,37 @@ html:not([data-scale]) .scrollList-item .am-card-footer::before {
     transform: scaleY(0.5);
 }
 input{
+	-webkit-appearance: none;
 	margin-bottom: 0 !important;
 	height: 30px !important;
 }
+input,button,select,textarea{
+	padding: 0;
+	font: inherit;
+	outline: none;
+	border: 0;
+	border-radius: 0;
+	-webkit-tap-highlight-color: transparent;
+	appearance: none;
+	-webkit-appearance: none;
+	background: transparent;
+	line-height: normal;
+	box-sizing: border-box;
+	-webkit-writing-mode: horizontal-tb;
+	outline: 0;
+	resize: none;
+	color: inherit;
+	white-space: pre-wrap;
+	word-wrap: break-word;
+	-webkit-rtl-ordering: logical;
+	user-select: text;
+}
+button{
+	user-select: none !important;
+	flex-direction: row !important;
+}
+
+input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appearance: none !important; margin: 0;}
 .check_wrapper{
 	padding-top: 0 !important;
 }
@@ -204,6 +232,10 @@ input{
     overflow: hidden;
     text-overflow: ellipsis;
 }
+.am-flexbox .am-last-flexItem{
+	overflow: visible;
+	margin-left: -50px;
+}
 .scrollList-item .am-card-footer{
 	position: relative;
 }
@@ -254,7 +286,7 @@ input{
     flex: 1 1;
     -ms-flex-item-align: stretch;
     align-self: stretch;
-    padding-right: 15px;
+    padding-right: 8px;
     overflow: hidden;
 }
 .am-list-item.am-list-item-middle .am-list-line {
@@ -271,7 +303,7 @@ input{
     margin-right: 5px;
     text-align: left;
     white-space: nowrap;
-    overflow: hidden;
+    /*overflow: hidden;*/
     padding: 2px 0;
 }
 .am-list-item .am-input-control {
@@ -286,7 +318,8 @@ input{
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
-    width: 100%;
+    /*width: 100%;*/
+    width: 102px;
     padding: 2px 0;
     border: 0;
     background-color: transparent;
@@ -301,6 +334,7 @@ input{
 .font-warning{
 	color: #f5222d !important;
 }
+
 
 .inline-Input{
     width: 57% !important;
@@ -346,4 +380,78 @@ input{
 .select_actualStore{
 	margin: 0 !important;
 	padding: 0 !important;
+}
+.checkInputDate{
+	float: none !important;
+	border-bottom: solid 1px #CCCCCC !important;
+	width: 25% !important;
+	border-radius: 0 !important;
+}
+.search-ullist{
+	z-index: 2;
+    background-color: #efeff4;
+    border: solid 1px #F5F5F9;
+    border-radius: 2px;
+    list-style: none;
+    position: absolute;
+    margin-top: 0;
+    margin-bottom: 0;
+    padding-left: 0;
+    list-style: none;
+    width: 100%;
+    top: 49px
+}
+.search-ullist-li{
+	position: relative;
+    overflow: hidden;
+    padding: 7px 30px;
+}
+.search-ullist-li::before{
+	font-family: Muiicons;
+	content: '\e466';
+	position: absolute;
+	left: 10px;
+}
+/* 批量 处理 */
+.batch-wrapper{
+	display: flex;
+	align-items: center;
+	border-bottom: solid 1px #C7C7CC;
+}
+.batch-wrapper:last-child{
+	border-bottom: none;
+}
+.fix_bottom-wraper{
+	position: fixed;
+	z-index: 10;
+	bottom: 0;
+	height: 60px;
+	width: 100%;
+	display: flex;
+	background: #FFFFFF;
+	align-items: center;
+}
+.fix-bottom-content{
+	display: flex;
+	align-items: center;
+    flex: 1 1;
+    height: 100%;
+    border-top: solid 1px #F2A11C;
+}
+.fix-bottom-extra{
+	background: #F2A11C;
+    display: flex;
+    text-align: center;
+    width: 120px;
+    height: 100%;
+    align-items: center;
+    justify-content: space-around;
+    color: #fff;
+    font-size: 18px;
+}
+/*
+ 批量处理按钮点击颜色
+ * */
+.fix-bottom-extra:active{
+	color: #FFFFFF;
 }

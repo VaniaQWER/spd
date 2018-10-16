@@ -6,25 +6,292 @@
 		<title>搜索页面</title>
 		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
 		<link href="../../css/mui.min.css" rel="stylesheet" />
+		<style>
+			#ulList{
+				padding-top: 10px;
+			}
+			.search-ullist{
+				z-index: 2;
+			    background-color: #efeff4;
+			    border-bottom: solid 1px #F5F5F9;
+			    border-radius: 2px;
+			    list-style: none;
+			    position: relative;
+			    margin-top: 0;
+			    margin-bottom: 0;
+			    padding-left: 0;
+			    list-style: none;
+			    width: 100%;
+			}
+			.search-ullist-li{
+				position: relative;
+			    overflow: hidden;
+			    padding: 10px 36px;
+			}
+			.search-ullist-li::before{
+				font-family: Muiicons;
+				content: '\e466';
+				position: absolute;
+				left: 10px;
+			}
+			.history-title{
+				display: flex;
+				justify-content: space-between;
+				padding-right: 10px;
+			}
+			.history-tags{
+				display: flex;
+				flex-wrap: wrap;
+			    padding: 0 10px 10px 0;
+			}
+			.tag{
+				padding: 8px 10px;
+				margin: 8px 10px;
+			    border: solid 1px #ccc;
+			    background-color: #F5F5F9;
+			    border-radius: 3px;
+			}
+		</style>
 	</head>
 	<body>
 		<header class="mui-bar mui-bar-nav">
 			 <div class="mui-input-row mui-search search_head" style="width:85%;display: inline-block;">
-				<input type="search" class="mui-input-clear" placeholder="输入供应商名称">
+				<input type="search" id="search" class="mui-input-clear" placeholder="供应商/通用名/商品名">
 			</div>
 		     <a class="mui-action-back mui-pull-right" style="height:45px;line-height: 45px;">取消</a>
 		</header>
 		<div class="mui-content">
-			<div  style="padding:10px;">
-				<h4>历史搜索记录</h4>
-				<button type="button">华润</button>
-				<button type="button">中医药</button>
+			<div id="ulList">
+					
+			</div>
+			<div style="padding:10px;">
+				<div class="history-title">
+					<h4>历史搜索记录</h4>
+				</div>
+				
+				<div class="history-tags">
+					
+				</div>
+				
 			</div>
 		</div>
 		
 		<script src="../../js/mui.min.js"></script>
+		<script src="../../js/common.js" type="text/javascript" charset="utf-8"></script>
+		<script src="../../js/request.js" type="text/javascript" charset="utf-8"></script>
 		<script type="text/javascript">
-			mui.init()
+			
+			(function($) {
+				mui.init();
+				
+				var params = undefined, key = undefined, localStorageItem = [] // 判断搜索 供应商 ，商品名 两类
+				$.plusReady(function(){
+					var self = plus.webview.currentWebview();
+					var searchList = JSON.parse(plus.storage.getItem('searchHistory'));
+					console.log(searchList);
+					if(searchList && searchList.list.length){
+						
+						// 创建 删除历史记录标签
+						var span = document.createElement('span');
+						span.className = 'mui-icon mui-icon-trash clearHistory';
+						document.querySelector('.history-title').appendChild(span);
+						
+						// 创建 历史记录tag
+						mui.each(searchList.list,function(index,item){
+							var div = document.createElement('div');
+							div.className = 'tag';
+							if(item.supplierCode){
+								div.innerHTML = item.supplierName
+								div.setAttribute('data-supplierCode',item.supplierCode);
+								div.setAttribute('data-supplierName',item.supplierName);
+							}else{
+								div.innerHTML = item.ctmmParam;
+								div.setAttribute('data-bigDrugCode',item.bigDrugCode);
+								div.setAttribute('data-ctmmParam',item.ctmmParam);
+							}
+							document.querySelector('.history-tags').appendChild(div)
+							
+						})
+						localStorageItem = searchList.list;
+					}
+					console.log(localStorageItem)
+					console.log(JSON.stringify(localStorageItem))
+				    params = self.params;//获得参数
+				    console.log(params)
+				    console.log(JSON.parse(params));
+				    key = JSON.parse(params).key;
+				    
+				    // 删除 历史记录
+				    $('.history-title').on('tap','.clearHistory',function(){
+				    	var btnArray = ['否', '是'];
+				    	mui.confirm('是否确认删除历史搜索记录？', '确认', btnArray, function(e) {
+				    		if (e.index == 1) {
+				    			plus.nativeUI.showWaiting();
+				    			setTimeout(function(){
+				    				plus.storage.removeItem('searchHistory');
+					    			var deleteChild = document.querySelector('.clearHistory');
+					    			document.querySelector('.history-title').removeChild(deleteChild);
+					    			document.querySelector('.history-tags').innerHTML = '';
+					    			plus.nativeUI.closeWaiting();
+				    			},1000)
+				    		}
+				    	},'div')
+				    });
+				    
+				    // 点击tag 进行搜索
+				    $('.history-tags').on('tap','.tag',function(){
+				    	var dataset = this.dataset;
+				    	if(dataset.suppliercode){
+				    		// 供应商
+				    		let supplier = {
+					  			supplierCode: dataset.suppliercode,
+					  			supplierName: dataset.suppliername
+					  		};
+				    		var page =  plus.webview.getWebviewById(JSON.parse(params).route);
+					  		mui.fire(page,'search',{ supplier: JSON.stringify(supplier) });
+				    	}else{
+				    		// 产品名称
+				    		let drugInfo = {
+					  			bigDrugCode: dataset.bigdrugcode,
+					  			ctmmParam: dataset.ctmmparam
+					  		};
+				    		var page =  plus.webview.getWebviewById(JSON.parse(params).route);
+					  		mui.fire(page,'search',{ drugInfo: JSON.stringify(drugInfo) });
+				    	}
+				    	mui.back()
+				    })
+				   
+				    $('.search_head').on('keyup','#search',function(e){
+				    	var paramName  = e.target.value;
+				    	var url = null, data = {};
+						if(paramName){
+							if(key === 'supplier'){
+				    			// 供应商
+				    			url = '/a/depot/supplier/all';
+				    			data = {
+					    			ctmaSupplierName: paramName
+					    		}
+					    	}else{
+					    		// 搜产品名称
+					    		url = '/a/common/queryDrugByList';
+					    		data = {
+					    			paramName: paramName,
+									queryType: '3'
+					    		}
+					    	}
+					    	mui.ajaxRequest(url,{
+								type:"post",
+								data: data,
+								success: function(data){
+									if(data.code === 200){
+										let dataList = data.data;
+										createSelect(dataList,key);
+									}
+								},
+								error: function(xhr,type,errorThrown){
+									alert(xhr.responseText)
+			            		}
+							})
+						}else{
+							document.querySelector('#ulList').innerHTML = '';
+						}
+				   });
+				   
+				   
+				   function createSelect(data,key){
+						if(document.querySelector('.search-ullist')){
+							var ulList = document.querySelector('.search-ullist');
+							document.querySelector('#ulList').removeChild(ulList);
+						}
+						var ul = document.createElement('ul');
+						ul.className = 'search-ullist';
+						for(var i=0;i<data.length; i++){
+							var li = document.createElement('li');
+							li.className = 'search-ullist-li';
+							if(key === 'supplier'){
+								li.setAttribute('data-supplierCode',data[i].ctmaSupplierCode);
+								li.setAttribute('data-supplierName',data[i].ctmaSupplierName);
+								li.innerHTML = data[i].ctmaSupplierName;
+							}else{
+								li.setAttribute('data-ctmmParam',data[i].ctmmParam);
+								li.setAttribute('data-bigDrugCode',data[i].bigDrugCode);
+								li.innerText = data[i].ctmmParam;
+							}
+							ul.appendChild(li);
+						}
+						document.querySelector('#ulList').appendChild(ul)
+					}
+				  $('#ulList').on('tap','.search-ullist-li',function(){
+				  	let dataset = this.dataset;
+				  	if(dataset.suppliercode){
+				  		let supplier = {
+				  			supplierCode: dataset.suppliercode,
+				  			supplierName: dataset.suppliername
+				  		}
+				  		// 存储当前搜索内容
+				  		var flag = false
+				  		console.log(localStorageItem)
+				  		mui.each(localStorageItem,function(index,item){
+				  			if(item.supplierCode === supplier.supplierCode){
+				  				flag = true
+				  			}
+				  		});
+				  		if(!flag){
+				  			if(localStorageItem.length >= 10){
+				  				localStorageItem.shift()
+				  			}
+				  			localStorageItem.push(supplier);
+				  			console.log('当前不存在')
+				  		}else{
+				  			console.log('已经存在')
+				  			
+				  		}
+				  		console.log(JSON.stringify(localStorageItem))
+				  		var parmas = {
+				  			list: localStorageItem
+				  		}
+				  		plus.storage.setItem('searchHistory',JSON.stringify(parmas))
+				  		var page =  plus.webview.getWebviewById(JSON.parse(params).route);
+				  		mui.fire(page,'search',{ supplier: JSON.stringify(supplier) });
+				  		mui.back()
+				  	}else{
+				  		let drugInfo = {
+				  			bigDrugCode: dataset.bigdrugcode,
+				  			ctmmParam: dataset.ctmmparam
+				  		}
+				  		var flag = false
+				  		console.log(localStorageItem)
+				  		mui.each(localStorageItem,function(index,item){
+				  			if(item.bigDrugCode === drugInfo.bigDrugCode){
+				  				flag = true
+				  			}
+				  		});
+				  		if(!flag){
+				  			if(localStorageItem.length >= 10){
+				  				localStorageItem.shift()
+				  			}
+				  			localStorageItem.push(drugInfo);
+				  			console.log('当前不存在')
+				  		}else{
+				  			console.log('已经存在')
+				  		}
+				  		var parmas = {
+				  			list: localStorageItem
+				  		}
+				  		plus.storage.setItem('searchHistory',JSON.stringify(parmas))
+				  		console.log(JSON.parse(params).route);
+				  		var page =  plus.webview.getWebviewById(JSON.parse(params).route);
+				  		mui.fire(page,'search',{ drugInfo: JSON.stringify(drugInfo) });
+				  		mui.back()
+				  	}
+				  	
+				  });
+				  
+				  
+				  
+				})
+			})(mui);
+			
 		</script>
 	</body>
 

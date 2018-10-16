@@ -15,17 +15,17 @@
 
 	<body>
 		<div class="mui-content detailRow">
-			<!--<div class="detail-header-flex">
-				<div class="am-action">
+			<div class="detail-header-flex">
+				<div class="am-action previous">
 					<a class="mui-icon mui-icon-arrowleft"></a>
 					<a class="theme_back_font">上一个</a>
 				</div>
-				<div>1/12</div>
-				<div class="am-action">
+				<div class="page-indictor"><span class="currentPage"></span>/<span class="page-total"></span></div>
+				<div class="am-action next">
 					<a class="theme_next_font">下一个</a>
 					<a class="mui-icon mui-icon-arrowright"></a>
 				</div>
-			</div>-->
+			</div>
 			<form class="mui-input-group" id="detailContent" style="background:none;">
 				<ul class="mui-table-view" style="margin-bottom:12px;">
 					<li class="mui-table-view-cell mui-collapse">
@@ -43,13 +43,28 @@
 		<script src="../../js/template-web.js" type="text/javascript" charset="utf-8"></script>
 		<script src="../../js/utils.js" type="text/javascript" charset="utf-8"></script>
 		<script src="../../js/common.js" type="text/javascript" charset="utf-8"></script>
-		
+		<script type="text/javascript" src="../../js/request.js" ></script>
 		<script type="text/javascript">
 			
 			(function($) {
-				var checkType = undefined, type = undefined;
+				var utils = new Utils();
+				utils.appendModule('#acc_detail_tpl');
+				
+				function showData(data){
+					var html = template('detail_tpl', data);
+					document.getElementById('detailContent').innerHTML = html;
+				}
+				var checkType = undefined, type = undefined, details = undefined, checkUrl = '/a/checkacceptdetail/checkList';
 				$.plusReady(function(){
-					
+					$.init({
+						beforeback: function() {
+					        var list = plus.webview.currentWebview().opener();  
+					        //触发列表界面的自定义事件（refresh）,从而进行数据刷新  
+					        mui.fire(list, 'refresh');  
+					        //返回true，继续页面关闭逻辑  
+					        return true;  
+				    	}
+					})
 					if(plus.storage.getItem('currDept')){
 						type = JSON.parse(plus.storage.getItem('currDept')).deptType;
 						switch(type){
@@ -67,30 +82,81 @@
 						}
 					}
 					var self = plus.webview.currentWebview();
-					var details = JSON.parse(self.details);//获得参数
-					console.log(JSON.stringify(details))
-					var data = {};
-					data.checkType = checkType;
-					data.list = [];
-					data.list.push(details);
+					details = JSON.parse(self.details);//获得参数
+					console.log(details)
+					var data = Object.assign({},details.orderInfo);
+					var currentIndex = Number(details.index);
+					console.log(currentIndex)
 					
-					if(checkType === 1 && details.hasAcceptance){
-						var node = '<div id="List"></div><div id="addBtn"><button class="mui-btn mui-btn-block btn">+ 增加批号</button></div>';
+					data.hasAcceptance = details.hasAcceptance;
+					data.isShowTemprature = details.isShowTemprature;
+					data.list = [];
+					data.list.push(details.allData[currentIndex]);
+					data.checkType = checkType;
+					if(currentIndex === 0){
+						console.log(currentIndex)
+						document.querySelector('.previous').style.zIndex = -1;
+					}
+					if(currentIndex === details.allData.length -1){
+						document.querySelector('.next').style.zIndex = -1;
+					}
+					document.querySelector('.currentPage').innerText = (currentIndex + 1);
+					if(details.hasAcceptance){
+						if(checkType === 1){
+							var node = '<form id="List"></form><div id="addBtn"><button class="mui-btn mui-btn-block btn">+ 增加批号</button></div>';
+							document.querySelector('#detailContent').insertAdjacentHTML('afterEnd',node);
+						}
 						var acceptanceBtn = '<button type="button" id="acceptance" class="mui-btn mui-btn-warning mui-btn-block" style="margin-bottom: 20px;" data-loading-text = "提交中" data-loading-icon-position="right">确认验收</button>'
-						document.querySelector('#detailContent').insertAdjacentHTML('afterEnd',node);
 						document.querySelector('.detailRow').insertAdjacentHTML("beforeEnd",acceptanceBtn);
 						
 					}
-					var utils = new Utils();
-					utils.appendModule('#acc_detail_tpl');
-					var html = template('detail_tpl', data);
-					document.getElementById('detailContent').innerHTML = html;
+					document.querySelector('.page-total').innerHTML = details.allData.length;
+					console.log(data)
+					showData(data);
+					
+						// 上一个
+					$('.detail-header-flex').on('tap','.previous',function(){
+						plus.nativeUI.showWaiting();
+						var _this = this;
+						setTimeout(function(){
+							_this.style.zIndex = currentIndex === 1 ? -1: 1;
+							currentIndex--;
+							$('.next')[0].style.zIndex = 1;
+							document.querySelector('.currentPage').innerText = (currentIndex + 1);
+							data.list = [];
+							data.list.push(details.allData[currentIndex]);
+							plus.nativeUI.closeWaiting();
+							showData(data);
+						},300)
+					});
+				
+					// 下一个
+					$('.detail-header-flex').on('tap','.next',function(){
+						plus.nativeUI.showWaiting();
+						var _this = this;
+						setTimeout(function(){
+							console.log('next');
+							currentIndex++;
+							$('.previous')[0].style.zIndex = 1;
+							document.querySelector('.currentPage').innerText = (currentIndex + 1);
+							_this.style.zIndex = currentIndex === details.allData.length-1 ? -1: 1;
+							data.list = [];
+							data.list.push(details.allData[currentIndex]);
+							plus.nativeUI.closeWaiting();
+							console.log(data)
+							showData(data);
+						},300)
+					});
+					
 				});
+				
 				/*
 					 *2 点击添加按钮 增加选填项    开始
 					 * 
 					 * 拖拽后显示操作图标，点击操作图标删除元素
 					 */
+					
+					
 					
 					var itemNum = 0, orderList = [];
 					mui(".detailRow").on('tap', '.btn', function() {
@@ -101,11 +167,11 @@
 							'<div class="mui-input-group">' +
 							'<div class="mui-input-row">' +
 							'<label>生产批号</label>' +
-							'<input type="text" name="buycontent" class="mui-input-clear mui-input mui-input-ph"  placeholder="请输入" >' +
+							'<input type="text" name="acc_lot" class="mui-input-clear mui-input mui-input-ph"  placeholder="请输入" >' +
 							'</div>' +
 							'<div class="mui-input-row">' +
 							'<label>数量</label>' +
-							'<input type="number" name="buycontent" class="mui-input-clear mui-input mui-input-num"  placeholder="请输入" >' +
+							'<input type="number" name="acc_num" class="mui-input-clear mui-input mui-input-num"  placeholder="请输入" >' +
 							'</div>' +
 							'</div>' +
 							'</div>' +
@@ -128,12 +194,6 @@
 									itemNum--;
 									li.parentNode.removeChild(li);
 									var index = li.getAttribute('data-index');
-									//获取该删除的子项的index
-									orderList.splice(index, 1);
-									orderListArray.splice(index, 1);
-									console.log(JSON.stringify(orderList));
-									console.log(orderListArray)
-		
 								} else {
 									setTimeout(function() {
 										mui.swipeoutClose(li);
@@ -144,32 +204,80 @@
 						var btnArray = ['确认', '取消'];
 					}
 					// 验收
-					if(checkType === 1 && details.hasAcceptance){
-						var acceptance = document.querySelector('#acceptance');
-						acceptance.addEventListener('tap',function(e){
-							var phValue = document.querySelector('.mui-input').value; // 批号文号
-							var phList = document.querySelector('#List').querySelectorAll('.mui-input-ph');
-							var numList = document.querySelector('#List').querySelectorAll('.mui-input-num');
-							let postData = [];
+					mui('.detailRow').on('tap','#acceptance',function(event){
+						var phValue = document.querySelector('.mui-input').value; // 批号文号
+						var phList = document.querySelector('#List').querySelectorAll('.mui-input-ph');
+						var numList = document.querySelector('#List').querySelectorAll('.mui-input-num');
+						
+						// 获取产品信息详情中编辑字段值
+						
+						var editBatchNo = document.querySelector('.BatchNo').value;
+						var realProductTime = document.querySelector('.realProductTime').value;
+						var realValidEndDate = document.querySelector('.realValidEndDate').value;
+						if(details.isShowTemprature === 1){
+							var realAcceptanceTemperature = document.querySelector('.realAcceptanceTemperature').value;
+						}
+						var realReceiveQuantiry = document.querySelector('.realReceiveQuantiry').value;
+						let postData = [],submitData = {};
+						if(phList.length){
 							for (let i =0 ;i < phList.length; i++) {
 								let values = {};
-								values.producterPH =  phList[i].value;
-								values.num = numList[i].value
+								values.productBatchNo =  phList[i].value;
+								values.realReceiveQuantiry = numList[i].value;
+								values.realProductTime = realProductTime;
+								values.realValidEndDate = realValidEndDate;
+								if(details.isShowTemprature === 1){
+									values.realAcceptanceTemperature = realAcceptanceTemperature;
+								}
+								values.drugCode = details.drugCode;
+								values.id = details.id;
 								postData.push(values);
 							}
-							console.log(phValue,'phValue'); // 批准文号
-							console.log(postData,'postData'); // 批号 数据
-							document.activeElement.blur(); // 隐藏软键盘
-							var btnArray = ['否', '是'];
-							mui.confirm('是否确认验收？', '确认', btnArray, function(e) {
-								if (e.index == 1) {
-//									alert('你点击了是');
-									/* 与后台交互  */
-								}
-							},'div')
-						});
-						
-					}
+						}else{
+							let values = {};
+							values.productBatchNo = editBatchNo;
+							values.realProductTime = realProductTime;
+							values.realValidEndDate = realValidEndDate;
+							values.realAcceptanceTemperature = realAcceptanceTemperature;
+							values.realDeliveryQuantiry = realReceiveQuantiry;
+							values.drugCode = details.drugCode;
+							values.id = details.id;
+							values.parentId = details.id;
+							postData.push(values);
+						}
+						submitData.detailList = postData;
+						submitData.distributeCode = details.distributeCode
+						console.log(submitData,'submitData'); // 批号 数据
+						document.activeElement.blur(); // 隐藏软键盘
+						var btnArray = ['否', '是'];
+						mui.confirm('是否确认验收？', '确认', btnArray, function(e) {
+							if (e.index == 1) {
+								mui.ajaxRequest(checkUrl,{
+									type: 'POST',
+									data: submitData,
+									showWaiting: true,
+									contentType: "application/json",
+									success: function(data){
+										if(data.code === 200){
+											mui.toast('验收成功');
+											var parmasData = {};
+											parmasData.finishUrl = '../acceptance/index';
+											parmasData.keepUrl = 'acc_list';
+											parmasData.resultType = 'acceptance';
+											parmasData.itemData = details.orderInfo;
+											common.openwin('../result/index',{ parmas: JSON.stringify(parmasData) },{
+												titleText: '结果',
+												autoBackButton: false
+											})
+										}
+									},
+									error: function(xhr,type,errorThrown){
+										alert(xhr.responseText)
+			                		}
+								})
+							}
+						},'div')
+					})
 			})(mui);
 		
 		</script>

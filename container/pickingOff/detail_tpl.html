@@ -2,32 +2,32 @@
 	<div style="margin-top:10px;">
 		{{ each list value i }}
 		<ul class="mui-table-view" style="margin-bottom:8px;">
-			<li class="mui-table-view-cell mui-collapse">
+			<li class="mui-table-view-cell mui-collapse mui-active">
 				<a class="mui-navigate-right" href="#">单据信息</a>
 				<div class="mui-collapse-content">
 						<div class="mui-input-row">
 							<label>拣货单号</label>
-							<p class="detailRow_content">{{value.pickingorderno ? value.pickingorderno: '--'}}</p>
+							<p class="detailRow_content">{{ pickingorderno ? pickingorderno: '--'}}</p>
 						</div>
 						<div class="mui-input-row">
 							<label>申领单号</label>
-							<p class="detailRow_content">{{value.applyorderno ? value.applyorderno: '--'}}</p>
+							<p class="detailRow_content">{{ applyorderno ? applyorderno: '--'}}</p>
 						</div>
 						<div class="mui-input-row">
 							<label>申领部门</label>
-							<p class="detailRow_content">{{value.deptname ? value.deptname: '--'}}</p>
+							<p class="detailRow_content">{{ deptname ? deptname: '--'}}</p>
 						</div>
 						<div class="mui-input-row">
 							<label>状态</label>
-							<p class="detailRow_content">{{ value.statusname }}</p>
+							<p class="detailRow_content">{{ statusname }}</p>
 						</div>
 						<div class="mui-input-row">
 							<label>拣货人</label>
-							<p class="detailRow_content">{{ value.pickingusername }}</p>
+							<p class="detailRow_content">{{ pickingusername }}</p>
 						</div>
 						<div class="mui-input-row">
 							<label>拣货时间</label>
-							<p class="detailRow_content">{{ value.updatedate? value.updatedate: '--'}}</p>
+							<p class="detailRow_content">{{ updatedate? updatedate: '--'}}</p>
 						</div>
 				</div>
 			</li>

@@ -1,14 +1,12 @@
 <script type="text/html" id="message-tpl">
-	<ul class="mui-table-view list-wrapper">
-		{{each list value i}}
-			<li class="mui-table-view-cell mui-media message-detail" data-id = "{{value.id}}" data-title="{{ value.messageContent }}" data-tipDate="{{ value.date }}">
-				<a class="mui-navigate-right">
-					<div class="mui-media-body">
-						<div class="title">{{ value.messageContent }}</div>
-						<p class='mui-ellipsis'> {{ value.date }} </p>
-					</div>
-				</a>
-			</li> 
-		{{/each}}
-	</ul>
+	{{each list value i}}
+		<li class="mui-table-view-cell mui-media message-detail" data-id = "{{value.id}}" data-title="{{ value.meassage }}" data-tipDate="{{ value.createDate }}">
+			<a class="mui-navigate-right">
+				<div class="mui-media-body">
+					<div class="title">{{ value.meassage }}</div>
+					<p class='mui-ellipsis'> {{ value.createDate }} </p>
+				</div>
+			</a>
+		</li> 
+	{{/each}}
 </script>

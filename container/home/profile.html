@@ -6,6 +6,11 @@
 		<title></title>
 		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
 		<link href="../../css/mui.css" rel="stylesheet" />
+		<style>
+			.theme_font_warning{
+				color: #f2a11c;
+			}
+		</style>
 	</head>
 
 	<body>
@@ -28,15 +33,24 @@
 		<script type="text/javascript" src="../../js/request.js" ></script>
 		<script type="text/javascript">
 			(function ($, doc) {
-				$.init()
+				$.init({
+					beforeback: function() {
+				        var list = plus.webview.currentWebview().opener();  
+				        //触发列表界面的自定义事件（refresh）,从而进行数据刷新  
+				        mui.fire(list, 'refresh');  
+				        //返回true，继续页面关闭逻辑  
+				        return true;  
+			    	}
+				})
 				$.plusReady(function() {
 					var ul = document.body.querySelector('.mui-table-view-radio');
+					var deptId = JSON.parse(plus.storage.getItem('currDept')).deptId;
 					var btnArray = ['确认', '取消'];
 					if(plus.storage.getItem('deptList')){
 						var deptList = JSON.parse(plus.storage.getItem('deptList'));
 						for(var i=0; i<deptList.length; i++){
 							var li = document.createElement('li');
-							li.className = 'mui-table-view-cell';
+							li.className = deptId === deptList[i].deptId ? 'mui-table-view-cell mui-selected theme_font_warning':'mui-table-view-cell';
 							li.setAttribute('data-id',deptList[i].deptId);
 							li.setAttribute('data-deptType',deptList[i].deptType);
 							li.setAttribute('data-deptname',deptList[i].deptName);
@@ -50,7 +64,7 @@
 						if(this.dataset.id === JSON.parse(plus.storage.getItem('currDept')).deptId){
 							return ;
 						}
-						mui.confirm('是否确认切换系统？', '确认', btnArray, function(e) {
+						mui.confirm('是否确认切换库房？', '确认', btnArray, function(e) {
 							if (e.index == 0) {
 								//与后台交互  
 								var currentDept = {
@@ -66,7 +80,9 @@
 			                		showWaiting: true,
 			                		success: function(data){
 			                			if(data.code === 200){
+			                				document.querySelector('.theme_font_warning').className = 'mui-table-view-cell'
 			                				mui.toast('切换系统成功');
+			                				_this.className = 'mui-table-view-cell mui-selected theme_font_warning';
 			                			}else{
 			                				mui.toast('切换系统失败')
 			                			}

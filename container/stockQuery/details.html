@@ -12,11 +12,6 @@
 
 	<body>
 		
-		<!--<header class="mui-bar mui-bar-nav theme_back">
-		   	<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
-		   	<a class="mui-pull-left theme_back_font">返回</a>
-		    <h1 class="mui-title">详情</h1>
-		</header>-->
 		<div class="mui-content detailRow">
 				<form class="mui-input-group" id="detailContent" style="background:none;">
 					<ul class="mui-table-view" style="margin-bottom:12px;">
@@ -38,28 +33,23 @@
 		<script type="text/javascript">
 			(function($) {
 				
+				var utils = new Utils();
+				utils.appendModule('#card_view');
+				
 				$.plusReady(function(){
 					
 					var params, hisDrugCode = undefined, drugCode = undefined;
 					var self = plus.webview.currentWebview();
-				    params = self.params;//获得参数
-					hisDrugCode = JSON.parse(params).hisdrugcode;
-					drugCode = JSON.parse(params).drugcode;
+				    params = JSON.parse(self.params);//获得参数
+					hisDrugCode = params.hisdrugcode;
+					drugCode = params.drugcode;
 					var baseUrl = '/a/StoreDetail/getRoomRepertoryDetail';
 					var tableUrl = '/a/StoreDetail/getRoomRepertoryDetailList';
 					var renderData = { };
 					genDetailData(baseUrl,hisDrugCode)
 					genTableData(tableUrl,drugCode);
-					var utils = new Utils();
-					utils.appendModule('#card_view');
-					setTimeout(function(){
-						var html = template('deitail_view', renderData);
-						document.getElementById('detailContent').innerHTML = html;
-					},2000)
-//					var html = template('deitail_view', data);
-//					console.log(html)
 					
-					
+
 				/*
 				  获取列表数据
 				 * */
@@ -98,7 +88,8 @@
 	                			if(data.code === 200){
 	                				var tablist = data.data.list;
 	                				renderData.tablist = tablist;
-	                				console.log(JSON.stringify(renderData))
+	                				var html = template('deitail_view', renderData);
+									document.getElementById('detailContent').innerHTML = html;
 	                			}else{
 	                				mui.alert(data.msg)
 	                			}
@@ -108,19 +99,7 @@
 	                		}
 	            		});
 					}
-					/*
-					 展示数据
-					 * */
-					function showData(data){
-						var acceptanceTab1 = document.querySelector('.mui-tab1');
-						var html1 = template('list_tpl_view',data.unVerfiyList);
-						if(!html1){
-							html1 = nullDataHtml;
-						}
-						acceptanceTab1.innerHTML = html1;
-					}
 				})
-			
 		})(mui);
 		
 		</script>

@@ -13,10 +13,19 @@
 	</head>
 
 	<body>
+		<header class="mui-bar mui-bar-nav themes_bg_color">
+		   	<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left">
+		   		<label class="mui-pull-right theme_back_font">返回</label>
+		   	</a>
+		    <h1 class="mui-title themes_title">药品信息</h1>
+		    <a href="#" class="mui-pull-right batchAccetpance" style="height: 45px;padding-top: 12px;">
+		    	批量验收
+		    </a>
+		</header>
 		<div class="mui-content">
-		    <div class="mui-input-row mui-search search_head" onclick="toSearchPage()">
+		    <!--<div class="mui-input-row mui-search search_head" onclick="toSearchPage()">
 				<input type="search" class="mui-input-clear" placeholder="通用名/商品名/生产厂家">
-			</div>
+			</div>-->
 			<div id="slider" class="mui-slider themes_tab mui-fullscreen">
 				<div id="sliderSegmentedControl" class="mui-slider-indicator mui-segmented-control mui-segmented-control-inverted">
 					<a class="mui-control-item themes_font_color_tab" href="#item1mobile">待验收</a>
@@ -24,7 +33,7 @@
 				</div>
 				<div id="sliderProgressBar" class="mui-slider-progress-bar mui-col-xs-6"></div>
 				<div class="mui-slider-group">
-					<div id="item1mobile" class="mui-slider-item mui-control-content mui-active">
+					<div id="item1mobile" class="mui-slider-item mui-control-content">
 						<div id="scroll1" class="mui-scroll-wrapper">
 							<div class="mui-scroll" id="mui-table-view-tab1">
 								<ul class="mui-table-view">
@@ -67,11 +76,16 @@
                     plus.webview.currentWebview().close();
                 })
             }
-
+			
 			(function($) {
 				
-				$.init()
-					
+				$.init({
+					beforeback: function() {
+				        var list = plus.webview.currentWebview().opener();  
+				        mui.fire(list, 'pagefresh'); 
+				        return true;  
+			    	}
+				})
 				var deceleration = mui.os.ios?0.003:0.0009;
 				$('.mui-scroll-wrapper').scroll({
 					bounce: false,
@@ -81,7 +95,7 @@
 				
 				
 				/* 渲染模板   */
-				var checkType, type, auditStatus// 验收单类型 // 验收状态   1 待验收  2 已验收 
+				var checkType, type, auditStatus, isShowTemprature// 验收单类型 // 验收状态   1 待验收  2 已验收   是否显示验收温度 1 显示 0 隐藏 
 				var nullDataHtml = '<div class="mui-pull-bottom-tips"><div class="mui-pull-bottom-wrapper">'+
 										'<span class="mui-pull-loading">暂无数据</span></div></div>'
 				var detailData = {
@@ -90,20 +104,27 @@
 					};
 				var utils = new Utils();
 				utils.appendModule('#list_tpl');
+				
 				/*
 				  获取列表数据
 				 * */
-				function genData(url){
+				function genData(url,selected){
+					plus.nativeUI.showWaiting();
 					mui.ajaxRequest(url,{
                 		type: 'GET',
                 		showWaiting: true,
                 		success: function(data){
+                			plus.nativeUI.closeWaiting();
                 			if(data.code === 200){
+                				isShowTemprature = data.data.isShowTemprature;
                 				detailData.unVerfiyList.list = data.data.unVerfiyList;
                 				detailData.unVerfiyList.acceptance = true;
+                				detailData.unVerfiyList.checkType = checkType;
+                				detailData.unVerfiyList.isShowTemprature = data.data.isShowTemprature;
                 				detailData.verifyList.list = data.data.verifyList;
                 				detailData.verifyList.acceptance = false;
-                				showData(detailData)
+                				detailData.verifyList.isShowTemprature = data.data.isShowTemprature;
+                				showData(detailData,selected)
                 			}else{
                 				mui.alert(data.msg)
                 			}
@@ -116,25 +137,68 @@
 				/*
 				 展示数据
 				 * */
-				function showData(data){
-					var acceptanceTab1 = document.querySelector('.mui-tab1');
-					var html1 = template('list_tpl_view',data.unVerfiyList);
-					if(!html1){
-						html1 = nullDataHtml;
+				function showData(data,selected){
+					if(selected === 'left'){
+						var acceptanceTab1 = document.querySelector('.mui-tab1');
+						var html1;
+						if(data.unVerfiyList.list.length === 0){
+							html1 = nullDataHtml;
+							document.querySelector('.batchAccetpance').style.display = 'none';
+						}else{
+							mui.each(data.unVerfiyList.list,function(index,item){
+								item.editable = checkType === 1 ? true: false;
+							})
+							html1 = template('list_tpl_view',data.unVerfiyList);
+							document.querySelector('.batchAccetpance').style.display = 'block';
+						}
+						acceptanceTab1.innerHTML = html1;
+					}else{
+						var acceptanceTab2 = document.querySelector('.mui-tab2');
+						var html2;
+						if(data.verifyList.list.length === 0){
+							html2 = nullDataHtml
+						}else{
+							
+							html2 = template('list_tpl_view',data.verifyList);
+						}
+						acceptanceTab2.innerHTML = html2;
+						document.querySelector('.batchAccetpance').style.display = 'none';
 					}
-					acceptanceTab1.innerHTML = html1;
+					
 				}
+            	
+            	
             	
 				// 模板加载
 				$.plusReady(function(){
-					var params, distributeCode
+					
+					window.addEventListener('pagefresh',function(event){
+						var query = JSON.parse(event.detail.params);
+						var genUrl = '/a/checkaccept/detail?distributeCode='+ query.distributecode;
+						genData(url,query.currentSelected);
+					})
+					
+					var params, distributeCode, currentSelected;
 					var self = plus.webview.currentWebview();
-				    params = self.params;//获得参数
-				    console.log(JSON.parse(params))
-				    distributeCode = JSON.parse(params).distributecode;
+				    params = JSON.parse(self.params);//获得参数
+				    console.log(params)
+				    distributeCode = params.distributecode;
+				    currentSelected = params.currentSelected; // 当前选中tabs 
+				    console.log(currentSelected)
+				    if(currentSelected === 'left'){
+				    	document.querySelector('#sliderProgressBar').style.transform = 'translate3d(0px,0px,0px) translateZ(0px)';
+				    	document.querySelector('.mui-slider-group').style.transform = 'translate3d(0px,0px,0px) translateZ(0px)';
+				    	document.querySelectorAll('.themes_font_color_tab')[0].className = 'mui-control-item themes_font_color_tab mui-active';
+				    	document.querySelector('#item1mobile').className = 'mui-slider-item mui-control-content mui-active';
+				    }else{
+				    	document.querySelector('#sliderProgressBar').style.transform = 'translate3d(267px,0px,0px) translateZ(0px)';
+				    	document.querySelector('.mui-slider-group').style.transform = 'translate3d(-534px,0px,0px) translateZ(0px)';
+				    	document.querySelectorAll('.themes_font_color_tab')[1].className = 'mui-control-item themes_font_color_tab mui-active';
+				    	document.querySelector('#item2mobile').className = 'mui-slider-item mui-control-content mui-active';
+				    }
 				    var checkUrl = '/a/checkacceptdetail/checkList';
 				    var url = '/a/checkaccept/detail?distributeCode='+ distributeCode;
-				    genData(url);
+				    genData(url,currentSelected);
 					if(plus.storage.getItem('currDept')){
 						type = JSON.parse(plus.storage.getItem('currDept')).deptType;
 						switch(type){
@@ -151,104 +215,41 @@
 								break;
 						}
 					}
-							
-					//tab页切的点击事件
-					/*var sliderSegmentedControl = document.getElementById('sliderSegmentedControl');
-					$('.mui-input-group').on('change', 'input', function() {
-						if (this.checked) {
-							sliderSegmentedControl.className = 'mui-slider-indicator mui-segmented-control mui-segmented-control-inverted mui-segmented-control-' + this.value;
-							//force repaint
-							sliderProgressBar.setAttribute('style', sliderProgressBar.getAttribute('style'));
-						}
-					});*/
+					var item1 = document.getElementById('item1mobile');
 					var item2 = document.getElementById('item2mobile');
 					document.getElementById('slider').addEventListener('slide', function(e) {
 						if (e.detail.slideNumber === 1) {
 							if (!item2.querySelector('.am-card')) {
 								var acceptanceTab2 = document.querySelector('.mui-tab2');
-								var html2 = template('list_tpl_view',detailData.verifyList);
-								if(!html2){
-									html2 = nullDataHtml;
+								var html2;
+								if(detailData.verifyList.list.length === 0){
+									html2 = nullDataHtml
+								}else{
+									html2 = template('list_tpl_view',detailData.verifyList);
 								}
-								console.log(acceptanceTab2)
 								acceptanceTab2.innerHTML = html2;
 							}
+							document.querySelector('.batchAccetpance').style.display = 'none';
+						}else if(e.detail.slideNumber === 0){
+							if (!item1.querySelector('.am-card')) {
+								var acceptanceTab1 = document.querySelector('.mui-tab1');
+								var html;
+								if(detailData.unVerfiyList.list.length === 0){
+									html = nullDataHtml
+								}else{
+									html = template('list_tpl_view',detailData.unVerfiyList);
+								}
+								acceptanceTab1.innerHTML = html;
+							}
+							document.querySelector('.batchAccetpance').style.display = 'block';
 						}
 					});
 					// 展开编辑
 					$('#slider').on('tap','.edit',function(){
-						this.innerHTML = this.innerHTML === '展开编辑' ? '收起编辑':'展开编辑' ;
-						let id = this.dataset.id;
+						this.innerHTML = this.innerHTML === '收起编辑' ? '展开编辑':'收起编辑' ;
 						let index = this.dataset.index;
-						let data = detailData.unVerfiyList.list[index];
-						var addDiv = document.createElement('div');
-						addDiv.className = 'editForm';
-						addDiv.innerHTML = '<div class="am-flexbox am-flexbox-align-center">'+
-						'<div class="am-flexbox-item">' + 
-						'<div class="am-list-item am-input-item am-list-item-middle">' + 
-						'<div class="am-list-line">'+
-						'<div class="am-input-label am-input-label-4 font-warning">实到数量:</div>'+
-						'<div class="am-input-control">'+
-						'<input pattern="[0-9]*" type="number" placeholder="请输入" class="realReceiveQuantity"/>'+
-						'</div>'+
-						'</div>'+
-						'</div>'+
-						'</div>' +
-						'<div class="am-flexbox-item">' + 
-						'<div class="am-list-item am-input-item am-list-item-middle">' + 
-						'<div class="am-list-line">'+
-						'<div class="am-input-label am-input-label-4 font-warning">生产日期:</div>'+
-						'<div class="am-input-control">'+
-						'<input pattern="[0-9]*" type="date" placeholder="请输入" class="realProductTime"/>'+
-						'</div>'+
-						'</div>'+
-						'</div>'+
-						'</div>' +
-						'</div>' +
-						'<div class="am-flexbox am-flexbox-align-center">'+
-						'<div class="am-flexbox-item">' + 
-						'<div class="am-list-item am-input-item am-list-item-middle">' + 
-						'<div class="am-list-line">'+
-						'<div class="am-input-label am-input-label-4 font-warning">生产批号:</div>'+
-						'<div class="am-input-control">'+
-						'<input pattern="[0-9]*" type="text" placeholder="请输入" class="productBatchNo"/>'+
-						'</div>'+
-						'</div>'+
-						'</div>'+
-						'</div>' +
-						'<div class="am-flexbox-item">' + 
-						'<div class="am-list-item am-input-item am-list-item-middle">' + 
-						'<div class="am-list-line">'+
-						'<div class="am-input-label am-input-label-4 font-warning">有效期至:</div>'+
-						'<div class="am-input-control">'+
-						'<input pattern="[0-9]*" type="date" placeholder="请输入" class="realValidEndDate"/>'+
-						'</div>'+
-						'</div>'+
-						'</div>'+
-						'</div>' +
-						'</div>'+
-						'<div class="am-flexbox am-flexbox-align-center">'+
-						'<div class="am-flexbox-item">批准文号：'+
-						'<span>'+ data.approvalNo +'</span>'+
-						'</div>'+
-						'<div class="am-flexbox-item">' + 
-						'<div class="am-list-item am-input-item am-list-item-middle">' + 
-						'<div class="am-list-line">'+
-						'<div class="am-input-label am-input-label-4 font-warning">验收温度:</div>'+
-						'<div class="am-input-control">'+
-						'<input pattern="[0-9]*" type="number" placeholder="请输入" class="realAcceptanceTemperature"/>'+
-						'</div>'+
-						'</div>'+
-						'</div>'+
-						'</div>'+
-						'</div>'
-						;
-						if($('.am-card-body')[index].querySelectorAll('.editForm').length === 0){
-							$('.am-card-body')[index].appendChild(addDiv);
-						}else{
-							var child = $('.am-card-body')[index].querySelector('.editForm');
-							$('.am-card-body')[index].removeChild(child);
-						}
+						var editForm = document.querySelectorAll('.editForm')[index];
+						editForm.style.display = editForm.style.display === 'block' ? 'none': 'block';
 					});
 					
 					//绑定点击事件  - 进入详情页
@@ -258,19 +259,42 @@
 						let index = this.dataset.index;
 						var item1mobile = document.querySelector('#item1mobile');
 						var hasAcceptance = item1mobile.className.indexOf('mui-active')>0 ? true: false;
-						let data = hasAcceptance ? detailData.unVerfiyList.list[index]: detailData.verifyList.list[index];
-						data.hasAcceptance = hasAcceptance; // 判断 详情页面是否有验收按钮
-						let newData = Object.assign({},data,JSON.parse(params));
+						let newData = {};
 						newData.statusname = hasAcceptance ? '待验收':'已验收';
+						newData.allData = hasAcceptance ? detailData.unVerfiyList.list: detailData.verifyList.list;
+						newData.index = index;
+						newData.isShowTemprature = isShowTemprature;
+						newData.hasAcceptance = hasAcceptance;// 判断 详情页面是否有验收按钮
+						newData.orderInfo = params;
 						document.activeElement.blur(); // 隐藏软键盘
 						common.openwin('acc_detail',{ details: JSON.stringify(newData) },{
 							titleText: '验收详情'
 						})
 					});
 					
+					/* 批量验收 */
+					$('.mui-bar').on('tap','.batchAccetpance',function(){
+						console.log(checkType)
+						var list = detailData.unVerfiyList.list;
+						console.log(list)
+						mui.each(list,function(index,item){
+							item.editable = checkType === 1 ? true: false;
+						})
+						var paramsData = {};
+						paramsData.list = list;
+						paramsData.distributeCode = distributeCode;
+						paramsData.isShowTemprature = isShowTemprature;
+						paramsData.itemData = params;
+						paramsData.acceptance = true;
+						console.log(paramsData)
+						common.openwin('acc_batch',{ params: JSON.stringify(paramsData) },{
+							titleText: '药品信息'
+						})
+					})
+					
 					// 绑定事件 --确认验收
 					$('#slider').on('tap','.acceptance',function(){
-						
+						document.activeElement.blur(); // 隐藏软键盘
 						let id = this.dataset.id;
 						let index = this.dataset.index;
 						if(document.querySelectorAll('.am-card')[index].querySelector('.editForm')){
@@ -279,23 +303,27 @@
 							var realProductTime = editForm.querySelector('.realProductTime').value;
 							var productBatchNo = editForm.querySelector('.productBatchNo').value;
 							var realValidEndDate = editForm.querySelector('.realValidEndDate').value;
-							var realAcceptanceTemperature = editForm.querySelector('.realAcceptanceTemperature').value;
-							if(realReceiveQuantity && realProductTime && productBatchNo && realValidEndDate &&realAcceptanceTemperature){
+							if(isShowTemprature === 1){
+								var realAcceptanceTemperature = editForm.querySelector('.realAcceptanceTemperature').value;
+							}
+							
+							if(realReceiveQuantity && realProductTime && productBatchNo && realValidEndDate){
 								var _this_node = document.querySelectorAll('.am-card')[index];
 								var postData = {}, detailList = [], submitData = {};
 								postData.drugCode = _this_node.dataset.drugcode;
 								postData.id = _this_node.dataset.id;
-								postData.parerntId = _this_node.dataset.parentid;
 								postData.realReceiveQuantity = realReceiveQuantity;
 								postData.realProductTime = realProductTime;
 								postData.productBatchNo = productBatchNo;
 								postData.realValidEndDate = realValidEndDate;
-								postData.realAcceptanceTemperature = realAcceptanceTemperature;
+								if(isShowTemprature === 1){
+									postData.realAcceptanceTemperature = realAcceptanceTemperature;
+								}
 								detailList.push(postData);
 								submitData.detailList = detailList;
 								submitData.distributeCode = distributeCode;
 								console.log(JSON.stringify(submitData));
-								document.activeElement.blur(); // 隐藏软键盘
+								
 								var btnArray = ['否', '是'];
 								mui.confirm('是否确认验收？', '确认', btnArray, function(e) {
 									if (e.index == 1) {
@@ -307,15 +335,21 @@
 											success: function(data){
 												if(data.code === 200){
 													mui.toast('验收成功');
-													genData(url)
+													var parmasData = {};
+													parmasData.finishUrl = '../acceptance/index';
+													parmasData.keepUrl = 'acc_list';
+													parmasData.resultType = 'acceptance';
+													parmasData.itemData = params;
+													common.openwin('../result/index',{ parmas: JSON.stringify(parmasData) },{
+														titleText: '结果',
+														autoBackButton: false
+													})
 												}
 											},
 											error: function(xhr,type,errorThrown){
-												alert(xhr.responseText)
+												(xhr.responseText)
 					                		}
 										})
-									} else {
-										alert('你点击了否')
 									}
 								},'div')
 								

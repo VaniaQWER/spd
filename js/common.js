@@ -79,24 +79,24 @@
 
 
 	//到某个窗口
-	owner.gotowin = function (id) {
+	owner.gotowin = function (id, argu, titleNView) {
 		var obj = plus.webview.getWebviewById(id)
 		if (obj) {
 			var arr = getParents(id);
 			if (arr.length > 0) {
-				owner.openwin(id);
+				owner.openwin(id, argu, titleNView);
 				var self = plus.webview.currentWebview();
 				setTimeout(function(){
 					for (var i = 0; i < arr.length; i++) {
-						plus.webview.getWebviewById(arr[i]).close();
+						plus.webview.getWebviewById(arr[i]).close(arr[i]);
 					}
 					self.close();
 				},600);
 			} else {
-				owner.openwin(id);
+				owner.openwin(id, argu, titleNView);
 			}
 		} else {
-			owner.openwin(id);
+			owner.openwin(id, argu, titleNView);
 		}
 	}
 
@@ -210,5 +210,18 @@
 			return ret;
 		} catch(e) {}
 		return ori;
+	}
+	owner.debounce = function(fn, delay){
+		console.log(fn)
+		let timer = null;
+	    return function() {
+	    // 通过 ‘this’ 和 ‘arguments’ 获取函数的作用域和变量
+		    let context = this;
+		    let args = arguments;
+		    clearTimeout(timer);
+	    	timer = setTimeout(function() {
+		      fn.apply(context, args);
+		    }, delay);
+		}
 	}
 })(window.common = {})

@@ -12,12 +12,6 @@
 		<link href="../../css/check.css" rel="stylesheet" />
 		<link href="../../css/index_view.css" rel="stylesheet" />
 		<link rel="import" href="../../tpl/check_card.html" id="card_view"/>
-		<style>
-			.mui-plus-pullrefresh .mui-scroll {
-                position: absolute;
-                width: 100%;
-            }
-		</style>
 	</head>
 
 	<body>
@@ -27,7 +21,7 @@
 		   		<label class="mui-pull-right theme_back_font">返回</label>
 		   	</a>
 		    <h1 class="mui-title themes_title">盘点</h1>
-		    <a href="#modal" class="mui-pull-right"  style="height: 45px;padding-top: 12px;">新建盘点</a>
+		    <a href="#modal" id='showModal' class="mui-pull-right"  style="height: 45px;padding-top: 12px;">新建盘点</a>
 		</header>
 		<div class="mui-content">
 			<h4 class="title_h3">盘点记录</h4>
@@ -35,34 +29,51 @@
 			<div id="check_scroll1" class="mui-scroll-wrapper">
 				<div class="mui-scroll" id='scroll'>
 					<ul class="mui-table-view">
-						<li class="mui-table-view-cell mui-tab2" style="padding: 0;"></li>
+						<li class="mui-table-view-cell mui-tab" style="padding: 0;"></li>
 					</ul>
 				</div>
 			</div>
-			<div id="modal" class="mui-modal">
+			<div id="modal1" class="mui-modal">
 				<header class="mui-bar mui-bar-nav">
-					<a class="mui-icon mui-icon-close mui-pull-right" href="#modal"></a>
+					<a class="mui-icon mui-icon-close mui-pull-right closeBtn" href="#modal1"></a>
 					<h1 class="mui-title">新建盘点</h1>
 				</header>
 				<div class="mui-content" style="height: 100%;padding-top: 12px;">
-						<div class="gird">
+					<form id='radioForm'>
+						<div class="gird mui-table-view-radio checkBillType">
 							<div class="gird-label">盘点类型：</div>
-							<button type="button" class="mui-btn gird-button">明盘</button>
-							<button type="button" class="mui-btn gird-button">暗盘</button>
-						</div>
-						<div class="gird">
-							<div class="gird-label"></div>
-							<button type="button" class="mui-btn gird-button">全盘</button>
-							<button type="button" class="mui-btn gird-button">动盘</button>
-							<button type="button" class="mui-btn gird-button">动销盘</button>
-						</div>
-						<div class="gird">
-							<div class="gird-label">备注：</div>
-							<div class="gird-content">
-								<textarea id="textarea" rows="5" placeholder="多行文本框"></textarea>
+							<div class="mui-input-row mui-radio mui-left">
+								<label for="mingpan">明盘</label>
+								<input name="radio1" id="mingpan" type="radio" value='1' class="radio">
+							</div>
+							<div class="mui-input-row mui-radio mui-left">
+								<label for="anpai">暗盘</label>
+								<input name="radio1" id="anpan" type="radio" vlaue='2' class="radio">
 							</div>
 						</div>
-						<button class="mui-btn mui-btn-block">确定</button>
+						<div class="gird mui-table-view-radio checkBillSubType">
+							<div class="gird-label"></div>
+							<div class="mui-input-row mui-radio mui-left">
+								<label for="allpan">全盘</label>
+								<input name="radio2" id="allpan" type="radio" value='1' class="radio2">
+							</div>
+							<div class="mui-input-row mui-radio mui-left">
+								<label for="dongpan">动盘</label>
+								<input name="radio2" id="dongpan" type="radio" value='2' class="radio2">
+							</div>
+							<div class="mui-input-row mui-radio mui-left addDate">
+								<label for="dongxiaopan">动销盘</label>
+								<input name="radio2" id="dongxiaopan" type="radio" value='3' class="radio2">
+							</div>
+						</div>
+						<div class="gird textarea">
+							<div class="gird-label">备注：</div>
+							<div class="gird-content">
+								<textarea id="textarea" rows="5" value='' placeholder="多行文本框"></textarea>
+							</div>
+						</div>
+						<button class="mui-btn mui-btn-block" readOnly id='check' data-loading-text = "提交中" data-loading-icon-position="right">确定</button>
+					</form>
 				</div>
 			</div>
 		</div>
@@ -81,6 +92,14 @@
 			mui.init();
 			(function($){
 				
+				$.init({
+					beforeback:function(){
+						var list = plus.webview.currentWebview().opener();
+						 mui.fire(list, 'refresh');
+						 return true;
+					}
+				});
+				
 				var deceleration = mui.os.ios?0.003: 0.1;
 				$('.mui-scroll-wrapper').scroll({
 					bounce: false,
@@ -88,8 +107,9 @@
 					deceleration:deceleration
 				});
 				
-				var url = '/a/checkbill/list';
-				var page = 1, totalPage = undefined;
+				var url = '/a/checkbill/list', newAddUrl = '/a/checkbill/create';
+				
+				var page = 1, totalPage = undefined, pageSize = 10, isMore = true;
 				var utils = new Utils();
 				utils.appendModule('#card_view');
 
@@ -102,14 +122,23 @@
 					mui.ajaxRequest(url,{
                 		type: 'POST',
                 		data: {
-                			pageNo: page
+                			pageNo: page,
+                			pageSize: pageSize
                 		},
                 		success: function(data){
-                			var resData = data.data;
-                			totalPage = data.totalPage;
-							self.endPullDownToRefresh(true);
-							self.refresh(true);
-							return template(resData, false)
+                			if(data.code === 200){
+                				var resData = data.data;
+	                			totalPage = data.totalPage;
+	                			if(resData.list.length < pageSize){
+	                				document.querySelector('.mui-pull-loading').innerHTML = '没有更多数据';
+	                				self.endPullDownToRefresh(true);
+	                				isMore = false;
+	                			}else{
+	                				self.endPullDownToRefresh();
+	                			}
+								self.refresh(true);
+								return template(resData, false)
+                			}
                 		},
                 		error: function(xhr,type,errorThrown){
 							alert(xhr.responseText)
@@ -123,30 +152,33 @@
 				 * */
 				function pullupRefresh(){
 					var self = this;
-					page++;
-					if( page <= totalPage ){
-						mui.ajaxRequest(url,{
-	                		type: 'POST',
-	                		data:{
-	                			pageNo: page
-	                		},
-	                		success: function(data){
-	                			var resData = data.data;
-	                			self.endPullUpToRefresh(page >= totalPage);
-								return template(resData, true)
-	                			
-	                		},
-	                		error: function(xhr,type,errorThrown){
-								alert(xhr.responseText)
-	                		}
-	            		});
+					if(isMore){
+						page++;
+						if( page <= totalPage ){
+							mui.ajaxRequest(url,{
+		                		type: 'POST',
+		                		data:{
+		                			pageNo: page
+		                		},
+		                		success: function(data){
+		                			var resData = data.data;
+		                			self.endPullUpToRefresh(page >= totalPage);
+									return template(resData, true)
+		                		},
+		                		error: function(xhr,type,errorThrown){
+									alert(xhr.responseText)
+		                		}
+		            		});
+						}
+					}else{
+						document.querySelector('.mui-pull-loading').innerHTML = '没有更多数据';
+						self.endPullUpToRefresh(true);
 					}
-					
 				}
             	
 				/* 渲染模板   */
 				function template(data, insertType){
-        			utils.innerTplHtml('check_list', '#scroll', data, insertType);
+        			utils.innerTplHtml('check_list', '.mui-tab', data, insertType);
             	}
 				
 				$.plusReady(function(){
@@ -163,12 +195,104 @@
 							},
 							up: {
 								contentrefresh : "正在加载...",//可选，正在加载状态时，上拉加载控件上显示的标题内容
-	      						contentnomore:'没有更多数据了',
+	      						contentnomore:'没有更多数据',
 								callback: pullupRefresh
 							}
 						});
 					});
+					/*
+					 	radio 与 modal相斥 bug 处理
+					 * */
+					mui('.mui-bar').on('tap','#showModal',function(){
+						document.activeElement.blur();
+						document.querySelector('#modal1').className = 'mui-modal mui-active';
+						// 清空值
+						var radios = document.getElementsByTagName('input');
+						for(var i=0; i <radios.length; i++){
+							radios[i].checked = '';
+						};
+						document.querySelector('#textarea').value = '';
+						if(document.querySelector('.dateRow')){
+							var dateRow = document.querySelector('.dateRow');
+							document.querySelector('#radioForm').removeChild(dateRow);
+						}
+					})
+					/*  请求数据  */
 					mui(".mui-scroll").pullToRefresh().pullDownLoading();
+					
+					if(document.querySelector('#modal1')){
+						document.querySelector('.checkBillSubType').addEventListener('click',function(e){
+							if(e.target.value === '3'){
+								if(document.querySelector('.dateRow')){
+									return ;
+								}
+								var div = document.createElement('div');
+						 		div.className = 'mui-input-row dateRow';
+						 		div.innerHTML ='<label class="font-warning" style="padding:11px 5px;width:24%">起始时间：</label>'+
+						 		'<input class="mui-input checkInputDate" type="date"/>'
+						 		document.querySelector('.textarea').insertAdjacentElement('beforeBegin',div);
+							}else{
+								if(document.querySelector('.dateRow')){
+									var dateRow = document.querySelector('.dateRow');
+									document.querySelector('#radioForm').removeChild(dateRow);
+								}
+							}
+						});
+					}
+					// 隐藏键盘
+					mui('#modal1').on('tap','.closeBtn',function(e){
+						document.activeElement.blur();
+					})
+					mui('#modal1').on('tap','.mui-btn',function(e){
+						document.activeElement.blur();
+						var checkBillType, checkBillSubType, checkStartTime;
+						var radio = document.querySelector('.checkBillType').querySelectorAll('input');
+						var subRadio = document.querySelector('.checkBillSubType').querySelectorAll('input');
+						if(document.querySelector('.checkInputDate')){
+							checkStartTime = document.querySelector('.checkInputDate').value;
+						}
+						var remarks = document.querySelector('#textarea').value;
+						mui.each(radio,function(index,item){
+							if(item.checked){
+								checkBillType = item.value;
+							}
+						});
+						mui.each(subRadio,function(index,item){
+							if(item.checked){
+								checkBillSubType = item.value;
+							}
+						});
+						if(checkBillSubType === '3'){
+							if(!checkStartTime){
+								mui.toast('请填写起始时间');
+								return;
+							}else{
+								var values = {};
+								values.checkBillType = checkBillType;
+								values.checkBillSubType = checkBillSubType;
+								values.checkStartTime = checkStartTime;
+								values.remarks = remarks;
+								console.log(JSON.stringify(values))
+								mui.ajaxRequest(newAddUrl,{
+									type: 'POST',
+									data: submitData,
+									showWaiting: true,
+									success: function(data){
+										if(data.code === 200){
+											mui.toast('新建盘点成功');
+											document.querySelector('#modal1').className = 'mui-modal';
+											mui(".mui-scroll").pullToRefresh().pullDownLoading();
+										}
+									},
+									error: function(xhr,type,errorThrown){
+										alert(xhr.responseText)
+			                		}
+								})
+							}
+						}
+					})
+					
+					
 	            	$('#scroll').on('tap','.am-card',function(){
 	            		let itemData = this.dataset;
 	            		console.log(JSON.stringify(itemData))

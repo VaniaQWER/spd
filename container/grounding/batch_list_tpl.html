@@ -1,7 +1,13 @@
 
-<script type="text/html" id='ground_list'>
+<script type="text/html" id='ground_batch_list'>
 	{{ each list value i}}
-		<div class="am-card scrollList-item am-card-full" 
+	<div class="batch-wrapper">
+		<div>
+			<div class="mui-checkbox mui-left" style="width: 48px;">
+			  <input name="selected" class="checkone" type="checkbox" data-index={{ i }} style="top: -10px;left: 10px;">
+			</div>
+		</div>
+		<div class="am-card scrollList-item am-card-full" style="width: 90%;border: none;"
 			data-id={{ value.id }}
 			>
 			<div class="am-card-header">
@@ -33,7 +39,7 @@
 								<div class="am-list-line">
 									<div class="am-input-label am-input-label-4 font-warning" style="width: 40px;">货位:</div>
 									<div class="am-input-control">
-										<select class="editInput select_actualStore" value={{ value.actualStore }}>
+										<select class="editInput select_actualStore" value={{ value.replanStore }}>
 											{{ each value.acceptoodsVo item i }}
 											<option value={{ item.id }}>{{ item.positionName }}</option>
 											{{ /each }}
@@ -47,7 +53,7 @@
 								<div class="am-list-line">
 									<div class="am-input-label am-input-label-5 font-warning">实际上架数量:</div>
 									<div class="am-input-control">
-										<input pattern="[0-9]*" type="number" value={{ value.realNum }} placeholder="请输入" class="realInputNum"/>
+										<input pattern="[0-9]*" type="number" value={{ value.realNum }} placeholder="请输入" class="realNum"/>
 									</div>
 								</div>
 							</div>
@@ -64,20 +70,7 @@
 					 </div>
 				</div>
 			</div>
-			<div class="am-card-footer">
-				<div class="am-card-footer-content"></div>
-				<div class="am-card-footer-extra">
-					{{ if hasGround }}
-						<button type="button" class="mui-btn mui-btn-blue mui-btn-outlined groundEdit" data-id={{ value.id }} data-index={{ i }} >收起编辑</button>
-					{{ /if }}
-					<button type="button" class="mui-btn mui-btn-blue mui-btn-outlined moreDetail" data-id={{ value.id }} data-index={{ i }} style="margin: 0 5px;">更多详情</button>
-					{{ if hasGround }}
-						<button type="button" class="mui-btn mui-btn-danger ground" data-id={{ value.id }} data-index={{ i }} >确认上架</button>
-					{{ /if }}
-				</div>
-			</div>
-		</div>	
-		<div style="background-color: #f5f5f9; height: 6px;">
 		</div>
+	</div>
 	{{/each}}
 </script>

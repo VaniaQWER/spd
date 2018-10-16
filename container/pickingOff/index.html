@@ -35,7 +35,7 @@
 		    <div class="mui-input-row mui-search search_head">
 				<input type="search" class="mui-input-clear" placeholder="下架单号" onclick="toSearchPage()">
 			</div>
-			<div id="slider" class="mui-slider themes_tab mui-fullscreen">
+			<div id="slider" class="mui-slider themes_tab mui-fullscreen" style="top: 102px;">
 				<div id="sliderSegmentedControl" class="mui-slider-indicator mui-segmented-control mui-segmented-control-inverted">
 					<a class="mui-control-item themes_font_color_tab" href="#item1mobile">待拣货</a>
 					<a class="mui-control-item themes_font_color_tab" href="#item2mobile">已拣货</a>
@@ -81,9 +81,13 @@
 				common.openwin('../commonPages/qrcode',true,{ titleText: '扫码下架' })
 			}
 			
+			
 			//去搜索页面
 			function toSearchPage (){
-				common.openwin('../commonPages/searchPage',true,true)
+				var params = {};
+				params.key = 'supplier';
+				params.route = '../pickingOff/index';
+				common.openwin('../commonPages/searchPage',{ params: JSON.stringify(params) },false)
 			}
 			
 			/*获取二维码返回值*/
@@ -94,6 +98,14 @@
 				})
 			}
 			(function($) {
+				
+				$.init({
+					beforeback:function(){
+						var list = plus.webview.currentWebview().opener();
+						 mui.fire(list, 'refresh');
+						 return true;
+					}
+				});
 				
 				var deceleration = mui.os.ios?0.003:0.0009;
 				$('.mui-scroll-wrapper').scroll({
@@ -109,7 +121,7 @@
 				var checkType, type, pickingStatus// 上架类型 // 上架状态  1 待上架  2 已上架 
 				var requestUrl =  '/a/common/pickingorder/list'; // 请求地址
 				
-				var pageLeft = 1, pageRight = 1, totalPageLeft, totalPageRight;
+				var pageLeft = 1, pageRight = 1, totalPageLeft, totalPageRight, isMore = true;
 				currSelected();
 				
 				
@@ -145,7 +157,8 @@
                 		type: 'POST',
                 		data: {
                 			pickingStatus: pickingStatus,
-                			pageNo: page
+                			pageNo: page,
+                			pageSize: pageSize
                 		},
                 		success: function(data){
                 			var resData = data.data;
@@ -155,9 +168,11 @@
                 			}else{
                 				totalPageRight = total;
                 			}
-                			if(resData.list.length === 0){
-                				console.log(JSON.stringify(self))
-                				document.querySelector('.mui-pull-loading').innerHTML = '没有更多数据';
+                			if(resData.list.length < pageSize){
+								var i = !hasChecked ? 0 : 1;
+                				document.querySelectorAll('.mui-pull-loading')[i].innerHTML = '没有更多数据';
+                				isMore = false;
+                				self.endPullDownToRefresh(true);
                 			}
                 			self.refresh(true);
                 			self.endPullDownToRefresh();
@@ -175,42 +190,53 @@
 				 *  上拉加载更多
 				 * */
 				function pullupRefresh(){
-					if(!hasChecked){
-						pageLeft ++
-					}else{
-						pageRight ++;
-					}
-					page = !hasChecked ? pageLeft: pageRight;
-					totalPage = !hasChecked ? totalPageLeft: totalPageRight;
-					console.log(page);
-					console.log(totalPage)
-					pickingStatus = !hasChecked ? '1': '2';
 					var self = this;
-					if(page <= totalPage){
-						mui.ajaxRequest(requestUrl,{
-							type: 'POST',
-	                		data: {
-	                			pickingStatus: pickingStatus,
-	                			pageNo: page
-	                		},
-	                    	contentType: "application/json",
-	                		success: function(data){
-	                			var resData = data.data;
-	                			if(page = totalPage){
-	                				self.endPullUpToRefresh(true);
-	                			}else{
-	                				self.endPullUpToRefresh(false);
-	                			}
-	                			return page < resData.totalPage ? template(selected,resData,false): template(selected,resData,true)	
-	                		},
-	                		error: function(xhr,type,errorThrown){
-								alert(xhr.responseText)
-	                		}
-	            		});
+					if(isMore){
+						if(!hasChecked){
+							pageLeft ++
+						}else{
+							pageRight ++;
+						}
+						page = !hasChecked ? pageLeft: pageRight;
+						totalPage = !hasChecked ? totalPageLeft: totalPageRight;
+						pickingStatus = !hasChecked ? '1': '2';
+						
+						if(page <= totalPage){
+							mui.ajaxRequest(requestUrl,{
+								type: 'POST',
+		                		data: {
+		                			pickingStatus: pickingStatus,
+		                			pageNo: page,
+		                			pageSize: pageSize
+		                		},
+		                    	contentType: "application/json",
+		                		success: function(data){
+		                			var resData = data.data;
+		                			if(page = totalPage){
+		                				self.endPullUpToRefresh(true);
+		                			}else{
+		                				self.endPullUpToRefresh(false);
+		                			}
+		                			return page < resData.totalPage ? template(selected,resData,false): template(selected,resData,true)	
+		                		},
+		                		error: function(xhr,type,errorThrown){
+									alert(xhr.responseText)
+		                		}
+		            		});
+						}
+					}else{
+						var i = !hasChecked ? 0 : 1;
+						document.querySelectorAll('.mui-pull-loading')[i].innerHTML = '没有更多数据';
+						self.endPullUpToRefresh(true);
 					}
 				}
 				
 				$.plusReady(function(){
+					
+					// 页面刷新
+					window.addEventListener('pagefresh',function(){
+						mui(".mui-slider-group .mui-scroll").pullToRefresh()[0].pullDownLoading();
+					})
 					
 					//循环初始化所有下拉刷新，上拉加载。
 					$.each(document.querySelectorAll('.mui-slider-group .mui-scroll'), function(index, pullRefreshEl) {
@@ -257,11 +283,10 @@
 					
 					$('#slider').on('tap','.am-card',function(){
 						let itemData = this.dataset;
+						itemData.currentSelected = hasChecked ? 'right': 'left';
 						console.log(JSON.stringify(itemData))
 						document.activeElement.blur();
-						common.openwin('pickingOffList',{ params: JSON.stringify(itemData) },{
-							titleText: '药品信息'
-						})
+						common.openwin('pickingOffList',{ params: JSON.stringify(itemData) },false)
 					})
 				
 				})

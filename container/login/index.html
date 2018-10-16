@@ -49,9 +49,11 @@
 					var passwordBox = doc.getElementById('password');
 					var btnArray = ['确认'];
 					loginButton.addEventListener('tap', function(event) {
-						document.activeElement.blur(); // 隐藏软键盘
-						mui(this).button('loading');
-						var _this = this;
+					document.activeElement.blur(); // 隐藏软键盘
+					if(!accountBox.value) return mui.toast('请输入用户名');
+					if(!passwordBox.value) return mui.toast('请输入密码');
+					mui(this).button('loading');
+					var _this = this;
 						mui.ajaxRequest('/a/entryPass/entryptPassword',{
 							type: 'POST',
 							data: {
@@ -69,7 +71,9 @@
 										success: function(res){
 											mui(_this).button('reset');
 											if(res.code === 200){
-												setUser(res.data);
+												var flag =  setUser(res.data);
+												if(!flag) return mui.toast('请重新进行登陆操作',{ duration:'long', type:'div' });
+												
 												common.openwin('../home/index',{})
 											}
 																					
@@ -81,7 +85,7 @@
 								}else{
 										mui.alert('账号或密码错误', '', btnArray, function(e) {
 										if (e.index == 0) {
-											alert('你点击了是');
+//											alert('你点击了是');
 										}
 									},'div')
 								}
@@ -94,6 +98,7 @@
 					});
 				});
 			}(mui, document));
+			
 			function setUser(res){
 				var deptInfo = res.deptInfo;
 				var deptList = [];
@@ -109,6 +114,24 @@
 				});
 				plus.storage.setItem('currDept',JSON.stringify(deptList[0]));
 				plus.storage.setItem('deptList',JSON.stringify(deptList));
+				// 后台设置当前选中库房
+				var url = '/a/cacheCurrentDept/'+ deptList[0].deptId
+				mui.ajaxRequest(url,{
+            		type: 'get',
+            		showWaiting: true,
+            		success: function(data){
+            			if(data.code === 200){
+            				mui.toast('设置当前系统成功');
+            			}else{
+            				mui.toast('设置切换系统失败,请重新登陆');
+            				return false
+            			}
+            		},
+            		error: function(xhr,type,errorThrown){
+            			return false
+            		}
+        		});
+        		return true
 			}
 		</script>
 	</body>
