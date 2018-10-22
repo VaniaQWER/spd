@@ -25,8 +25,8 @@
 		<div class="mui-content">
 			<div id="slider" class="mui-slider themes_tab mui-fullscreen">
 				<div id="sliderSegmentedControl" class="mui-slider-indicator mui-segmented-control mui-segmented-control-inverted">
-					<a class="mui-control-item themes_font_color_tab" href="#item1mobile">待上架</a>
-					<a class="mui-control-item themes_font_color_tab" href="#item2mobile">已上架</a>
+					<a class="mui-control-item themes_font_color_tab item1mobile" href="#item1mobile">待上架</a>
+					<a class="mui-control-item themes_font_color_tab item2mobile" href="#item2mobile">已上架</a>
 				</div>
 				<div id="sliderProgressBar" class="mui-slider-progress-bar mui-col-xs-6"></div>
 				<div class="mui-slider-group">
@@ -170,10 +170,16 @@
 				    	document.querySelectorAll('.themes_font_color_tab')[0].className = 'mui-control-item themes_font_color_tab mui-active';
 				    	document.querySelector('#item1mobile').className = 'mui-slider-item mui-control-content mui-active';
 				    }else{
-				    	document.querySelector('#sliderProgressBar').style.transform = 'translate3d(267px,0px,0px) translateZ(0px)';
-				    	document.querySelector('.mui-slider-group').style.transform = 'translate3d(-534px,0px,0px) translateZ(0px)';
+				    	var sliderProgressBar = document.querySelector('#sliderProgressBar');
+				    	var slideGroup = document.querySelector('.mui-slider-group');
+				    	sliderProgressBar.style.transform = 'translate3d(267px,0px,0px) translateZ(0px)';
+				    	sliderProgressBar.style.display = 'none';
+				    	slideGroup.style.transform = 'translate3d(-534px,0px,0px) translateZ(0px)';
+				    	slideGroup.style.top = '-1px';
 				    	document.querySelectorAll('.themes_font_color_tab')[1].className = 'mui-control-item themes_font_color_tab mui-active';
 				    	document.querySelector('#item2mobile').className = 'mui-slider-item mui-control-content mui-active';
+				    	document.querySelector('#sliderSegmentedControl').style.display = 'none';
+				    	
 				    }
 				    
 				    var groundUrl = '/a/checkacceptdetail/finish';

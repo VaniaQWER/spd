@@ -455,3 +455,17 @@ input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appear
 .fix-bottom-extra:active{
 	color: #FFFFFF;
 }
+/*更多筛选*/
+.moreCondition{
+	position: absolute;
+	display: none;
+	top: 0;
+	right: 0;
+	width: 50%;
+	font-size: 16px;
+	z-index: 2;
+	border-left: solid 1px #c8c7cc;
+}
+.moreCondition .mui-table-view-cell::after{
+	background-color: #fff;
+}

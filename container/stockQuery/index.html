@@ -26,9 +26,10 @@
 			<div id="slider" class="mui-slider themes_tab mui-fullscreen" style="top: 102px;">
 				<div id="sliderSegmentedControl" class="mui-slider-indicator mui-segmented-control mui-segmented-control-inverted">
 					<a class="mui-control-item themes_font_color_tab" href="#item1mobile">全部</a>
-					<a class="mui-control-item themes_font_color_tab" href="#item2mobile">更多筛选</a>
+					<a class="mui-control-item themes_font_color_tab item2mobile" href="#item2mobile">更多筛选</a>
 				</div>
 				<div id="sliderProgressBar" class="mui-slider-progress-bar mui-col-xs-6"></div>
+				
 				<div class="mui-slider-group">
 					<div id="item1mobile" class="mui-slider-item mui-control-content mui-active">
 						<div id="scroll1" class="mui-scroll-wrapper">
@@ -38,6 +39,12 @@
 								</ul>
 							</div>
 						</div>
+					</div>
+					<div class="moreCondition">
+						<ul class="mui-table-view">
+							<li class="mui-table-view-cell" data-search='nearEffect'>近效期(三个月)</li>
+							<li class="mui-table-view-cell" data-search= 'lowStock'>低库存</li>
+						</ul>
 					</div>
 				</div>
 			</div>
@@ -201,6 +208,17 @@
 							sliderProgressBar.setAttribute('style', sliderProgressBar.getAttribute('style'));
 						}
 					});
+					// 更多筛选
+					$('#sliderSegmentedControl').on('tap','.item2mobile',function(){
+						var moreCondition = document.querySelector('.moreCondition');
+						moreCondition.style.display = moreCondition.style.display === 'none'? 'block':'none';
+					});
+					
+					// 更多筛选条件查询
+					$('.moreCondition').on('tap','.mui-table-view-cell',function(){
+						this.parentNode.parentNode.style.display = 'none';
+						console.log(this.dataset.search)
+					})
 					
 					//绑定点击事件  - 进入详情页
 					

@@ -266,7 +266,8 @@
 							if(!checkStartTime){
 								mui.toast('请填写起始时间');
 								return;
-							}else{
+							}
+						}else{
 								var values = {};
 								values.checkBillType = checkBillType;
 								values.checkBillSubType = checkBillSubType;
@@ -275,7 +276,7 @@
 								console.log(JSON.stringify(values))
 								mui.ajaxRequest(newAddUrl,{
 									type: 'POST',
-									data: submitData,
+									data: values,
 									showWaiting: true,
 									success: function(data){
 										if(data.code === 200){
@@ -289,7 +290,6 @@
 			                		}
 								})
 							}
-						}
 					})
 					
 					

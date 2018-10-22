@@ -101,7 +101,26 @@
 			            }, 1000);
 			        } else {
 			            if (new Date().getTime() - first < 1000) {
-							plus.runtime.quit();
+							mui.confirm('是否确定退出?','确定',['取消','确认'],function(event){
+								console.log(event.index)
+								if(event.index === 1){
+									mui.ajaxRequest(logoutUrl,{
+										type: 'GET',
+										data: {},
+										success: function(data){
+											if(data.code === 200){
+												console.log('退出了')
+												plus.runtime.quit();
+											}
+										},
+										error: function(){
+											mui.toast('网络异常,请稍后在试');
+										}
+									})
+								}
+							},'div')
+//							
+
 			            }
 			        }
 	        	}

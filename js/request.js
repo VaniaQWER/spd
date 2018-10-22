@@ -64,10 +64,17 @@
             		plus.nativeUI.closeWaiting();
             	}
                 hideLoading();
-                if(options.error){
-                	
-                    options.error(a , b , c);
-                }
+               	mui.openWindow({
+                    url: "login/index.html",
+                    id: "login/index.html",
+                    extras: {
+                        mark: "index" //额外的参数，仅仅是个标识，实际开发中不用；
+                    }
+                });
+//              if(options.error){
+//              	
+//                  options.error(a , b , c);
+//              }
             }
         };
         return defaults;
