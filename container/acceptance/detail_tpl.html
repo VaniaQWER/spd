@@ -5,30 +5,34 @@
 			<li class="mui-table-view-cell mui-collapse mui-active">
 				<a class="mui-navigate-right" href="#">单据信息</a>
 				<div class="mui-collapse-content">
-						<div class="mui-input-row">
-							<label>配送单号</label>
-							<p class="detailRow_content">{{ distributecode ? distributecode: '' }}</p>
-						</div>
-						<div class="mui-input-row">
-							<label>订单号</label>
-							<p class="detailRow_content">{{ ordercode ? ordercode: '' }}</p>
-						</div>
-						<div class="mui-input-row">
-							<label>状态</label>
-							<p class="detailRow_content">{{ statusname ? statusname: '' }}</p>
-						</div>
-						<div class="mui-input-row">
-							<label>类型</label>
-							<p class="detailRow_content">{{ typename ? typename: '' }}</p>
-						</div>
-						<div class="mui-input-row">
-							<label>供应商</label>
-							<p class="detailRow_content">{{ suppliername ? suppliername: '' }}</p>
-						</div>
-						<div class="mui-input-row">
-							<label>收货地址</label>
-							<p class="detailRow_content">{{ deptaddress ? deptaddress: '' }}</p>
-						</div>
+					<!--<div class="mui-input-row">
+						<label>配送单号</label>
+						<p class="detailRow_content">{{ distributecode ? distributecode: '' }}</p>
+					</div>
+					<div class="mui-input-row">
+						<label>订单号</label>
+						<p class="detailRow_content">{{ ordercode ? ordercode: '' }}</p>
+					</div>-->
+					<div class="mui-input-row">
+						<label>出库单</label>
+						<p class="detailRow_content">{{ ordercode ? ordercode: '' }}</p>
+					</div>
+					<div class="mui-input-row">
+						<label>状态</label>
+						<p class="detailRow_content">{{ statusname ? statusname: '' }}</p>
+					</div>
+					<div class="mui-input-row">
+						<label>类型</label>
+						<p class="detailRow_content">{{ typename ? typename: '' }}</p>
+					</div>
+					<!--<div class="mui-input-row">
+						<label>供应商</label>
+						<p class="detailRow_content">{{ suppliername ? suppliername: '' }}</p>
+					</div>
+					<div class="mui-input-row">
+						<label>收货地址</label>
+						<p class="detailRow_content">{{ deptaddress ? deptaddress: '' }}</p>
+					</div>-->
 				</div>
 			</li>
 		</ul>
