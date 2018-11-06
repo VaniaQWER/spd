@@ -73,7 +73,7 @@
 							<p class="detailRow_content">{{value.unit}}</p>
 						</div>
 						<div class="mui-input-row">
-							{{ if checkType === 1 && hasAcceptance }}
+							{{ if (accepttype === '1' || accepttype === '2' || accepttype === '4') && hasAcceptance }}
 								<label class="font-warning">生产批号</label>
 								<input class="mui-input editInput BatchNo" value={{ value.productBatchNo }} />
 								{{ else }}
@@ -82,7 +82,7 @@
 							{{ /if }}
 						</div>
 						<div class="mui-input-row">
-							{{ if checkType === 1 && hasAcceptance }}
+							{{ if (accepttype === '1' || accepttype === '2' || accepttype === '4') && hasAcceptance }}
 								<label class="font-warning">生产日期</label>
 								<input class="mui-input editInput realProductTime" type='date' value={{ value.realProductTime }} />
 								{{ else }}
@@ -92,7 +92,7 @@
 							
 						</div>
 						<div class="mui-input-row">
-							{{ if checkType === 1 && hasAcceptance }}
+							{{ if (accepttype === '1' || accepttype === '2' || accepttype === '4') && hasAcceptance }}
 								<label class="font-warning">有效期至</label>
 								<input class="mui-input editInput realValidEndDate" type='date' value={{ value.realValidEndDate }} />
 								{{ else }}
@@ -102,7 +102,7 @@
 						</div>
 						{{ if isShowTemprature === 1 }}
 							<div class="mui-input-row">
-								{{ if checkType === 1 && hasAcceptance }}
+								{{ if (accepttype === '1' || accepttype === '2' || accepttype === '4') && hasAcceptance }}
 									<label class="font-warning">验收温度（℃）</label>
 									<input class="mui-input editInput realAcceptanceTemperature" type='number' value={{ value.realAcceptanceTemperature}}/>
 									{{ else }}
@@ -116,12 +116,12 @@
 							<p class="detailRow_content">{{value.realDeliveryQuantiry}}</p>
 						</div>
 						<div class="mui-input-row">
-							{{ if checkType === 1 && hasAcceptance }}
+							{{ if (accepttype === '1' || accepttype === '2' || accepttype === '4') && hasAcceptance }}
 								<label class="font-warning">实到数量</label>
-								<input class="mui-input editInput realReceiveQuantiry" type="number"  pattern="[0-9]*" value={{ value.realReceiveQuantity?value.realReceiveQuantity: 0 }} />
+								<input class="mui-input editInput realReceiveQuantiry" type="number"  pattern="[0-9]*" value={{ value.realReceiveQuantiry ? value.realReceiveQuantiry: value.realDeliveryQuantiry }} />
 								{{ else }}
 									<label>实到数量</label>
-									<p class="detailRow_content">{{value.realReceiveQuantity}}</p>
+									<p class="detailRow_content">{{value.realReceiveQuantiry ? value.realReceiveQuantiry: value.realDeliveryQuantiry}}</p>
 							{{ /if }}
 						</div>
 						<div class="mui-input-row">

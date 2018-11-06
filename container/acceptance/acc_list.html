@@ -23,9 +23,6 @@
 		    </a>
 		</header>
 		<div class="mui-content">
-		    <!--<div class="mui-input-row mui-search search_head" onclick="toSearchPage()">
-				<input type="search" class="mui-input-clear" placeholder="通用名/商品名/生产厂家">
-			</div>-->
 			<div id="slider" class="mui-slider themes_tab mui-fullscreen">
 				<div id="sliderSegmentedControl" class="mui-slider-indicator mui-segmented-control mui-segmented-control-inverted">
 					<a class="mui-control-item themes_font_color_tab" href="#item1mobile">待验收</a>
@@ -95,7 +92,7 @@
 				
 				
 				/* 渲染模板   */
-				var checkType, type, auditStatus, isShowTemprature// 验收单类型 // 验收状态   1 待验收  2 已验收   是否显示验收温度 1 显示 0 隐藏 
+				var params, checkType, type, auditStatus, isShowTemprature// 验收单类型 // 验收状态   1 待验收  2 已验收   是否显示验收温度 1 显示 0 隐藏 
 				var nullDataHtml = '<div class="mui-pull-bottom-tips"><div class="mui-pull-bottom-wrapper">'+
 										'<span class="mui-pull-loading">暂无数据</span></div></div>'
 				var detailData = {
@@ -146,8 +143,10 @@
 							document.querySelector('.batchAccetpance').style.display = 'none';
 						}else{
 							mui.each(data.unVerfiyList.list,function(index,item){
+								item.showEditBtn = (params.accepttype === '1' || params.accepttype === '2' || params.accepttype === '4' ) ? true: false;
 								item.editable = checkType === 1 ? true: false;
-							})
+							});
+							console.log(data.unVerfiyList)
 							html1 = template('list_tpl_view',data.unVerfiyList);
 							document.querySelector('.batchAccetpance').style.display = 'block';
 						}
@@ -178,7 +177,7 @@
 						genData(url,query.currentSelected);
 					})
 					
-					var params, distributeCode, currentSelected;
+					var  distributeCode, currentSelected;
 					var self = plus.webview.currentWebview();
 				    params = JSON.parse(self.params);//获得参数
 				    console.log(params)

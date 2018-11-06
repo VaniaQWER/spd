@@ -36,7 +36,7 @@
 										<div class="am-list-line">
 											<div class="am-input-label am-input-label-4 font-warning">实到数量:</div>
 											<div class="am-input-control">
-												<input pattern="[0-9]*" type="number" value={{ value.realReceiveQuantity?value.realReceiveQuantity: '' }} placeholder="请输入" class="realReceiveQuantity flex-item-input" />
+												<input pattern="[0-9]*" type="number" value={{ value.realReceiveQuantiry?value.realReceiveQuantiry: '' }} placeholder="请输入" class="realReceiveQuantity flex-item-input" />
 											</div>
 										</div>
 									</div>
@@ -99,7 +99,7 @@
 						
 						<div class="am-flexbox am-flexbox-align-center">
 							<div class="am-flexbox-item"> 
-								实到数量：<span>{{ value.realReceiveQuantity }}</span>
+								实到数量：<span>{{ value.realReceiveQuantiry }}</span>
 							</div>
 							<div class="am-flexbox-item am-last-flexItem">
 							 	生产日期：<span>{{ value.realProductTime }}</span>
@@ -123,7 +123,7 @@
 			<div class="am-card-footer">
 				<div class="am-card-footer-content"></div>
 				<div class="am-card-footer-extra">
-					{{ if acceptance && checkType === 1 }}
+					{{ if acceptance && value.showEditBtn }}
 						<button type="button" class="mui-btn mui-btn-blue mui-btn-outlined edit" data-id={{ value.id }} data-index={{ i }}>收起编辑</button>
 					{{ /if }}
 					<button type="button" class="mui-btn mui-btn-blue mui-btn-outlined moreDetail" data-id={{ value.id }} data-index={{ i }} style="margin: 0 5px;">更多详情</button>

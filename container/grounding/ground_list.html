@@ -272,16 +272,16 @@
 						let index = this.dataset.index;
 						var _this_card = document.querySelectorAll('.am-card')[index];
 						let id = _this_card.dataset.id;
-						var realNum = _this_card.querySelector('.realInputNum').value
+						var realNum = detailData.listwsj.list[index].realNum;
 						var realReceiveStore = _this_card.querySelector('.select_actualStore').value
 						console.log(realNum);
 						console.log(realReceiveStore)
-						if(realNum <= 0 ){
+						/*if(realNum <= 0 ){
 							return mui.alert('实际上架数量不能小于或等于0','警告',['确定'],function(){},'div')
 						}
 						if(realNum > _this_card.querySelector('.groundNum').innerText){
 							return mui.alert('实际数量不得大于指示数量','警告',['确定'],function(){},'div')
-						}
+						}*/
 						var btnArray = ['否', '是'];
 						mui.confirm('是否确认上架？', '确认', btnArray, function(e) {
 							if (e.index == 1) {
@@ -292,7 +292,7 @@
 									detailListVo.push(postData);
 									submitData.detailListVo = detailListVo;
 									submitData.distributeCode = distributeCode;
-									console.log(JSON.stringify(submitData));
+									console.log(submitData);
 									mui.ajaxRequest(groundUrl,{
 				                		type: 'POST',
 				                		data: submitData,

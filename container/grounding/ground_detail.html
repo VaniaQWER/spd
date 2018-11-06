@@ -124,25 +124,25 @@
 					if(details.hasGround){
 						var ground = document.querySelector('#ground');
 						ground.addEventListener('tap',function(e){
-							var realNum = document.querySelector('.relNum').value;
 							var realReceiveStore = document.querySelector('.realReceiveStore').value;
-							if(realNum <= 0 ){
+							/*if(realNum <= 0 ){
 								return mui.toast('实际上架数量不能小于或等于0')
 							}
 							if(realNum > details.realNum){
 								return mui.toast('实际数量不得大于指示数量');
-							}
+							}*/
+//							var realNum = details.realNum;
 							document.activeElement.blur(); // 隐藏软键盘
 							var btnArray = ['否', '是'];
 							mui.confirm('是否确认上架？', '操作提示', btnArray, function(e) {
 								if (e.index == 1) {
 									var detailListVo = [],postData = {},submitData = {};
-									postData.id = details.id;
-									postData.realNum = realNum;
+									postData.id = data.list[0].id;
+									postData.realNum = data.list[0].realNum;
 									postData.realReceiveStore = realReceiveStore;
 									detailListVo.push(postData);
 									submitData.detailListVo = detailListVo;
-									submitData.distributeCode = details.distributecode;
+									submitData.distributeCode = data.distributecode;
 									console.log(submitData);
 									mui.ajaxRequest(groundUrl,{
 				                		type: 'POST',

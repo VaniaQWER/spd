@@ -87,7 +87,6 @@
 					var data = Object.assign({},details.orderInfo);
 					var currentIndex = Number(details.index);
 					console.log(currentIndex)
-					
 					data.hasAcceptance = details.hasAcceptance;
 					data.isShowTemprature = details.isShowTemprature;
 					data.list = [];
@@ -112,6 +111,7 @@
 					}
 					document.querySelector('.page-total').innerHTML = details.allData.length;
 					console.log(data)
+					// type  1 2 4 配送单 可编辑     其余 出库单  不能编辑
 					showData(data);
 					
 						// 上一个
