@@ -46,13 +46,14 @@
 					var baseUrl = '/a/StoreDetail/getRoomRepertoryDetail';
 					var tableUrl = '/a/StoreDetail/getRoomRepertoryDetailList';
 					var renderData = { };
+					plus.nativeUI.showWaiting();
 					genDetailData(baseUrl,hisDrugCode)
-					genTableData(tableUrl,drugCode);
 					
 
 				/*
 				  获取列表数据
 				 * */
+				
 					function genDetailData(baseUrl,hisDrugCode){
 						// 详情 数据
 						mui.ajaxRequest(baseUrl,{
@@ -60,12 +61,12 @@
 	                		data: {
 	                			hisDrugCode: hisDrugCode
 	                		},
-	                		showWaiting: true,
 	                		success: function(data){
 	                			if(data.code === 200){
 	                				var list = [];
 	                				list.push(data.data);
 	                				renderData.list = list;
+	                				genTableData(tableUrl,drugCode);
 	                			}else{
 	                				mui.alert(data.msg)
 	                			}
@@ -78,14 +79,15 @@
 					
 					function genTableData(tableUrl,drugCode){
 						// 列表数据
+						
 	            		mui.ajaxRequest(tableUrl,{
 	                		type: 'post',
 	                		data: {
 	                			drugCode: drugCode
 	                		},
-	                		showWaiting: true,
 	                		success: function(data){
 	                			if(data.code === 200){
+	                				plus.nativeUI.closeWaiting();
 	                				var tablist = data.data.list;
 	                				renderData.tablist = tablist;
 	                				var html = template('deitail_view', renderData);

@@ -73,8 +73,18 @@
 							<p class="detailRow_content">{{value.unit}}</p>
 						</div>
 						<div class="mui-input-row">
-							<label>实际数量</label>
-							<p class="detailRow_content">{{value.practicalRepertory}}</p>
+							<label>账面库存</label>
+							<p class="detailRow_content">{{value.accountStoreNum}}</p>
+						</div>
+						<div class="mui-input-row">
+							{{ if value.checkDetailStatus === 1 }}
+								<label class="font-warning">实际数量</label>
+								<input pattern="[0-9]*" type="number" value={{ value.accountStoreNum }} placeholder="请输入" class="practicalRepertory flex-item-input" />
+								{{ else }}
+									<label>实际数量</label>
+									<p class="detailRow_content">{{value.practicalRepertory}}</p>
+							{{ /if }}
+							
 						</div>
 						<div class="mui-input-row">
 							<label>盈亏数量</label>
@@ -85,24 +95,39 @@
 							<p class="detailRow_content">{{value.accountBatchNo}}</p>
 						</div>
 						<div class="mui-input-row">
-							<label>实际批号</label>
-							<p class="detailRow_content">{{value.practicalBatch}}</p>
+							{{ if value.checkDetailStatus === 1 }}
+								<label class="font-warning">实际批号</label>
+								<input pattern="[0-9]*" type="number" value={{ value.accountBatchNo }} placeholder="请输入" class="practicalBatch flex-item-input" />
+								{{ else }}
+								<label>实际批号</label>
+								<p class="detailRow_content">{{value.practicalBatch}}</p>
+							{{ /if }}
 						</div>
 						<div class="mui-input-row">
 							<label>生产日期</label>
 							<p class="detailRow_content">{{value.accountProductTime}}</p>
 						</div>
 						<div class="mui-input-row">
-							<label>实际生产日期</label>
-							<p class="detailRow_content">{{value.realProductTime}}</p>
+							{{ if value.checkDetailStatus === 1 }}
+								<label class="font-warning">实际生产日期</label>
+								<input pattern="[0-9]*" type="date" value={{ value.accountProductTime }} placeholder="请输入" class="realProductTime flex-item-input" />
+								{{ else }}
+								<label>实际生产日期</label>
+								<p class="detailRow_content">{{value.realProductTime}}</p>
+							{{ /if }}
 						</div>
 						<div class="mui-input-row">
 							<label>有效期至</label>
 							<p class="detailRow_content">{{value.accountEndTime}}</p>
 						</div>
 						<div class="mui-input-row">
-							<label>实际有效期至</label>
-							<p class="detailRow_content">{{value.realProductTime}}</p>
+							{{ if value.checkDetailStatus === 1 }}
+								<label class="font-warning">实际有效期至</label>
+								<input pattern="[0-9]*" type="date" value={{ value.accountEndTime }} placeholder="请输入" class="validEndTime flex-item-input"/>
+								{{ else }}
+								<label>实际有效期至</label>
+								<p class="detailRow_content">{{value.validEndTime}}</p>
+							{{ /if }}
 						</div>
 						<div class="mui-input-row">
 							<label>参考价格</label>

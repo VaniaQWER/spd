@@ -10,9 +10,7 @@
 		<link href="../../css/themes.css" rel="stylesheet" />
 		<link href="../../css/index_view.css" rel="stylesheet" />
 		<link rel="stylesheet" href="../../css/check.css" />
-		<script src="../../js/mui.min.js"></script>
-		<script src="../../js/template-web.js" type="text/javascript" charset="utf-8"></script>
-		<script src="../../js/utils.js" type="text/javascript" charset="utf-8"></script>
+		
 	</head>
 
 	<body>
@@ -48,7 +46,11 @@
 				</ul>
 			</form>
 		</div>
-		<script src="../js/mui.min.js"></script>
+		<script src="../../js/mui.min.js"></script>
+		<script src="../../js/template-web.js" type="text/javascript" charset="utf-8"></script>
+		<script src="../../js/utils.js" type="text/javascript" charset="utf-8"></script>
+		<script src="../../js/common.js" type="text/javascript" charset="utf-8"></script>
+		<script src="../../js/request.js" type="text/javascript" charset="utf-8"></script>
 		<script type="text/javascript">
 			
 
@@ -141,9 +143,11 @@
 									postData.id = data.list[0].id;
 									postData.pickingNum = realInputNum
 									pickingDetail.push(postData);
+									submitData.applyNo = data.applyorderno;
+									submitData.pickingOrderNo = data.pickingorderno;
 									submitData.pickingDetail = pickingDetail;
 									console.log(JSON.stringify(submitData));
-									mui.ajaxRequest(groundUrl,{
+									mui.ajaxRequest(pickUrl,{
 				                		type: 'POST',
 				                		data: submitData,
 				                		contentType: "application/json",

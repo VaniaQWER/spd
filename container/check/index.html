@@ -182,7 +182,10 @@
             	}
 				
 				$.plusReady(function(){
-				 	
+					
+				 	window.addEventListener('pagefresh',function(){
+				 		mui(".mui-scroll").pullToRefresh().pullDownLoading();
+					})
 				 	//循环初始化所有下拉刷新，上拉加载。
 					$.each(document.querySelectorAll('.mui-scroll'), function(index, pullRefreshEl) {
 						$(pullRefreshEl).pullToRefresh({

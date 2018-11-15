@@ -14,6 +14,7 @@
 
 	<body>
 		<div class="main-content" style='padding-top: 44px;'>
+			
 			<header class="mui-bar mui-bar-nav themes_bg_color">
 			   	<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left">
 			   		<label class="mui-pull-right theme_back_font">返回</label>
@@ -25,10 +26,10 @@
 					</div>
 			    </a>
 			</header>
-		    <div class="mui-input-row mui-search search_head">
+		    <!--<div class="mui-input-row mui-search search_head">
 				<input type="search" class="mui-input-clear" placeholder="商品名/生产厂家/货位">
-			</div>
-			<div id="refreshContainer" class="mui-scroll-wrapper" style="top: 102px;">
+			</div>-->
+			<div id="refreshContainer" class="mui-scroll-wrapper" style="top: 44px;">
 				<div class="mui-scroll">
 					<ul class="mui-table-view">
 						<li class="mui-table-view-cell mui-tab" style="padding: 0;"></li>
@@ -67,6 +68,13 @@
 			}
 			
 			(function($) {
+				$.init({
+					beforeback: function() {
+				        var list = plus.webview.currentWebview().opener();  
+				        mui.fire(list, 'pagefresh'); 
+				        return true;  
+			    	}
+				})
 				var deceleration = mui.os.ios?0.003:0.0009;
 				$('.mui-scroll-wrapper').scroll({
 					bounce: false,
@@ -84,7 +92,7 @@
 				detailData = { list: [] }, url = '/a/checkbilldetail/getListByBillNo';
 				var page = 0, pageSize = 10, totalPage = 0, checkBillNo = null,isMore = false;
 				checkUrl = '/a/checkbill/submitCheck';
-				
+				begCheckUrl = '/a/checkbill/beginCheck';// 开始盘点接口
 				/* 渲染模板   */
 				function template(data, insertType){
 					mui.each(data.list,function(index,item){
@@ -106,6 +114,7 @@
 		            	mui.ajaxRequest(url,{
 		            		type: 'POST',
 		            		data: postData,
+		            		contentType: 'application/json',
 		            		success: function(data){
 		            			var resData = data.data;
 		            			totalPage = resData.totalPage;
@@ -142,6 +151,7 @@
 	            	mui.ajaxRequest(url,{
 	            		type: 'POST',
 	            		data: postData,
+	            		contentType: 'application/json',
 	            		success: function(data){
 	            			var resData = data.data;
 	            			totalPage = resData.totalPage;
@@ -163,14 +173,25 @@
 	            	})
 				}
 				
+				
+				
 				$.plusReady(function(){
+					
+					window.addEventListener('pagefresh',function(event){
+						plus.nativeUI.showWaiting();
+						setTimeout(function(){
+							plus.nativeUI.closeWaiting();
+						},500);
+						mui(".mui-scroll").pullToRefresh().pullDownLoading();
+						
+					})
 					
 					var params, flag = false
 					var self = plus.webview.currentWebview();
 				    params = JSON.parse(self.params);//获得参数
 				    console.log(params)
 				    checkBillNo = params.checkbillno;
-				    checkStatus = params.checkStatus
+				    checkStatus = params.checkStatus;
 				    
 				    
 				    //循环初始化所有下拉刷新，上拉加载。
@@ -190,8 +211,34 @@
 							}
 						});
 					});
-					/*  请求数据  */
-					mui(".mui-scroll").pullToRefresh().pullDownLoading();
+					
+					var btnArray = ['否', '是'];
+					if(params.checkstatus === '1'){
+						var mask = mui.createMask();
+				    	mask.show();
+						mui.confirm('是否开始盘点？','药品信息',btnArray,function(e){
+					    	if (e.index == 1) {
+									mask.close();
+									mui.ajaxRequest(begCheckUrl,{
+										type: 'POST',
+										data: { checkBillNo: checkBillNo },
+										showWaiting: true,
+										success: function(data){
+											if(data.code === 200){
+												mui(".mui-scroll").pullToRefresh().pullDownLoading();
+											}
+										},
+										error: function(xhr,type,errorThrown){
+											alert(xhr.responseText)
+				                		}
+									})
+								} else {
+									
+								}
+					    },'div')
+					}else{
+						mui(".mui-scroll").pullToRefresh().pullDownLoading();
+					}
 				    
 					 // 展开编辑
 					$('.main-content').on('tap','.eidtRow',function(){
@@ -208,6 +255,7 @@
 						let index = this.dataset.index;
 						let data = detailData.list[index];
 						let newData = Object.assign({}, data, params);
+						newData.orderInfo = params;
 						console.log(JSON.stringify(newData))
 						document.activeElement.blur();
 						common.openwin('checkDetails',{ details: JSON.stringify(newData) },{
@@ -217,57 +265,66 @@
 					
 					// 提交
 					$('.main-content').on('tap','.submitButton',function(){
-						var index = this.dataset.index;
-						var _this_card = document.querySelectorAll('.am-card')[index];
-						var currData = detailData.list[index];
-						var postData = {}, detailList = [], submitData = {}
-						console.log(index)
-						postData.accountBatchNo = currData.accountBatchNo;
-						postData.accountEndTime = currData.accountEndTime;
-						postData.accountProductTime = currData.accountProductTime;
-						postData.accountStoreNum = currData.accountStoreNum;
-						postData.bigDrugCode = currData.bigDrugCode;
-						postData.drugCode = currData.drugCode;
-						postData.id = currData.id;
-						postData.locCode = currData.locCode;
-						postData.pId = currData.pId;
-						postData.practicalBatch = currData.practicalBatch;
-						postData.practicalRepertory = currData.practicalRepertory;
-						postData.realProductTime = currData.realProductTime;
-						postData.referencePrice = currData.referencePrice;
-						postData.unitCode = currData.unitCode;
-						postData.validEndTime = currData.validEndTime;
-						postData.supplierCode = currData.supplierCode;
-						
-						
-						detailList.push(postData);
-						submitData.detailList = detailList;
-						submitData.checkBillNo = checkBillNo;
-						console.log(JSON.stringify(submitData));
-						
-						mui.ajaxRequest(checkUrl,{
-							type: 'POST',
-							data: submitData,
-							showWaiting: true,
-							contentType: "application/json",
-							success: function(data){
-								if(data.code === 200){
-									mui.toast('提交成功');
-									mui(".mui-scroll").pullToRefresh().pullDownLoading();
-								}
-							},
-							error: function(xhr,type,errorThrown){
-								alert(xhr.responseText)
-	                		}
-						})
 						document.activeElement.blur();
-						var btnArray = ['否', '是'];
-						$.confirm('确定要执行此操作吗？', '确认提交', btnArray, function(e) {
+						var _this = this;
+						mui.confirm('确定要执行此操作吗？', '确认提交', btnArray, function(e) {
 							if (e.index == 1) {
+								var index = _this.dataset.index;
+								var _this_card = document.querySelectorAll('.am-card')[index];
+								// 获取实际数据
+								var practicalRepertory = _this_card.querySelector('.practicalRepertory').value;
+								var realProductTime = _this_card.querySelector('.realProductTime').value;
+								var practicalBatch = _this_card.querySelector('.practicalBatch').value;
+								var validEndTime = _this_card.querySelector('.validEndTime').value;
 								
+								
+								var currData = detailData.list[index];
+								var postData = {}, detailList = [], submitData = {}
+								console.log(index)
+								postData.accountBatchNo = currData.accountBatchNo;
+								postData.accountEndTime = currData.accountEndTime;
+								postData.accountProductTime = currData.accountProductTime;
+								postData.accountStoreNum = currData.accountStoreNum;
+								postData.bigDrugCode = currData.bigDrugCode;
+								postData.drugCode = currData.drugCode;
+								postData.id = currData.id;
+								postData.locCode = currData.locCode;
+								postData.pId = currData.pId;
+								postData.practicalBatch = practicalBatch;
+								postData.practicalRepertory = practicalRepertory;
+								postData.realProductTime = realProductTime;
+								postData.referencePrice = currData.referencePrice;
+								postData.unitCode = currData.unitCode;
+								postData.validEndTime = validEndTime;
+								postData.supplierCode = currData.supplierCode;
+								
+								
+								detailList.push(postData);
+								submitData.detailList = detailList;
+								submitData.checkBillNo = checkBillNo;
+								console.log(submitData);
+								
+								mui.ajaxRequest(checkUrl,{
+									type: 'POST',
+									data: submitData,
+									showWaiting: true,
+									contentType: "application/json",
+									success: function(data){
+										if(data.code === 200){
+											mui.toast('提交成功');
+											mui(".mui-scroll").pullToRefresh().pullDownLoading();
+										}
+									},
+									error: function(xhr,type,errorThrown){
+										alert(xhr.responseText)
+			                		}
+								})
 							} else {
+								
 							}
-						})
+						},'div')
+						
+						
 					})
 					
 				});

@@ -54,7 +54,7 @@
 					var html = template('detail_tpl', data);
 					document.getElementById('detailContent').innerHTML = html;
 				}
-				var checkType = undefined, type = undefined, details = undefined, checkUrl = '/a/checkacceptdetail/checkList';
+				var checkType = undefined, type = undefined, data = null, details = undefined, checkUrl = '/a/checkacceptdetail/checkList';
 				$.plusReady(function(){
 					$.init({
 						beforeback: function() {
@@ -84,7 +84,7 @@
 					var self = plus.webview.currentWebview();
 					details = JSON.parse(self.details);//获得参数
 					console.log(details)
-					var data = Object.assign({},details.orderInfo);
+					data = Object.assign({},details.orderInfo);
 					var currentIndex = Number(details.index);
 					console.log(currentIndex)
 					data.hasAcceptance = details.hasAcceptance;
@@ -205,48 +205,67 @@
 					}
 					// 验收
 					mui('.detailRow').on('tap','#acceptance',function(event){
-						var phValue = document.querySelector('.mui-input').value; // 批号文号
-						var phList = document.querySelector('#List').querySelectorAll('.mui-input-ph');
-						var numList = document.querySelector('#List').querySelectorAll('.mui-input-num');
-						
-						// 获取产品信息详情中编辑字段值
-						
-						var editBatchNo = document.querySelector('.BatchNo').value;
-						var realProductTime = document.querySelector('.realProductTime').value;
-						var realValidEndDate = document.querySelector('.realValidEndDate').value;
-						if(details.isShowTemprature === 1){
-							var realAcceptanceTemperature = document.querySelector('.realAcceptanceTemperature').value;
-						}
-						var realReceiveQuantiry = document.querySelector('.realReceiveQuantiry').value;
 						let postData = [],submitData = {};
-						if(phList.length){
-							for (let i =0 ;i < phList.length; i++) {
+						if(details.isPsList){ // 配送单验收  可以修改
+							
+							// 获取产品信息详情中编辑字段值
+							
+							var phValue = document.querySelector('.mui-input').value; // 批号文号
+							var phList = document.querySelector('#List').querySelectorAll('.mui-input-ph'); // 新增批号数据
+							var numList = document.querySelector('#List').querySelectorAll('.mui-input-num'); // 批号对应的数值
+							var editBatchNo = document.querySelector('.BatchNo').value;
+							var realProductTime = document.querySelector('.realProductTime').value;
+							var realValidEndDate = document.querySelector('.realValidEndDate').value;
+							if(details.isShowTemprature === 1){
+								realAcceptanceTemperature = document.querySelector('.realAcceptanceTemperature').value;
+							}
+							var realReceiveQuantiry = document.querySelector('.realReceiveQuantiry').value;
+							if(phList.length){
+								for (let i =0 ;i < phList.length; i++) {
+									let values = {};
+									values.productBatchNo =  phList[i].value;
+									values.realReceiveQuantiry = numList[i].value;
+									values.realProductTime = realProductTime;
+									values.realValidEndDate = realValidEndDate;
+									if(details.isShowTemprature === 1){
+										values.realAcceptanceTemperature = realAcceptanceTemperature;
+									}
+									values.drugCode = details.drugCode;
+									values.id = details.id;
+									postData.push(values);
+								}
+							}else{
 								let values = {};
-								values.productBatchNo =  phList[i].value;
-								values.realReceiveQuantiry = numList[i].value;
+								values.productBatchNo = editBatchNo;
 								values.realProductTime = realProductTime;
 								values.realValidEndDate = realValidEndDate;
 								if(details.isShowTemprature === 1){
 									values.realAcceptanceTemperature = realAcceptanceTemperature;
 								}
-								values.drugCode = details.drugCode;
-								values.id = details.id;
+								values.realDeliveryQuantiry = realReceiveQuantiry;
+								values.drugCode = data.list[0].drugCode;
+								values.id = data.list[0].id;
+								values.parentId = data.list[0].id;
 								postData.push(values);
 							}
 						}else{
+							// 非配送单验收，不能修改
 							let values = {};
-							values.productBatchNo = editBatchNo;
-							values.realProductTime = realProductTime;
-							values.realValidEndDate = realValidEndDate;
-							values.realAcceptanceTemperature = realAcceptanceTemperature;
-							values.realDeliveryQuantiry = realReceiveQuantiry;
-							values.drugCode = details.drugCode;
-							values.id = details.id;
-							values.parentId = details.id;
+							values.productBatchNo = data.list[0].productBatchNo;
+							values.realProductTime = data.list[0].realProductTime;
+							values.realValidEndDate = data.list[0].realValidEndDate;
+							if(defaultStatus.isShowTemprature === 1){
+								values.realAcceptanceTemperature = data.list[0].realAcceptanceTemperature;
+							}
+							values.realDeliveryQuantiry = data.list[0].realReceiveQuantiry;
+							values.drugCode = data.list[0].drugCode;
+							values.id = data.list[0].id;
+							values.parentId = data.list[0].id;
 							postData.push(values);
 						}
+						
 						submitData.detailList = postData;
-						submitData.distributeCode = details.distributeCode
+						submitData.distributeCode = data.distributecode
 						console.log(submitData,'submitData'); // 批号 数据
 						document.activeElement.blur(); // 隐藏软键盘
 						var btnArray = ['否', '是'];
