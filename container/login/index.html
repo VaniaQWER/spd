@@ -71,6 +71,7 @@
 										success: function(res){
 											mui(_this).button('reset');
 											if(res.code === 200){
+												console.log(res)
 												var flag =  setUser(res.data);
 												if(!flag) return mui.toast('请重新进行登陆操作',{ duration:'long', type:'div' });
 												
@@ -102,20 +103,24 @@
 			function setUser(res){
 				var deptInfo = res.deptInfo;
 				var deptList = [];
+				var currDept = {};
 				mui.each(deptInfo,function(index,item){
 					if(item.deptType === "3" || item.deptType === '4'|| item.deptType === '5'){
 						var deptItem = {
 							deptId: item.deptId,
 							deptType: item.deptType,
-							deptName: item.deptName
+							deptName: item.deptName,
+							lastSelect: item.lastSelect
 						}
+						currDept = item.lastSelect ? item: {};
 						deptList.push(deptItem);
 					}
 				});
-				plus.storage.setItem('currDept',JSON.stringify(deptList[0]));
+				currDept = currDept.deptId ? currDept: deptList[0];
+				plus.storage.setItem('currDept',JSON.stringify(currDept));
 				plus.storage.setItem('deptList',JSON.stringify(deptList));
 				// 后台设置当前选中库房
-				var url = '/a/cacheCurrentDept/'+ deptList[0].deptId
+				var url = '/a/cacheCurrentDept/'+ currDept.deptId
 				mui.ajaxRequest(url,{
             		type: 'get',
             		showWaiting: true,
