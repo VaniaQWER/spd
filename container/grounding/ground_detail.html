@@ -99,7 +99,7 @@
 							data.list.push(details.allData[currentIndex]);
 							plus.nativeUI.closeWaiting();
 							showData(data);
-						},300)
+						},200)
 					});
 				
 					// 下一个
@@ -116,7 +116,7 @@
 							data.list.push(details.allData[currentIndex]);
 							plus.nativeUI.closeWaiting();
 							showData(data);
-						},300)
+						},200)
 						
 					});
 					
@@ -139,6 +139,7 @@
 									var detailListVo = [],postData = {},submitData = {};
 									postData.id = data.list[0].id;
 									postData.realNum = data.list[0].realNum;
+									postData.productBatchNo = data.list[0].productBatchNo;
 									postData.realReceiveStore = realReceiveStore;
 									detailListVo.push(postData);
 									submitData.detailListVo = detailListVo;

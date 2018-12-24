@@ -76,9 +76,10 @@
 			//去搜索页面
 			function toSearchPage (){
 				var params = {};
-				params.key = 'supplier';
+				params.key = 'distributeCode';
 				params.route = '../grounding/index';
-				common.openwin('../commonPages/searchPage',{ params: JSON.stringify(params) },false)
+				params.auditStatus = auditStatus;
+				common.openwin('../commonPages/searchCode',{ params: JSON.stringify(params) },false)
 			}
 			
 			/*获取二维码返回值*/
@@ -109,7 +110,7 @@
 				utils.appendModule('#card_view');
 				
 				/* 渲染模板   */
-				var selected = undefined,hasChecked = false,page = undefined, pageSize = 10,totalPage = undefined;
+				var selected = undefined,hasChecked = false,page = undefined, pageSize = 10,totalPage = undefined, query = {};
 				
 				var checkType, type, shelfStatus// 上架类型 // 上架状态  1 待上架  2 已上架 
 				var requestUrl =  '/a/checkaccept/shelfList'; // 请求地址
@@ -149,6 +150,10 @@
 						auditStatus: auditStatus,
             			pageNo: page,
             			pageSize: pageSize
+					}
+					if(query.distributeCode){
+						postData.distributeCode = query.distributeCode;
+						postData.auditStatus = query.auditStatus;
 					}
 					mui.ajaxRequest(requestUrl,{
                 		type: 'POST',
@@ -226,14 +231,14 @@
 				}
 				
 				$.plusReady(function(){
-					
 					// 触发刷新 搜索页面搜的值
 					window.addEventListener('search',function(event){
-						query.supplierCode = JSON.parse(event.detail.supplier).supplierCode;
-						query.supplierName = JSON.parse(event.detail.supplier).supplierName;
+						console.log(event.detail)
+						query.distributeCode = JSON.parse(event.detail.searchData).distributeCode;
+						query.auditStatus = JSON.parse(event.detail.searchData).auditStatus;
 						document.querySelector('.mui-input-clear').placeholder = '';
 						document.querySelector('.mui-placeholder').style.display = 'none';
-						document.querySelector('.mui-input-clear').value = query.supplierName;
+						document.querySelector('.mui-input-clear').value = query.distributeCode;
 						mui(".mui-slider-group .mui-scroll").pullToRefresh()[0].pullDownLoading();
 					})
 					 // 页面刷新

@@ -161,7 +161,6 @@
 							html2 = template('list_tpl_view',data.verifyList);
 						}
 						acceptanceTab2.innerHTML = html2;
-						document.querySelector('.batchAccetpance').style.display = 'none';
 					}
 					
 				}
@@ -197,6 +196,7 @@
 				    	document.querySelector('.mui-slider-group').style.transform = 'translate3d(-534px,0px,0px) translateZ(0px)';
 				    	document.querySelectorAll('.themes_font_color_tab')[1].className = 'mui-control-item themes_font_color_tab mui-active';
 				    	document.querySelector('#item2mobile').className = 'mui-slider-item mui-control-content mui-active';
+				    	document.querySelector('.batchAccetpance').style.display = 'none';
 				    }
 				    var checkUrl = '/a/checkacceptdetail/checkList';
 				    var url = '/a/checkaccept/detail?distributeCode='+ distributeCode;

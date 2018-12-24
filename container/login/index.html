@@ -76,6 +76,8 @@
 												if(!flag) return mui.toast('请重新进行登陆操作',{ duration:'long', type:'div' });
 												
 												common.openwin('../home/index',{})
+											}else{
+												mui.toast(res.msg);
 											}
 																					
 										},
@@ -112,7 +114,9 @@
 							deptName: item.deptName,
 							lastSelect: item.lastSelect
 						}
-						currDept = item.lastSelect ? item: {};
+						if(item.lastSelect){
+							currDept = item;
+						}
 						deptList.push(deptItem);
 					}
 				});

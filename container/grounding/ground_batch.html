@@ -167,6 +167,8 @@
 							var id = item.dataset.id;
 							var realNum = item.querySelector('.realNum').value;
 							var realReceiveStore = item.querySelector('.select_actualStore').value;
+							var productBatchNo = item.querySelector('#productBatchNo').querySelector('span').innerText;
+							console.log(productBatchNo)
 							console.log(realNum);
 							console.log(realReceiveStore);
 							if(realNum <= 0 ){

@@ -48,6 +48,7 @@
 				})
 				$.plusReady(function() {
 					var ul = document.body.querySelector('.mui-table-view-radio');
+					console.log(plus.storage.getItem('currDept'))
 					var deptId = JSON.parse(plus.storage.getItem('currDept')).deptId;
 					var btnArray = ['确认', '取消'];
 					if(plus.storage.getItem('deptList')){
@@ -74,7 +75,8 @@
 								var currentDept = {
 									deptName:  _this.dataset.deptname,
 									deptId: _this.dataset.id,
-									deptType: _this.dataset.depttype
+									deptType: _this.dataset.depttype,
+									lastSelect: true
 								}
 								plus.storage.setItem('currDept',JSON.stringify(currentDept));
 								console.log(plus.storage.getItem('currDept'));

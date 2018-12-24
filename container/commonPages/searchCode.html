@@ -1,4 +1,4 @@
-<!--通用 搜索页面-->
+<!--单号搜索页面-->
 <!doctype html>
 <html>
 	<head>
@@ -56,7 +56,7 @@
 	<body>
 		<header class="mui-bar mui-bar-nav">
 			 <div class="mui-input-row mui-search search_head" style="width:85%;display: inline-block;">
-				<input type="search" id="search" class="mui-input-clear" placeholder="供应商/通用名/商品名">
+				<input type="search" id="search" class="mui-input-clear" placeholder="请输入单号">
 			</div>
 		     <a class="mui-action-back mui-pull-right" style="height:45px;line-height: 45px;">取消</a>
 		</header>
@@ -84,13 +84,13 @@
 			(function($) {
 				mui.init();
 				
-				var params = undefined, key = undefined, localStorageItem = [] // 判断搜索 供应商 ，商品名 两类
+				var params = undefined, key = undefined, localStorageItem = [] // 单号
 				$.plusReady(function(){
 					var self = plus.webview.currentWebview();
 					params = JSON.parse(self.params);//获得参数
 					console.log(self.params);
 				    key = params.key;
-					var searchList = JSON.parse(plus.storage.getItem('searchHistory'));
+					var searchList = JSON.parse(plus.storage.getItem('searchCodeHistory'));
 					console.log(searchList);
 					if(searchList && searchList.list.length){
 						
@@ -103,15 +103,8 @@
 						mui.each(searchList.list,function(index,item){
 							var div = document.createElement('div');
 							div.className = 'tag';
-							if(item.supplierCode){
-								div.innerHTML = item.supplierName
-								div.setAttribute('data-supplierCode',item.supplierCode);
-								div.setAttribute('data-supplierName',item.supplierName);
-							}else{
-								div.innerHTML = item.ctmmParam;
-								div.setAttribute('data-bigDrugCode',item.bigDrugCode);
-								div.setAttribute('data-ctmmParam',item.ctmmParam);
-							}
+							div.innerHTML = item;
+							div.setAttribute('data-distributeCode',item);
 							document.querySelector('.history-tags').appendChild(div)
 							
 						})
@@ -120,8 +113,6 @@
 					console.log(localStorageItem)
 					console.log(JSON.stringify(localStorageItem))
 				    
-				    
-				    
 				    // 删除 历史记录
 				    $('.history-title').on('tap','.clearHistory',function(){
 				    	var btnArray = ['否', '是'];
@@ -129,7 +120,7 @@
 				    		if (e.index == 1) {
 				    			plus.nativeUI.showWaiting();
 				    			setTimeout(function(){
-				    				plus.storage.removeItem('searchHistory');
+				    				plus.storage.removeItem('searchCodeHistory');
 					    			var deleteChild = document.querySelector('.clearHistory');
 					    			document.querySelector('.history-title').removeChild(deleteChild);
 					    			document.querySelector('.history-tags').innerHTML = '';
@@ -142,49 +133,31 @@
 				    // 点击tag 进行搜索
 				    $('.history-tags').on('tap','.tag',function(){
 				    	var dataset = this.dataset;
-				    	if(dataset.suppliercode){
-				    		// 供应商
-				    		let supplier = {
-					  			supplierCode: dataset.suppliercode,
-					  			supplierName: dataset.suppliername
-					  		};
-				    		var page =  plus.webview.getWebviewById(JSON.parse(params).route);
-					  		mui.fire(page,'search',{ supplier: JSON.stringify(supplier) });
-				    	}else{
-				    		// 产品名称
-				    		let drugInfo = {
-					  			bigDrugCode: dataset.bigdrugcode,
-					  			ctmmParam: dataset.ctmmparam
-					  		};
-				    		var page =  plus.webview.getWebviewById(JSON.parse(params).route);
-					  		mui.fire(page,'search',{ drugInfo: JSON.stringify(drugInfo) });
+				    	var page =  plus.webview.getWebviewById(params.route);
+				    	var searchData = {
+				    		distributeCode: dataset.distributecode,
+				    		auditStatus: params.auditStatus
 				    	}
-				    	mui.back()
+					  	mui.fire(page,'search',{ searchData: JSON.stringify(searchData) });
+					  	mui.back()
 				    })
 				   
 				    $('.search_head').on('keyup','#search',function(e){
 				    	var paramName  = e.target.value;
 				    	var url = null, data = {};
 						if(paramName){
-							if(key === 'supplier'){
-				    			// 供应商
-				    			url = '/a/depot/supplier/all';
-				    			data = {
-					    			ctmaSupplierName: paramName
-					    		}
-					    	}else{
-					    		// 搜产品名称
-					    		url = '/a/common/queryDrugByList';
+					    	if(key === 'distributeCode'){
+					    		// 单号
+					    		url = '/a/checkaccept/shelfListNoPage';
 					    		data = {
-					    			paramName: paramName,
-									queryType: '3'
+					    			distributeCode: paramName,
+					    			auditStatus: params.auditStatus
 					    		}
 					    	}
 					    	mui.ajaxRequest(url,{
 								type:"post",
 								data: data,
 								success: function(data){
-								console.log(JSON.stringify(data))
 									if(data.code === 200){
 										let dataList = data.data;
 										createSelect(dataList,key);
@@ -200,7 +173,7 @@
 				   });
 				   
 				   
-				   function createSelect(data,key){
+					function createSelect(data,key){
 						if(document.querySelector('.search-ullist')){
 							var ulList = document.querySelector('.search-ullist');
 							document.querySelector('#ulList').removeChild(ulList);
@@ -210,87 +183,42 @@
 						for(var i=0;i<data.length; i++){
 							var li = document.createElement('li');
 							li.className = 'search-ullist-li';
-							if(key === 'supplier'){
-								li.setAttribute('data-supplierCode',data[i].ctmaSupplierCode);
-								li.setAttribute('data-supplierName',data[i].ctmaSupplierName);
-								li.innerHTML = data[i].ctmaSupplierName;
-							}else{
-								li.setAttribute('data-ctmmParam',data[i].ctmmParam);
-								li.setAttribute('data-bigDrugCode',data[i].bigDrugCode);
-								li.innerText = data[i].ctmmParam;
-							}
+							li.setAttribute('data-distributeCode',data[i].distributeCode);
+							li.innerHTML = data[i].distributeCode;
 							ul.appendChild(li);
 						}
 						document.querySelector('#ulList').appendChild(ul)
-					}
+					  }
 				  $('#ulList').on('tap','.search-ullist-li',function(){
 				  	let dataset = this.dataset;
-				  	if(dataset.suppliercode){
-				  		let supplier = {
-				  			supplierCode: dataset.suppliercode,
-				  			supplierName: dataset.suppliername
-				  		}
-				  		// 存储当前搜索内容
-				  		var flag = false
-				  		console.log(localStorageItem)
-				  		mui.each(localStorageItem,function(index,item){
-				  			if(item.supplierCode === supplier.supplierCode){
-				  				flag = true
-				  			}
-				  		});
-				  		if(!flag){
-				  			if(localStorageItem.length >= 10){
-				  				localStorageItem.shift()
-				  			}
-				  			localStorageItem.push(supplier);
-				  			console.log('当前不存在')
-				  		}else{
-				  			console.log('已经存在')
-				  			
-				  		}
-				  		console.log(JSON.stringify(localStorageItem))
-				  		var parmas = {
-				  			list: localStorageItem
-				  		}
-				  		plus.storage.setItem('searchHistory',JSON.stringify(parmas))
-				  		var page =  plus.webview.getWebviewById(JSON.parse(params).route);
-				  		mui.fire(page,'search',{ supplier: JSON.stringify(supplier) });
-				  		mui.back()
-				  	}else{
-				  		let drugInfo = {
-				  			bigDrugCode: dataset.bigdrugcode,
-				  			ctmmParam: dataset.ctmmparam
-				  		}
-				  		var flag = false
-				  		console.log(localStorageItem)
-				  		mui.each(localStorageItem,function(index,item){
-				  			if(item.bigDrugCode === drugInfo.bigDrugCode){
-				  				flag = true
-				  			}
-				  		});
-				  		if(!flag){
-				  			if(localStorageItem.length >= 10){
-				  				localStorageItem.shift()
-				  			}
-				  			localStorageItem.push(drugInfo);
-				  			console.log('当前不存在')
-				  		}else{
-				  			console.log('已经存在')
-				  		}
-				  		var parmas = {
-				  			list: localStorageItem
-				  		}
-				  		plus.storage.setItem('searchHistory',JSON.stringify(parmas))
-				  		console.log(JSON.parse(params).route);
-				  		var page =  plus.webview.getWebviewById(JSON.parse(params).route);
-				  		mui.fire(page,'search',{ drugInfo: JSON.stringify(drugInfo) });
-				  		mui.back()
-				  	}
-				  	
+				  	console.log(dataset)
+				  	let flag = false;
+				  	mui.each(localStorageItem,function(index,item){
+			  			if(item.distributecode === dataset.distributecode){
+			  				flag = true
+			  			}
+			  		});
+			  		if(!flag){
+			  			if(localStorageItem.length > 10){
+			  				localStorageItem.shift();
+			  			}
+			  			localStorageItem.push(dataset.distributecode);
+			  			console.log('当前不存在')
+			  		}else{
+			  			console.log('已经存在')
+			  		}
+			  		let localParams = {
+			  			list: localStorageItem
+			  		}
+			  		let searchData = {
+			  			distributeCode: dataset.distributecode,
+			  			auditStatus: params.auditStatus
+			  		}
+			  		plus.storage.setItem('searchCodeHistory',JSON.stringify(localParams))
+			  		var page =  plus.webview.getWebviewById(params.route);
+			  		mui.fire(page,'search',{ searchData: JSON.stringify(searchData)});
+			  		mui.back()
 				  });
-				  
-				  
-				  
 				})
 			})(mui);
 			

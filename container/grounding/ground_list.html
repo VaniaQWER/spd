@@ -120,7 +120,6 @@
 							html2 = template('ground_list',data.listysj);
 						}
 						acceptanceTab2.innerHTML = html2;
-						document.querySelector('.batchAccetpance').style.display = 'none';
 					}
 					
 				}
@@ -164,30 +163,33 @@
 				    distributeCode = params.distributecode;
 				    currentSelected = params.currentSelected; // 当前选中tabs 
 				    console.log(currentSelected)
+				    var sliderProgressBar = document.querySelector('#sliderProgressBar');
+				    var slideGroup = document.querySelector('.mui-slider-group');
+				    var themeFontTabs = document.querySelectorAll('.themes_font_color_tab');
+				    var item1 = document.querySelector('#item1mobile');
+	            	var item2 = document.querySelector('#item2mobile');
+				    var sliderSegmentedControl = document.querySelector('#sliderSegmentedControl');
 				    if(currentSelected === 'left'){
-				    	document.querySelector('#sliderProgressBar').style.transform = 'translate3d(0px,0px,0px) translateZ(0px)';
-				    	document.querySelector('.mui-slider-group').style.transform = 'translate3d(0px,0px,0px) translateZ(0px)';
-				    	document.querySelectorAll('.themes_font_color_tab')[0].className = 'mui-control-item themes_font_color_tab mui-active';
-				    	document.querySelector('#item1mobile').className = 'mui-slider-item mui-control-content mui-active';
+				    	sliderProgressBar.style.transform = 'translate3d(0px,0px,0px) translateZ(0px)';
+				    	slideGroup.style.transform = 'translate3d(0px,0px,0px) translateZ(0px)';
+				    	themeFontTabs[0].className = 'mui-control-item themes_font_color_tab mui-active';
+				    	item1.className = 'mui-slider-item mui-control-content mui-active';
 				    }else{
-				    	var sliderProgressBar = document.querySelector('#sliderProgressBar');
-				    	var slideGroup = document.querySelector('.mui-slider-group');
 				    	sliderProgressBar.style.transform = 'translate3d(267px,0px,0px) translateZ(0px)';
 				    	sliderProgressBar.style.display = 'none';
 				    	slideGroup.style.transform = 'translate3d(-534px,0px,0px) translateZ(0px)';
 				    	slideGroup.style.top = '-1px';
-				    	document.querySelectorAll('.themes_font_color_tab')[1].className = 'mui-control-item themes_font_color_tab mui-active';
-				    	document.querySelector('#item2mobile').className = 'mui-slider-item mui-control-content mui-active';
-				    	document.querySelector('#sliderSegmentedControl').style.display = 'none';
-				    	
+				    	themeFontTabs[1].className = 'mui-control-item themes_font_color_tab mui-active';
+				    	item2.className = 'mui-slider-item mui-control-content mui-active';
+				    	sliderSegmentedControl.style.display = 'none';
+				    	document.querySelector('.batchAccetpance').style.display = 'none';
 				    }
 				    
 				    var groundUrl = '/a/checkacceptdetail/finish';
 				    var url = '/a/checkacceptdetail/shelfInfo?distributeCode='+ distributeCode;
 				    genData(url,currentSelected);
 					
-					var item1 = document.getElementById('item1mobile');
-	            	var item2 = document.getElementById('item2mobile');
+					
 					document.getElementById('slider').addEventListener('slide', function(e) {
 						if (e.detail.slideNumber === 1) {
 							if (!item2.querySelector('.am-card')) {
@@ -217,7 +219,7 @@
 					});
 					
 					//tab页切的点击事件
-					var sliderSegmentedControl = document.getElementById('sliderSegmentedControl');
+					
 					$('.mui-input-group').on('change', 'input', function() {
 						if (this.checked) {
 							sliderSegmentedControl.className = 'mui-slider-indicator mui-segmented-control mui-segmented-control-inverted mui-segmented-control-' + this.value;
@@ -239,8 +241,8 @@
 						let id = this.getAttribute('data-id');
 						let index = this.dataset.index;
 						console.log(index)
-						var item1mobile = document.querySelector('#item1mobile');
-						var hasGround = item1mobile.className.indexOf('mui-active')>0 ? true: false;
+//						var item1mobile = document.querySelector('#item1mobile');
+						var hasGround = item1.className.indexOf('mui-active')>0 ? true: false;
 						
 						let newData = {};
 						newData.index = index;
@@ -271,11 +273,14 @@
 						document.activeElement.blur(); // 隐藏软键盘
 						let index = this.dataset.index;
 						var _this_card = document.querySelectorAll('.am-card')[index];
+						console.log(_this_card)
 						let id = _this_card.dataset.id;
 						var realNum = detailData.listwsj.list[index].realNum;
+						var productBatchNo = detailData.listwsj[index].productBatchNo;
 						var realReceiveStore = _this_card.querySelector('.select_actualStore').value
 						console.log(realNum);
 						console.log(realReceiveStore)
+						console.log(productBatchNo)
 						/*if(realNum <= 0 ){
 							return mui.alert('实际上架数量不能小于或等于0','警告',['确定'],function(){},'div')
 						}
@@ -289,35 +294,36 @@
 									postData.id = id;
 									postData.realNum = realNum;
 									postData.realReceiveStore = realReceiveStore;
+									postData.productBatchNo = productBatchNo;
 									detailListVo.push(postData);
 									submitData.detailListVo = detailListVo;
 									submitData.distributeCode = distributeCode;
 									console.log(submitData);
-									mui.ajaxRequest(groundUrl,{
-				                		type: 'POST',
-				                		data: submitData,
-				                		contentType: "application/json",
-				                		showWaiting: true,
-				                		success: function(data){
-				                			if(data.code === 200){
-				                				mui.toast('上架成功');
-				                				var parmasData = {};
-												parmasData.finishUrl = '../grounding/index';
-												parmasData.keepUrl = 'ground_list';
-												parmasData.resultType = 'ground';
-												parmasData.itemData = params;
-												common.openwin('../result/index',{ parmas: JSON.stringify(parmasData) },{
-													titleText: '结果',
-													autoBackButton: false
-												})
-				                			}else{
-				                				mui.alert(data.msg)
-				                			}
-				                		},
-				                		error: function(xhr,type,errorThrown){
-											alert(xhr.responseText)
-				                		}
-				            		});
+//									mui.ajaxRequest(groundUrl,{
+//				                		type: 'POST',
+//				                		data: submitData,
+//				                		contentType: "application/json",
+//				                		showWaiting: true,
+//				                		success: function(data){
+//				                			if(data.code === 200){
+//				                				mui.toast('上架成功');
+//				                				var parmasData = {};
+//												parmasData.finishUrl = '../grounding/index';
+//												parmasData.keepUrl = 'ground_list';
+//												parmasData.resultType = 'ground';
+//												parmasData.itemData = params;
+//												common.openwin('../result/index',{ parmas: JSON.stringify(parmasData) },{
+//													titleText: '结果',
+//													autoBackButton: false
+//												})
+//				                			}else{
+//				                				mui.alert(data.msg)
+//				                			}
+//				                		},
+//				                		error: function(xhr,type,errorThrown){
+//											alert(xhr.responseText)
+//				                		}
+//				            		});
 							} else {
 								
 							}

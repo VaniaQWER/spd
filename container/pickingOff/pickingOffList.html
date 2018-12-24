@@ -148,7 +148,6 @@
 						html2 = template('picking_tpl',data.existDetail);
 					}
 					acceptanceTab2.innerHTML = html2;
-					document.querySelector('.batchAccetpance').style.display = 'none';
 				}
 			}
         	
@@ -165,17 +164,24 @@
 				params = JSON.parse(self.params);//获得参数
 				pickingOrderNo = params.pickingorderno;
 				currentSelected = params.currentSelected; // 当前选中tabs
-				console.log(currentSelected)
+				console.log(currentSelected);
+				var sliderProgressBar = document.querySelector('#sliderProgressBar');
+				var muiSlideGroup = document.querySelector('.mui-slider-group');
+				var themsFontTabs = document.querySelectorAll('.themes_font_color_tab');
+				var item1mobile = document.querySelector('#item1mobile');
+				var item2mobile = document.querySelector('#item2mobile');
 			    if(currentSelected === 'left'){
-			    	document.querySelector('#sliderProgressBar').style.transform = 'translate3d(0px,0px,0px) translateZ(0px)';
-			    	document.querySelector('.mui-slider-group').style.transform = 'translate3d(0px,0px,0px) translateZ(0px)';
-			    	document.querySelectorAll('.themes_font_color_tab')[0].className = 'mui-control-item themes_font_color_tab mui-active';
-			    	document.querySelector('#item1mobile').className = 'mui-slider-item mui-control-content mui-active';
+			    	sliderProgressBar.style.transform = 'translate3d(0px,0px,0px) translateZ(0px)';
+			    	muiSlideGroup.style.transform = 'translate3d(0px,0px,0px) translateZ(0px)';
+			    	themsFontTabs[0].className = 'mui-control-item themes_font_color_tab mui-active';
+			    	item1mobile.className = 'mui-slider-item mui-control-content mui-active';
 			    }else{
-			    	document.querySelector('#sliderProgressBar').style.transform = 'translate3d(267px,0px,0px) translateZ(0px)';
-			    	document.querySelector('.mui-slider-group').style.transform = 'translate3d(-534px,0px,0px) translateZ(0px)';
-			    	document.querySelectorAll('.themes_font_color_tab')[1].className = 'mui-control-item themes_font_color_tab mui-active';
-			    	document.querySelector('#item2mobile').className = 'mui-slider-item mui-control-content mui-active';
+			    	sliderProgressBar.style.transform = 'translate3d(267px,0px,0px) translateZ(0px)';
+			    	muiSlideGroup.style.transform = 'translate3d(-534px,0px,0px) translateZ(0px)';
+			    	themsFontTabs[1].className = 'mui-control-item themes_font_color_tab mui-active';
+			    	item2mobile.className = 'mui-slider-item mui-control-content mui-active';
+
+					document.querySelector('.batchAccetpance').style.display = 'none';
 			    }
 			    console.log(pickingOrderNo)
 			    var url = '/a/common/pickingorderdetail/getPickingDetail?pickingOrderNo='+ pickingOrderNo;
