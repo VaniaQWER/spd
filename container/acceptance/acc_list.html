@@ -143,7 +143,7 @@
 							document.querySelector('.batchAccetpance').style.display = 'none';
 						}else{
 							mui.each(data.unVerfiyList.list,function(index,item){
-								item.editable = (params.accepttype === '1' || params.accepttype === '2' || params.accepttype === '4' ) ? true: false;
+								item.editable = (params.accepttype === '101' || params.accepttype === '102' || params.accepttype === '103'|| params.accepttype === '104' ) ? true: false;
 								item.showEditBtn = item.editable;
 							});
 							console.log(data.unVerfiyList)
@@ -183,7 +183,7 @@
 				    distributeCode = params.distributecode;
 				    
 				    // 判断是否是配送单
-				    isPsList = (params.accepttype === '1' || params.accepttype === '2' || params.accepttype === '4' ) ? true: false;
+				    isPsList = (params.accepttype === '101' || params.accepttype === '102' || params.accepttype === '103' ||params.accepttype === '104' ) ? true: false;
 				    currentSelected = params.currentSelected; // 当前选中tabs 
 				    console.log(currentSelected)
 				    if(currentSelected === 'left'){

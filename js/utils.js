@@ -16,7 +16,6 @@ Utils.prototype.appendModule = function(selector) {
  * @params [function] callback 回调方法
  */
 Utils.prototype.innerTplHtml = function(tplId, innerSelector ,data, insertType ,callback) {
-	console.log(insertType,'insertType')
 	var html = template(tplId, data);
 	if (html) {
 		if(!insertType){

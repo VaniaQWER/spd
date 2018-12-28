@@ -105,7 +105,7 @@
 				/* 渲染模板   */
 				var selected = undefined,hasChecked = false, page = undefined, pageSize = 10,totalPage = undefined, query = {};
 				
-				var checkType, type, auditStatus// 验收单类型 // 验收状态   1 待验收  2 已验收 
+				var checkType, type, acceptanceType// 验收单类型 // 验收状态   1 待验收  2 已验收 
 				var requestUrl =  '/a/checkaccept/list'; // 请求地址
 				
 				var pageLeft = 1, pageRight = 1, totalPageLeft, totalPageRight, isMore = true;
@@ -137,10 +137,10 @@
 						}else{
 							pageRight = 1;
 						}
-						auditStatus = !hasChecked ? '1': '2';
+						acceptanceType = !hasChecked ? '1': '2';
 						page = !hasChecked ? pageLeft: pageRight;
 						var postData = {
-							auditStatus: auditStatus,
+							acceptanceType: acceptanceType,
 	                		checkType: checkType,
 	                		pageNo: page,
 	                		pageSize: pageSize
@@ -196,9 +196,9 @@
 						totalPage = !hasChecked ? totalPageLeft: totalPageRight;
 						console.log(page);
 						console.log(totalPage)
-						auditStatus = !hasChecked ? '1': '2';
+						acceptanceType = !hasChecked ? '1': '2';
 						var postData = {
-							auditStatus: auditStatus,
+							acceptanceType: acceptanceType,
 	                		checkType: checkType,
 	                		pageNo: page,
 	                		pageSize: pageSize

@@ -34,7 +34,7 @@
 						</div>
 					</div>
 					{{ if acceptance }}
-						{{ if value.editable }}
+						{{ if value.editable && value.isUsual === 0 }}
 							<div class="editForm" style="display: block;">
 								<div class="am-flexbox am-flexbox-align-center">
 									<div class="am-flexbox-item">

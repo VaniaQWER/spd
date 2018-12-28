@@ -101,7 +101,7 @@
 					}
 					document.querySelector('.currentPage').innerText = (currentIndex + 1);
 					if(details.hasAcceptance){
-						if(checkType === 1){
+						if(checkType === 1 && details.allData[currentIndex].isUsual === 0){
 							var node = '<form id="List"></form><div id="addBtn"><button class="mui-btn mui-btn-block btn">+ 增加批号</button></div>';
 							document.querySelector('#detailContent').insertAdjacentHTML('afterEnd',node);
 						}

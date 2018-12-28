@@ -9,8 +9,9 @@
 		<meta name="apple-mobile-web-app-status-bar-style" content="black">
 		<link href="../../css/mui.min.css" rel="stylesheet" />
 		<link href="../../css/themes.css" rel="stylesheet" />
-		<link href="../../css/check.css" rel="stylesheet" />
 		<link href="../../css/index_view.css" rel="stylesheet" />
+		<!--<link rel="stylesheet" href="../../css/mui.picker.min.css" />-->
+		<link href="../../css/check.css" rel="stylesheet" />
 		<link rel="import" href="../../tpl/check_card.html" id="card_view"/>
 	</head>
 
@@ -51,7 +52,7 @@
 								<input name="radio1" id="anpan" type="radio" vlaue='2' class="radio">
 							</div>
 						</div>
-						<div class="gird mui-table-view-radio checkBillSubType">
+						<div class="gird mui-table-view-radio" id="checkBillSubType">
 							<div class="gird-label"></div>
 							<div class="mui-input-row mui-radio mui-left">
 								<label for="allpan">全盘</label>
@@ -66,9 +67,58 @@
 								<input name="radio2" id="dongxiaopan" type="radio" value='3' class="radio2">
 							</div>
 						</div>
+						<div style="background-color: #f5f5f9; height: 6px;" id="checkBill"></div>
+						<div style="background-color: #f5f5f9; height: 6px;"></div>
+						<div style="background-color: #f5f5f9; height: 6px;" id="divide"></div>
+						<div class="gird mui-table-view-radio" id="purchaseType">
+							<div class="gird-label">采购类型：</div>
+							<div class="mui-input-row mui-radio mui-left">
+								<label for="zero_storage">零库存</label>
+								<input name="purchaseType" id="zero_storage" type="radio" value='1' class="purchaseType">
+							</div>
+							<div class="mui-input-row mui-radio mui-left">
+								<label for="buy_myself">自采</label>
+								<input name="purchaseType" id="buy_myself" type="radio" value='2' class="purchaseType">
+							</div>
+						</div>
+						<div style="background-color: #f5f5f9; height: 6px;"></div>
+						<div class="gird mui-table-view-radio" id="isLocCheck">
+							<div class="gird-label">盘点范围：</div>
+							<div class="mui-input-row mui-radio mui-left">
+								<label for="checkAll">全部</label>
+								<input name="isLocCheck" id="checkAll" type="radio" value='0' class="isLocCheck">
+							</div>
+							<div class="mui-input-row mui-radio mui-left">
+								<label for="custom">自定义</label>
+								<input name="isLocCheck" id="custom" type="radio" value='1' class="isLocCheck">
+							</div>
+						</div>
+						<div style="background-color: #f5f5f9; height: 6px;"></div>
+						<div id="position" style="display: none;">
+							<div class="gird mui-table-view">
+								<div class="gird-label font-warning">起始货位：</div>
+								<div class="mui-input-row mui-search search_head" style="width:80%;display: inline-block;">
+									<input type="search" id="search_start" class="mui-input-clear" placeholder="请选择起始货位">
+									
+								</div>
+								<div id="ulList_start">
+									
+								</div>
+							</div>
+							<div style="background-color: #f5f5f9; height: 6px;"></div>
+							<div class="gird mui-table-view">
+								<div class="gird-label font-warning">结束货位：</div>
+								<div class="mui-input-row mui-search search_head" style="width:80%;display: inline-block;">
+									<input type="search" id="search_end" class="mui-input-clear" placeholder="请选择结束货位">
+								</div>
+								<div id="ulList_end">
+									
+								</div>
+							</div>
+						</div>
 						<div class="gird textarea">
 							<div class="gird-label">备注：</div>
-							<div class="gird-content">
+							<div class="gird-content" style="padding: 0 20px">
 								<textarea id="textarea" rows="5" value='' placeholder="多行文本框"></textarea>
 							</div>
 						</div>
@@ -81,12 +131,11 @@
 		<script src="../../js/mui.js"></script>
 		<script src="../../js/mui.pullToRefresh.js"></script>
 		<script src="../../js/mui.pullToRefresh.material.js"></script>
+		<!--<script src="../../js/mui.picker.min.js" ></script>-->
 		<script src="../../js/template-web.js" type="text/javascript" charset="utf-8"></script>
 		<script src="../../js/utils.js" type="text/javascript" charset="utf-8"></script>
 		<script src="../../js/common.js" type="text/javascript" charset="utf-8"></script>
 		<script src="../../js/request.js" type="text/javascript" charset="utf-8"></script>
-
-		
 
 		<script type="text/javascript">
 			mui.init();
@@ -107,8 +156,7 @@
 					deceleration:deceleration
 				});
 				
-				var url = '/a/checkbill/list', newAddUrl = '/a/checkbill/create';
-				
+				var url = '/a/checkbill/list', newAddUrl = '/a/checkbill/create', medicineFeautureUrl = '/a/spd/dict/type', medicineData = [];		
 				var page = 1, totalPage = undefined, pageSize = 10, isMore = true;
 				var utils = new Utils();
 				utils.appendModule('#card_view');
@@ -180,7 +228,16 @@
 				function template(data, insertType){
         			utils.innerTplHtml('check_list', '.mui-tab', data, insertType);
             	}
-				
+				// 数组分割
+				function sliceArray(array, size) {
+				    var result = [];
+				    for (var x = 0; x < Math.ceil(array.length / size); x++) {
+				        var start = x * size;
+				        var end = start + size;
+				        result.push(array.slice(start, end));
+				    }
+				    return result;
+				}
 				$.plusReady(function(){
 					
 				 	window.addEventListener('pagefresh',function(){
@@ -222,9 +279,62 @@
 					})
 					/*  请求数据  */
 					mui(".mui-scroll").pullToRefresh().pullDownLoading();
+					var divideDOM = document.querySelector('#divide');
+					// 药品特征
+					mui.ajaxRequest(medicineFeautureUrl,{
+						type: 'POST',
+						data: { type: 'med_his_drug_feature' },
+						showWaiting: true,
+						success: function(data){
+							if(data.code === 200){
+								medicineData = data.data;
+								var medicineSplitData = sliceArray( medicineData, 3 );
+								mui.each(medicineSplitData,function(index,item){
+									var wrap_node = document.createElement('div');
+									var wrap_node_label = document.createElement('div');
+									wrap_node_label.className = 'gird-label';
+									wrap_node_label.innerText = index === 0 ? '药品特征：': '';
+									wrap_node.appendChild(wrap_node_label);
+									wrap_node.className = 'gird mui-table-view-radio drugFeatureCode'
+									if(item.length){
+
+										mui.each(item,function(_index,_item){
+											var div = document.createElement('div');
+											div.className = 'mui-input-row mui-radio mui-left';
+											var label = document.createElement('label');
+											label.innerText = _item.label;
+											var input = document.createElement('input');
+											input.type = 'radio';
+											input.name = 'drugFeatureCode';
+											input.value = _item.value;
+											div.appendChild(label);
+											div.appendChild(input)
+											wrap_node.appendChild(div);
+										})
+									}
+									divideDOM.parentNode.insertBefore(wrap_node,divideDOM)
+								})
+							}else{
+								mui.toast(data.msg)
+							}
+						},
+						error: function(xhr,type,errorThrown){
+							alert(xhr.responseText)
+                		}
+					});
+					var position = document.querySelector('#position');
+					document.querySelector('#isLocCheck').addEventListener('click',function(e){
+						if(e.target.value === '1'){
+							position.style.display = 'block';
+							document.querySelector('#search_start').value = '';
+							document.querySelector('#search_end').value = '';
+						}else{
+							position.style.display = 'none';
+						}
+					},false)
 					
 					if(document.querySelector('#modal1')){
-						document.querySelector('.checkBillSubType').addEventListener('click',function(e){
+						document.querySelector('#checkBillSubType').addEventListener('click',function(e){
 							if(e.target.value === '3'){
 								if(document.querySelector('.dateRow')){
 									return ;
@@ -233,7 +343,7 @@
 						 		div.className = 'mui-input-row dateRow';
 						 		div.innerHTML ='<label class="font-warning" style="padding:11px 5px;width:24%">起始时间：</label>'+
 						 		'<input class="mui-input checkInputDate" type="date"/>'
-						 		document.querySelector('.textarea').insertAdjacentElement('beforeBegin',div);
+						 		document.querySelector('#checkBill').insertAdjacentElement('afterend',div);
 							}else{
 								if(document.querySelector('.dateRow')){
 									var dateRow = document.querySelector('.dateRow');
@@ -242,15 +352,100 @@
 							}
 						});
 					}
+					
+					// 起始货位搜索
+					$('#position').on('keyup','#search_start',function(e){
+						var positionName  = e.target.value;
+						if(positionName){
+							fetchSelect(positionName,'#ulList_start','start')
+						}
+					})
+					
+					// 结束货位搜索
+					$('#position').on('keyup','#search_end',function(e){
+						var positionName  = e.target.value;
+						if(positionName){
+							fetchSelect(positionName,'#ulList_end','end')
+						}
+					})
+					
+					function fetchSelect(name,target,key){
+						var url = '/a/dept/queryDeptLocationInfo';
+						mui.ajaxRequest(url,{
+							data: { positionName: name },
+							type:"post",
+							success: function(data){
+									if(data.code === 200){
+										let selectList = data.data;
+										createSelect(selectList,target,key);
+									}
+								
+							},
+							error: function(xhr,type,errorThrown){
+								alert(xhr.responseText)
+			            	}
+						})
+					}
+				
+					function createSelect(selectList,target,key){
+						if(key === 'start'){
+							if(document.querySelector('.search_ullist_start')){
+								var ulList = document.querySelector('.search_ullist_start');
+								document.querySelector('#ulList_start').removeChild(ulList);
+							}
+						}else{
+							if(document.querySelector('.search_ullist_end')){
+								var ulList = document.querySelector('.search_ullist_end');
+								document.querySelector('#ulList_end').removeChild(ulList);
+							}
+						}
+						var ul = document.createElement('ul');
+						ul.className = key === 'start'? 'search_ullist_start': 'search_ullist_end';
+						for(var i=0;i<selectList.length; i++){
+							var li = document.createElement('li');
+							li.className = key === 'start'? 'search_ullist_start_li': 'search_ullist_end_li';
+							li.innerText = selectList[i].positionName;
+							ul.appendChild(li);
+						}
+						document.querySelector(target).appendChild(ul)
+					}
+					
+					// 开始货位搜索选中
+					$('#position').on('click','.search_ullist_start_li',function(e){
+						document.querySelector('#search_start').value = this.innerText;
+						document.querySelector('.search_ullist_start').style.display = 'none';
+					})
+					// 结束货位搜索选中
+					$('#position').on('click','.search_ullist_end_li',function(e){
+						document.querySelector('#search_end').value = this.innerText;
+						document.querySelector('.search_ullist_end').style.display = 'none';
+					})
+					
+					var dateButton = document.querySelector('.checkInputDate');	
+					
 					// 隐藏键盘
 					mui('#modal1').on('tap','.closeBtn',function(e){
 						document.activeElement.blur();
+						document.querySelector('#search_start').value = '';
+						document.querySelector('#search_end').value = '';
 					})
+					// 新建盘点
 					mui('#modal1').on('tap','.mui-btn',function(e){
 						document.activeElement.blur();
-						var checkBillType, checkBillSubType, checkStartTime;
+						var checkBillType = undefined // 盘点类型
+							checkBillSubType = undefined, //盘点子类型
+							drugFeatureRadio = undefined, //药品特征
+							purchaseType = undefined, //采购类型
+							isLocCheck = undefined,// 盘点范围
+							checkStartTime = undefined;// 备注
 						var radio = document.querySelector('.checkBillType').querySelectorAll('input');
-						var subRadio = document.querySelector('.checkBillSubType').querySelectorAll('input');
+						var subRadio = document.querySelector('#checkBillSubType').querySelectorAll('input');
+						var drugFeatureRadio = document.querySelector('.drugFeatureCode').querySelectorAll('input');
+						var purchaseTypeRadio = document.querySelector('#purchaseType').querySelectorAll('input');
+						var isLocCheckRodio = document.querySelector('#isLocCheck').querySelectorAll('input')
+						var startLocSort = document.querySelector('#search_start').value;
+						var endLocSort = document.querySelector('#search_end').value;
+						var dateButton = undefined;
 						if(document.querySelector('.checkInputDate')){
 							checkStartTime = document.querySelector('.checkInputDate').value;
 						}
@@ -265,6 +460,23 @@
 								checkBillSubType = item.value;
 							}
 						});
+						mui.each(drugFeatureRadio,function(index,item){
+							if(item.checked){
+								drugFeatureCode = item.value;
+							}
+						});
+						
+						mui.each(isLocCheckRodio,function(index,item){
+							if(item.checked){
+								isLocCheck = item.value;
+							}
+						})
+						
+						mui.each(purchaseTypeRadio,function(index,item){
+							if(item.checked){
+								purchaseType = item.value;
+							}
+						})
 						if(checkBillSubType === '3'){
 							if(!checkStartTime){
 								mui.toast('请填写起始时间');
@@ -274,9 +486,19 @@
 								var values = {};
 								values.checkBillType = checkBillType;
 								values.checkBillSubType = checkBillSubType;
-								values.checkStartTime = checkStartTime;
+								values.drugFeatureCode = drugFeatureCode;
+								values.purchaseType = purchaseType;
+								if(checkBillSubType === '3'){
+									values.checkStartTime = checkStartTime;
+								}
+								values.isLocCheck = isLocCheck;
 								values.remarks = remarks;
-								console.log(JSON.stringify(values))
+								if(isLocCheck === '1'){
+									values.startLocSort = startLocSort;
+									values.endLocSort = endLocSort;
+								}
+								
+								console.log(values)
 								mui.ajaxRequest(newAddUrl,{
 									type: 'POST',
 									data: values,
