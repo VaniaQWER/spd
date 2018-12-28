@@ -173,22 +173,24 @@
 									var realAcceptanceTemperature = item.querySelector('.realAcceptanceTemperature').value;
 									postData.realAcceptanceTemperature = realAcceptanceTemperature
 								}
-								postData.realReceiveQuantity = realReceiveQuantity;
+								postData.realReceiveQuantiry = realReceiveQuantity;
 								postData.realProductTime = realProductTime;
 								postData.productBatchNo = productBatchNo;
 								postData.realValidEndDate = realValidEndDate;
 								postData.id = item.dataset.id;
+								postData.isUsual = item.dataset.isusual;
 								postData.drugCode = item.dataset.drugcode;
 								detailList.push(postData);
 							});
 						}else{
 							mui.each(selecteIndex,function(index,item){
 								let postData = {};
-								postData.realReceiveQuantity = acceptList[item].realReceiveQuantiry;
+								postData.realReceiveQuantiry = acceptList[item].realReceiveQuantiry;
 								postData.realProductTime = acceptList[item].realProductTime;
 								postData.productBatchNo = acceptList[item].productBatchNo;
 								postData.realValidEndDate = acceptList[item].realValidEndDate;
 								postData.id = acceptList[item].id;
+								postData.isUsual = acceptList[item].isUsual;
 								if(isShowTemprature === 1){
 									postData.realAcceptanceTemperature = acceptList[item].realAcceptanceTemperature;
 								}

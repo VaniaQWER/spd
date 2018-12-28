@@ -299,31 +299,31 @@
 									submitData.detailListVo = detailListVo;
 									submitData.distributeCode = distributeCode;
 									console.log(submitData);
-//									mui.ajaxRequest(groundUrl,{
-//				                		type: 'POST',
-//				                		data: submitData,
-//				                		contentType: "application/json",
-//				                		showWaiting: true,
-//				                		success: function(data){
-//				                			if(data.code === 200){
-//				                				mui.toast('上架成功');
-//				                				var parmasData = {};
-//												parmasData.finishUrl = '../grounding/index';
-//												parmasData.keepUrl = 'ground_list';
-//												parmasData.resultType = 'ground';
-//												parmasData.itemData = params;
-//												common.openwin('../result/index',{ parmas: JSON.stringify(parmasData) },{
-//													titleText: '结果',
-//													autoBackButton: false
-//												})
-//				                			}else{
-//				                				mui.alert(data.msg)
-//				                			}
-//				                		},
-//				                		error: function(xhr,type,errorThrown){
-//											alert(xhr.responseText)
-//				                		}
-//				            		});
+									mui.ajaxRequest(groundUrl,{
+				                		type: 'POST',
+				                		data: submitData,
+				                		contentType: "application/json",
+				                		showWaiting: true,
+				                		success: function(data){
+				                			if(data.code === 200){
+				                				mui.toast('上架成功');
+				                				var parmasData = {};
+												parmasData.finishUrl = '../grounding/index';
+												parmasData.keepUrl = 'ground_list';
+												parmasData.resultType = 'ground';
+												parmasData.itemData = params;
+												common.openwin('../result/index',{ parmas: JSON.stringify(parmasData) },{
+													titleText: '结果',
+													autoBackButton: false
+												})
+				                			}else{
+				                				mui.alert(data.msg)
+				                			}
+				                		},
+				                		error: function(xhr,type,errorThrown){
+											alert(xhr.responseText)
+				                		}
+				            		});
 							} else {
 								
 							}

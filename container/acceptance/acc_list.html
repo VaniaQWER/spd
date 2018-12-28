@@ -176,12 +176,11 @@
 						genData(url,query.currentSelected);
 					})
 					
-					var  distributeCode, currentSelected;
+					var  distributeCode, currentSelected,isUsual = undefined;
 					var self = plus.webview.currentWebview();
 				    params = JSON.parse(self.params);//获得参数
 				    console.log(params)
 				    distributeCode = params.distributecode;
-				    
 				    // 判断是否是配送单
 				    isPsList = (params.accepttype === '101' || params.accepttype === '102' || params.accepttype === '103' ||params.accepttype === '104' ) ? true: false;
 				    currentSelected = params.currentSelected; // 当前选中tabs 
@@ -305,6 +304,7 @@
 						var _this_node = document.querySelectorAll('.am-card')[index];
 						postData.id = _this_node.dataset.id;
 						postData.drugCode = _this_node.dataset.drugcode;
+						postData.isUsual = Number(_this_node.dataset.isusual);
 						if(isPsList){
 							// 配送单验收
 							var editForm = document.querySelectorAll('.am-card')[index].querySelector('.editForm');
@@ -316,7 +316,7 @@
 								var realAcceptanceTemperature = editForm.querySelector('.realAcceptanceTemperature').value;
 							}
 							if(realReceiveQuantity && realProductTime && productBatchNo && realValidEndDate){
-								postData.realReceiveQuantity = realReceiveQuantity;
+								postData.realReceiveQuantiry = Number(realReceiveQuantity);
 								postData.realProductTime = realProductTime;
 								postData.productBatchNo = productBatchNo;
 								postData.realValidEndDate = realValidEndDate;
@@ -327,7 +327,7 @@
 						}else{
 							// 送货单验收
 							let dataSource = detailData.unVerfiyList.list;
-							postData.realReceiveQuantity = dataSource[index].realReceiveQuantiry;
+							postData.realReceiveQuantiry = Number(dataSource[index].realReceiveQuantiry);
 							postData.realProductTime = dataSource[index].realProductTime;
 							postData.productBatchNo = dataSource[index].productBatchNo;
 							postData.realValidEndDate = dataSource[index].realValidEndDate;

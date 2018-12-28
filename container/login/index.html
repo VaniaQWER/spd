@@ -74,10 +74,10 @@
 												console.log(res)
 												var flag =  setUser(res.data);
 												if(!flag) return mui.toast('请重新进行登陆操作',{ duration:'long', type:'div' });
-												
 												common.openwin('../home/index',{})
 											}else{
 												mui.toast(res.msg);
+												mui(_this).button('reset');
 											}
 																					
 										},
