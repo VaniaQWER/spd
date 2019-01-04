@@ -256,13 +256,13 @@
 					if(plus.storage.getItem('currDept')){
 						type = JSON.parse(plus.storage.getItem('currDept')).deptType;
 						switch(type){
-							case '3':
+							case '3'://药房
 								checkType = 1;
 								break;
-							case '4':
+							case '4':// 药库
 								checkType = 2;
 								break;
-							case '5':
+							case '5': // 基数药
 								checkType = 3;
 								break;
 							default:

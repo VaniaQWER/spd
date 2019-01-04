@@ -18,9 +18,9 @@
 		   		<label class="mui-pull-right theme_back_font">返回</label>
 		   	</a>
 		    <h1 class="mui-title themes_title">药品信息</h1>
-		    <a href="#" class="mui-pull-right batchAccetpance" style="height: 45px;padding-top: 12px;">
+		    <!--<a href="#" class="mui-pull-right batchAccetpance" style="height: 45px;padding-top: 12px;">
 		    	批量上架
-		    </a>
+		    </a>-->
 		</header>
 		<div class="mui-content">
 			<div id="slider" class="mui-slider themes_tab mui-fullscreen">
@@ -102,13 +102,13 @@
 						var html1;
 						if(data.listwsj.list.length === 0){
 							html1 = nullDataHtml;
-							document.querySelector('.batchAccetpance').style.display = 'none';
+//							document.querySelector('.batchAccetpance').style.display = 'none';
 						}else{
 							mui.each(data.listwsj.list,function(index,item){
 								item.editable = true;
 							})
 							html1 = template('ground_list',data.listwsj);
-							document.querySelector('.batchAccetpance').style.display = 'block';
+//							document.querySelector('.batchAccetpance').style.display = 'block';
 						}
 						acceptanceTab1.innerHTML = html1;
 					}else{
@@ -182,7 +182,7 @@
 				    	themeFontTabs[1].className = 'mui-control-item themes_font_color_tab mui-active';
 				    	item2.className = 'mui-slider-item mui-control-content mui-active';
 				    	sliderSegmentedControl.style.display = 'none';
-				    	document.querySelector('.batchAccetpance').style.display = 'none';
+//				    	document.querySelector('.batchAccetpance').style.display = 'none';
 				    }
 				    
 				    var groundUrl = '/a/checkacceptdetail/finish';
@@ -202,7 +202,7 @@
 								}
 								acceptanceTab2.innerHTML = html2;
 							}
-							document.querySelector('.batchAccetpance').style.display = 'none';
+//							document.querySelector('.batchAccetpance').style.display = 'none';
 						}else if(e.detail.slideNumber === 0){
 							if (!item1.querySelector('.am-card')) {
 								var acceptanceTab1 = document.querySelector('.mui-tab1');
@@ -214,7 +214,7 @@
 								}
 								acceptanceTab1.innerHTML = html;
 							}
-							document.querySelector('.batchAccetpance').style.display = 'block';
+//							document.querySelector('.batchAccetpance').style.display = 'block';
 						}
 					});
 					
@@ -257,7 +257,7 @@
 					});
 					
 					/* 批量上架 */
-					$('.mui-bar').on('tap','.batchAccetpance',function(){
+/*					$('.mui-bar').on('tap','.batchAccetpance',function(){
 						var paramsData = {};
 						paramsData.list = detailData.listwsj.list;
 						paramsData.distributeCode = distributeCode;
@@ -266,7 +266,7 @@
 						common.openwin('ground_batch',{ params: JSON.stringify(paramsData) },{
 							titleText: '药品信息'
 						})
-					})
+					})*/
 					
 					// 绑定事件 --确认上架
 					$('#slider').on('tap','.ground',function(){
@@ -276,7 +276,7 @@
 						console.log(_this_card)
 						let id = _this_card.dataset.id;
 						var realNum = detailData.listwsj.list[index].realNum;
-						var productBatchNo = detailData.listwsj[index].productBatchNo;
+						var productBatchNo = detailData.listwsj.list[index].productBatchNo;
 						var realReceiveStore = _this_card.querySelector('.select_actualStore').value
 						console.log(realNum);
 						console.log(realReceiveStore)

@@ -33,9 +33,9 @@
 								<div class="am-list-line">
 									<div class="am-input-label am-input-label-4 font-warning" style="width: 40px;">货位:</div>
 									<div class="am-input-control">
-										<select class="editInput select_actualStore" value={{ value.actualStore }}>
+										<select class="editInput select_actualStore">
 											{{ each value.acceptoodsVo item i }}
-											<option value={{ item.id }}>{{ item.positionName }}</option>
+											<option value={{ item.id }} selected={{ value.realReceiveStore===item.id }}>{{ item.positionName }}</option>
 											{{ /each }}
 										</select>
 									</div>

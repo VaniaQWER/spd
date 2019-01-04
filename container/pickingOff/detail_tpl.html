@@ -10,7 +10,7 @@
 							<p class="detailRow_content">{{ pickingorderno ? pickingorderno: '--'}}</p>
 						</div>
 						<div class="mui-input-row">
-							<label>申领单号</label>
+							<label>单号</label>
 							<p class="detailRow_content">{{ applyorderno ? applyorderno: '--'}}</p>
 						</div>
 						<div class="mui-input-row">
@@ -50,15 +50,15 @@
 						</div>
 						<div class="mui-input-row">
 							<label>生产批号</label>
-							<p class="detailRow_content">{{value.productBatchNo}}</p>
+							<p class="detailRow_content">{{value.lot}}</p>
 						</div>
 						<div class="mui-input-row">
 							<label>生产日期</label>
-							<p class="detailRow_content">{{value.realProductTime}}</p>
+							<p class="detailRow_content">{{value.productDate}}</p>
 						</div>
 						<div class="mui-input-row">
 							<label>有效期至</label>
-							<p class="detailRow_content">{{value.realValidEndDate}}</p>
+							<p class="detailRow_content">{{value.validEndDate}}</p>
 						</div>
 						<div class="mui-input-row">
 							<label>包装规格</label>
@@ -66,11 +66,11 @@
 						</div>
 						<div class="mui-input-row">
 							<label>单位</label>
-							<p class="detailRow_content">{{value.unit}}</p>
+							<p class="detailRow_content">{{value.replanUnit}}</p>
 						</div>
 						<div class="mui-input-row">
 							<label>指示货位</label>
-							<p class="detailRow_content">{{value.actualStore}}</p>
+							<p class="detailRow_content">{{value.locName}}</p>
 						</div>
 						<div class="mui-input-row">
 							<label>数量</label>

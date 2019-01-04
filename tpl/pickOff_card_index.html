@@ -5,7 +5,7 @@
 			data-pickingOrderNo={{ value.pickingOrderNo }}
 			data-deptName={{ value.deptName?value.deptName: '--' }}
 			data-statusName={{ value.statusName ? value.statusName: '--' }}
-			data-updateDate={{ value.updateDate ? value.updateDate: '--' }}
+			data-updateDate={{ value.updateDate ? value.updateDate.split(' ').join('|'): '--' }}
 			data-pickingUserName={{ value.pickingUserName ? value.pickingUserName: '--' }}
 			data-applyOrderNo={{ value.applyOrderNo ? value.applyOrderNo: '--' }}
 			

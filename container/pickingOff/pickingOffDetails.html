@@ -71,12 +71,10 @@
 				console.log(details)
 				var data = Object.assign({},details.orderInfo); 
 				var currentIndex = Number(details.index), pickUrl = '/a/common/pickingorder/finishPicking';
-				console.log(currentIndex)
 				data.hasPicked = details.hasPicked;
 				data.list = [];
 				data.list.push(details.allData[currentIndex]);
 				if(currentIndex === 0){
-					console.log(currentIndex)
 					document.querySelector('.previous').style.zIndex = -1;
 				}
 				if(currentIndex === details.allData.length -1){
@@ -143,10 +141,10 @@
 									postData.id = data.list[0].id;
 									postData.pickingNum = realInputNum
 									pickingDetail.push(postData);
-									submitData.applyNo = data.applyorderno;
+									submitData.applyNo = data.applyorderno === '--'?'':data.applyorderno;
 									submitData.pickingOrderNo = data.pickingorderno;
 									submitData.pickingDetail = pickingDetail;
-									console.log(JSON.stringify(submitData));
+									console.log(submitData);
 									mui.ajaxRequest(pickUrl,{
 				                		type: 'POST',
 				                		data: submitData,

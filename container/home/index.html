@@ -85,6 +85,18 @@
 					src: '../../images/icon_query.png'
 				}
 			];
+			var basicMediclist = [
+				{
+					text: '验收',
+					url: '../basicMedicine/index',
+					src: '../../images/icon_query.png'
+				},
+				{
+					text: '库存查询',
+					url: '../stockQuery/index',
+					src: '../../images/icon_query.png'
+				}
+			]
 			window.addEventListener('refresh', function(e) {  
 			    location.reload();
 			});
@@ -265,13 +277,13 @@
 	            				div.className = 'home-card-item';
 	            				var addHtml;
 	            				if(i === 0){
-	            					div.setAttribute('data-src', itemDesc[0].url);
+	            					div.setAttribute('data-src', basicMediclist[0].url);
 	            					addHtml = '<span class="mui-badge mui-badge-warning badge">'+ nums[1] +'</span>' + '<img width="65" height="65" src=' + itemDesc[0].src + ' />'+
-	            					'<div class="home-card-text">'+ itemDesc[0].text +'</div>';
+	            					'<div class="home-card-text">'+ basicMediclist[0].text +'</div>';
 	            				}else{
-	            					div.setAttribute('data-src', itemDesc[4].url);
-	            					addHtml = '<img width="65" height="65" src=' + itemDesc[4].src + ' />'+
-	            					'<div class="home-card-text">'+ itemDesc[4].text +'</div>';
+	            					div.setAttribute('data-src', basicMediclist[1].url);
+	            					addHtml = '<img width="65" height="65" src=' + basicMediclist[1].src + ' />'+
+	            					'<div class="home-card-text">'+ basicMediclist[1].text +'</div>';
 	            				}
 	            				div.innerHTML = addHtml;
 	            				document.querySelector('.home-card-content').appendChild(div);

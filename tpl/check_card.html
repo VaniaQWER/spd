@@ -6,7 +6,7 @@
 			data-checkBillTypeName={{ value.checkBillTypeName ? value.checkBillTypeName: '--' }}
 			data-checkBillDeptName={{ value.checkBillDeptName ? value.checkBillDeptName: '--' }}
 			data-createUserName={{ value.createUserName ? value.createUserName: '--' }}
-			data-createDate={{ value.createDate ? value.createDate: '--' }}
+			data-createDate={{ value.createDate ? value.createDate.split(' ').join('|'): '--' }}
 			data-sheveUserName={{ value.sheveUserName ? value.sheveUserName: '--' }}
 			data-updateDate={{ value.updateDate ? value.updateDate: '--' }}
 			data-checkStatus={{ value.checkStatus ? value.checkStatus: '--' }}
@@ -26,8 +26,8 @@
 					<div class="am-flexbox-item"> 
 						制单时间：<span>{{ value.createDate }}</span> 
 					</div>
-					<div class="am-flexbox-item"> 
-						制单：<span>{{ value.sheveUserName }}</span> 
+					<div class="am-flexbox-itexm"> 
+						盘点责任人：<span>{{ value.sheveUserName }}</span> 
 					</div>
 				</div>
 				<div class="am-flexbox am-flexbox-align-center">

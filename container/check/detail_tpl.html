@@ -79,7 +79,7 @@
 						<div class="mui-input-row">
 							{{ if value.checkDetailStatus === 1 }}
 								<label class="font-warning">实际数量</label>
-								<input pattern="[0-9]*" type="number" value={{ value.accountStoreNum }} placeholder="请输入" class="practicalRepertory flex-item-input" />
+								<input pattern="[0-9]*" id="accountStoreNum" type="number" value={{ value.accountStoreNum }} placeholder="请输入" class="practicalRepertory flex-item-input" />
 								{{ else }}
 									<label>实际数量</label>
 									<p class="detailRow_content">{{value.practicalRepertory}}</p>
@@ -88,7 +88,7 @@
 						</div>
 						<div class="mui-input-row">
 							<label>盈亏数量</label>
-							<p class="detailRow_content">{{value.checkNum}}</p>
+							<p class="detailRow_content" id="checkNum">{{value.checkNum}}</p>
 						</div>
 						<div class="mui-input-row">
 							<label>账面批号</label>
@@ -130,12 +130,12 @@
 							{{ /if }}
 						</div>
 						<div class="mui-input-row">
-							<label>参考价格</label>
-							<p class="detailRow_content"></p>
+							<label>单价</label>
+							<p class="detailRow_content">{{ value.referencePrice }}</p>
 						</div>
 						<div class="mui-input-row">
-							<label>参考盈亏金额</label>
-							<p class="detailRow_content"></p>
+							<label>盈亏金额</label>
+							<p class="detailRow_content">{{ (value.referencePrice*value.checkNum).toFixed(4) }}</p>
 						</div>
 				</div>
 			</li>

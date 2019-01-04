@@ -92,8 +92,8 @@
 				    key = params.key;
 					var searchList = JSON.parse(plus.storage.getItem('searchCodeHistory'));
 					console.log(searchList);
+					localStorageItem = searchList && searchList.list ? searchList.list: [];
 					if(searchList && searchList.list.length){
-						
 						// 创建 删除历史记录标签
 						var span = document.createElement('span');
 						span.className = 'mui-icon mui-icon-trash clearHistory';
@@ -106,13 +106,9 @@
 							div.innerHTML = item;
 							div.setAttribute('data-distributeCode',item);
 							document.querySelector('.history-tags').appendChild(div)
-							
 						})
-						localStorageItem = searchList.list;
 					}
 					console.log(localStorageItem)
-					console.log(JSON.stringify(localStorageItem))
-				    
 				    // 删除 历史记录
 				    $('.history-title').on('tap','.clearHistory',function(){
 				    	var btnArray = ['否', '是'];
@@ -121,9 +117,11 @@
 				    			plus.nativeUI.showWaiting();
 				    			setTimeout(function(){
 				    				plus.storage.removeItem('searchCodeHistory');
+				    				console.log(plus.storage.getItem('searchCodeHistory'))
 					    			var deleteChild = document.querySelector('.clearHistory');
 					    			document.querySelector('.history-title').removeChild(deleteChild);
 					    			document.querySelector('.history-tags').innerHTML = '';
+					    			
 					    			plus.nativeUI.closeWaiting();
 				    			},1000)
 				    		}
@@ -190,11 +188,12 @@
 						document.querySelector('#ulList').appendChild(ul)
 					  }
 				  $('#ulList').on('tap','.search-ullist-li',function(){
+				  	console.log(localStorageItem)
 				  	let dataset = this.dataset;
 				  	console.log(dataset)
 				  	let flag = false;
 				  	mui.each(localStorageItem,function(index,item){
-			  			if(item.distributecode === dataset.distributecode){
+			  			if(item === dataset.distributecode){
 			  				flag = true
 			  			}
 			  		});

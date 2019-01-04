@@ -90,6 +90,8 @@
 					params = JSON.parse(self.params);//获得参数
 					console.log(self.params);
 				    key = params.key;
+				    var lastChildNode = document.querySelector('.mui-placeholder').lastChild;
+				    lastChildNode.innerText = key === 'supplier' ? '请输入供应商': '请输入通用名/商品名'
 					var searchList = JSON.parse(plus.storage.getItem('searchHistory'));
 					console.log(searchList);
 					if(searchList && searchList.list.length){
@@ -120,8 +122,6 @@
 					console.log(localStorageItem)
 					console.log(JSON.stringify(localStorageItem))
 				    
-				    
-				    
 				    // 删除 历史记录
 				    $('.history-title').on('tap','.clearHistory',function(){
 				    	var btnArray = ['否', '是'];
@@ -148,7 +148,7 @@
 					  			supplierCode: dataset.suppliercode,
 					  			supplierName: dataset.suppliername
 					  		};
-				    		var page =  plus.webview.getWebviewById(JSON.parse(params).route);
+				    		var page =  plus.webview.getWebviewById(params.route);
 					  		mui.fire(page,'search',{ supplier: JSON.stringify(supplier) });
 				    	}else{
 				    		// 产品名称
@@ -156,7 +156,7 @@
 					  			bigDrugCode: dataset.bigdrugcode,
 					  			ctmmParam: dataset.ctmmparam
 					  		};
-				    		var page =  plus.webview.getWebviewById(JSON.parse(params).route);
+				    		var page =  plus.webview.getWebviewById(params.route);
 					  		mui.fire(page,'search',{ drugInfo: JSON.stringify(drugInfo) });
 				    	}
 				    	mui.back()
@@ -244,16 +244,13 @@
 				  			}
 				  			localStorageItem.push(supplier);
 				  			console.log('当前不存在')
-				  		}else{
-				  			console.log('已经存在')
-				  			
 				  		}
 				  		console.log(JSON.stringify(localStorageItem))
 				  		var parmas = {
 				  			list: localStorageItem
 				  		}
 				  		plus.storage.setItem('searchHistory',JSON.stringify(parmas))
-				  		var page =  plus.webview.getWebviewById(JSON.parse(params).route);
+				  		var page =  plus.webview.getWebviewById(params.route);
 				  		mui.fire(page,'search',{ supplier: JSON.stringify(supplier) });
 				  		mui.back()
 				  	}else{
@@ -282,7 +279,7 @@
 				  		}
 				  		plus.storage.setItem('searchHistory',JSON.stringify(parmas))
 				  		console.log(JSON.parse(params).route);
-				  		var page =  plus.webview.getWebviewById(JSON.parse(params).route);
+				  		var page =  plus.webview.getWebviewById(params.route);
 				  		mui.fire(page,'search',{ drugInfo: JSON.stringify(drugInfo) });
 				  		mui.back()
 				  	}

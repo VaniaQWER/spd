@@ -1,10 +1,10 @@
-<!--上架 -  详情页 - wwb-->
+<!--验收 -  详情页 - wwb-->
 <!doctype html>
 <html>
 	<head>
 		<meta charset="UTF-8">
 		<title></title>
-		<link rel="import" href="./detail_tpl.html" id="ground_detail_tpl"/>
+		<link rel="import" href="./detail_tpl.html" id="acc_detail_tpl"/>
 		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
 		<link href="../../css/mui.min.css" rel="stylesheet" />
 		<link href="../../css/themes.css" rel="stylesheet" />
@@ -31,7 +31,7 @@
 					<li class="mui-table-view-cell mui-collapse">
 						<a class="mui-navigate-right" href="#">产品信息</a>
 						<div class="mui-collapse-content">
-							
+								
 						</div>
 					</li>
 				</ul>
@@ -43,50 +43,60 @@
 		<script src="../../js/template-web.js" type="text/javascript" charset="utf-8"></script>
 		<script src="../../js/utils.js" type="text/javascript" charset="utf-8"></script>
 		<script src="../../js/common.js" type="text/javascript" charset="utf-8"></script>
-		<script src="../../js/request.js" type="text/javascript" charset="utf-8"></script>
+		<script type="text/javascript" src="../../js/request.js" ></script>
 		<script type="text/javascript">
 			
-
 			(function($) {
 				var utils = new Utils();
-				utils.appendModule('#ground_detail_tpl');
+				utils.appendModule('#acc_detail_tpl');
 				
 				function showData(data){
 					var html = template('detail_tpl', data);
 					document.getElementById('detailContent').innerHTML = html;
 				}
-				
+				var checkType = undefined, type = undefined, data = null, details = undefined, checkUrl = '/a/checkacceptdetail/checkList';
 				$.plusReady(function(){
-					
+					$.init({
+						beforeback: function() {
+					        var list = plus.webview.currentWebview().opener();  
+					        //触发列表界面的自定义事件（refresh）,从而进行数据刷新  
+					        mui.fire(list, 'refresh');  
+					        //返回true，继续页面关闭逻辑  
+					        return true;  
+				    	}
+					})
+					if(plus.storage.getItem('currDept')){
+						checkType = '3';
+					}
 					var self = plus.webview.currentWebview();
-					var details = JSON.parse(self.details);//获得参数
+					details = JSON.parse(self.details);//获得参数
 					console.log(details)
-					
-					var data = Object.assign({},details.orderInfo); 
-					var currentIndex = Number(details.index), groundUrl = '/a/checkacceptdetail/finish';
-					data.hasGround = details.hasGround;
+					data = Object.assign({},details.orderInfo);
+					var currentIndex = Number(details.index);
+					console.log(currentIndex)
+					data.hasAcceptance = details.hasAcceptance;
+					data.isShowTemprature = details.isShowTemprature;
 					data.list = [];
 					data.list.push(details.allData[currentIndex]);
-					
+					data.checkType = checkType;
 					if(currentIndex === 0){
-						console.log(currentIndex)
 						document.querySelector('.previous').style.zIndex = -1;
 					}
 					if(currentIndex === details.allData.length -1){
 						document.querySelector('.next').style.zIndex = -1;
 					}
 					document.querySelector('.currentPage').innerText = (currentIndex + 1);
-					
-					if(details.hasGround){
-						var groundBtn = '<button type="button" id="ground" class="mui-btn mui-btn-warning mui-btn-block" style="margin-bottom: 20px;" data-loading-text = "提交中" data-loading-icon-position="right">确认上架</button>'
-						document.querySelector('.detailRow').insertAdjacentHTML("beforeEnd",groundBtn);
+					if(details.hasAcceptance){
+						var acceptanceBtn = '<button type="button" id="acceptance" class="mui-btn mui-btn-warning mui-btn-block" style="margin-bottom: 20px;" data-loading-text = "提交中" data-loading-icon-position="right">确认验收</button>'
+						document.querySelector('.detailRow').insertAdjacentHTML("beforeEnd",acceptanceBtn);
+						
 					}
-					
 					document.querySelector('.page-total').innerHTML = details.allData.length;
+					console.log(data)
+					// type  1 2 4 配送单 可编辑     其余 出库单  不能编辑
 					showData(data);
-					
-					
-					// 上一个
+
+						// 上一个
 					$('.detail-header-flex').on('tap','.previous',function(){
 						plus.nativeUI.showWaiting();
 						var _this = this;
@@ -115,66 +125,52 @@
 							data.list = [];
 							data.list.push(details.allData[currentIndex]);
 							plus.nativeUI.closeWaiting();
+							console.log(data)
 							showData(data);
 						},200)
-						
 					});
-					
-					// 上架
-					if(details.hasGround){
-						var ground = document.querySelector('#ground');
-						ground.addEventListener('tap',function(e){
-							var realReceiveStore = document.querySelector('.realReceiveStore').value;
-							/*if(realNum <= 0 ){
-								return mui.toast('实际上架数量不能小于或等于0')
+				});
+					// 验收
+					mui('.detailRow').on('tap','#acceptance',function(event){
+						let postData = [],submitData = {};
+						let values = {};
+						values.id = data.list[0].id;
+						postData.push(values);
+						
+						submitData.detailList = postData;
+						submitData.distributeCode = data.distributecode;
+
+						console.log(submitData,'submitData'); // 批号 数据
+						document.activeElement.blur(); // 隐藏软键盘
+						var btnArray = ['否', '是'];
+						mui.confirm('是否确认验收？', '确认', btnArray, function(e) {
+							if (e.index == 1) {
+								mui.ajaxRequest(checkUrl,{
+									type: 'POST',
+									data: submitData,
+									showWaiting: true,
+									contentType: "application/json",
+									success: function(data){
+										if(data.code === 200){
+											mui.toast('验收成功');
+											var parmasData = {};
+											parmasData.finishUrl = '../basicMedicine/index';
+											parmasData.keepUrl = 'acc_list';
+											parmasData.resultType = 'acceptance';
+											parmasData.itemData = details.orderInfo;
+											common.openwin('../result/index',{ parmas: JSON.stringify(parmasData) },{
+												titleText: '结果',
+												autoBackButton: false
+											})
+										}
+									},
+									error: function(xhr,type,errorThrown){
+										alert(xhr.responseText)
+			                		}
+								})
 							}
-							if(realNum > details.realNum){
-								return mui.toast('实际数量不得大于指示数量');
-							}*/
-//							var realNum = details.realNum;
-							document.activeElement.blur(); // 隐藏软键盘
-							var btnArray = ['否', '是'];
-							mui.confirm('是否确认上架？', '操作提示', btnArray, function(e) {
-								if (e.index == 1) {
-									var detailListVo = [],postData = {},submitData = {};
-									postData.id = data.list[0].id;
-									postData.realNum = data.list[0].realNum;
-									postData.productBatchNo = data.list[0].productBatchNo;
-									postData.realReceiveStore = realReceiveStore;
-									detailListVo.push(postData);
-									submitData.detailListVo = detailListVo;
-									submitData.distributeCode = data.distributecode;
-									console.log(submitData);
-									mui.ajaxRequest(groundUrl,{
-				                		type: 'POST',
-				                		data: submitData,
-				                		contentType: "application/json",
-				                		showWaiting: true,
-				                		success: function(data){
-				                			if(data.code === 200){
-				                				mui.toast('上架成功');
-				                				var parmasData = {};
-												parmasData.finishUrl = '../grounding/index';
-												parmasData.keepUrl = 'ground_list';
-												parmasData.resultType = 'ground';
-												parmasData.itemData = details.orderInfo;
-												common.openwin('../result/index',{ parmas: JSON.stringify(parmasData) },{
-													titleText: '结果',
-													autoBackButton: false
-												})
-				                			}else{
-				                				mui.alert(data.msg)
-				                			}
-				                		},
-				                		error: function(xhr,type,errorThrown){
-											alert(xhr.responseText)
-				                		}
-				            		});
-								}
-							},'div')
-						});
-					}
-				})
+						},'div')
+					})
 			})(mui);
 		
 		</script>

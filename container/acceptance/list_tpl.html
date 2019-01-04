@@ -29,8 +29,8 @@
 					</div>
 				</div>
 				{{ if acceptance }}
-					{{ if value.editable }}
-						<div class="editForm" style="display: block;">
+					{{ if value.editable && value.isUsual === 0 }}
+						<div class="editForm" data-index={{ i }} style="display: block;">
 							<div class="am-flexbox am-flexbox-align-center">
 								<div class="am-flexbox-item">
 									<div class="am-list-item am-input-item am-list-item-middle">
@@ -124,7 +124,7 @@
 			<div class="am-card-footer">
 				<div class="am-card-footer-content"></div>
 				<div class="am-card-footer-extra">
-					{{ if acceptance && value.showEditBtn }}
+					{{ if acceptance && value.isUsual === 0 && value.showEditBtn }}
 						<button type="button" class="mui-btn mui-btn-blue mui-btn-outlined edit" data-id={{ value.id }} data-index={{ i }}>收起编辑</button>
 					{{ /if }}
 					<button type="button" class="mui-btn mui-btn-blue mui-btn-outlined moreDetail" data-id={{ value.id }} data-index={{ i }} style="margin: 0 5px;">更多详情</button>
