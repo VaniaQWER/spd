@@ -77,16 +77,21 @@
 		
 		<script type="text/javascript">
 			
+			var pickingStatus = undefined;// 上架类型 // 上架状态  1 待上架  2 已上架 
+			
 			function clicked(){
 				common.openwin('../commonPages/qrcode',true,{ titleText: '扫码下架' })
 			}
 			
 			
-			//去搜索页面
+			
+//			//去搜索页面
 			function toSearchPage (){
 				var params = {};
-				params.key = 'supplier';
 				params.route = '../pickingOff/index';
+				params.auditStatus = pickingStatus;
+				params.location = 'main_list';// 主列表
+				params.module = 'pickingOff';// 所属模块
 				common.openwin('../commonPages/searchPage',{ params: JSON.stringify(params) },false)
 			}
 			
@@ -102,7 +107,7 @@
 				$.init({
 					beforeback:function(){
 						var list = plus.webview.currentWebview().opener();
-						 mui.fire(list, 'refresh');
+						 mui.fire(list, 'refresh',{ getCountFlag: true });
 						 return true;
 					}
 				});
@@ -117,14 +122,14 @@
 				var utils = new Utils();
 				utils.appendModule('#card_view');
 				
-				var selected = undefined,hasChecked = false,page = undefined, pageSize = 10,totalPage = undefined;
-				var checkType, type, pickingStatus// 上架类型 // 上架状态  1 待上架  2 已上架 
+				var selected = undefined,hasChecked = false,page = undefined, pageSize = 10,totalPage = undefined, query = {};
+				var checkType, type;
 				var requestUrl =  '/a/common/pickingorder/list'; // 请求地址
 				
-				var pageLeft = 1, pageRight = 1, totalPageLeft, totalPageRight, isMore = true;
+				var pageLeft = 1, pageRight = 1, totalPageLeft, totalPageRight, isMore = true,selectTabs = 1;
 				currSelected();
-				
-				
+				var searchPlaceholder = undefined;
+				var search_clear = undefined;
 				function template(selected, data, insertType){
         			utils.innerTplHtml('pick_list', selected, data, insertType);
             	}
@@ -135,48 +140,55 @@
 					if(item1mobile.className.indexOf('mui-active')>0){
 						selected = '.mui-tab1';
 						hasChecked = false;
+						selectTabs = 1;
 					}else{
 						selected = '.mui-tab2';
 						hasChecked = true;
+						selectTabs = 2;
 					}
             	}
             	/*
             	 	下拉刷新
             	 * */
             	function pulldownRefresh(){
-//					url = !hasChecked ? '/groundList': '/groundList2';
-					if(!hasChecked){
+					if(selectTabs === 1){
 						pageLeft  = 1
 					}else{
 						pageRight = 1;
 					}
-					pickingStatus = !hasChecked ? '1': '2';
-					page = !hasChecked ? pageLeft: pageRight;
+					pickingStatus = selectTabs === 1 ? '1': '2';
+					page = selectTabs === 1 ? pageLeft: pageRight;
 					var self = this;
+					var postData = {
+						pickingStatus: pickingStatus,
+            			pageNo: page,
+            			pageSize: pageSize,
+					}
+					if(query.applyOrderNo){
+						postData.applyOrderNo = query.applyOrderNo;
+					}
+					query = {};
 					mui.ajaxRequest(requestUrl,{
                 		type: 'POST',
-                		data: {
-                			pickingStatus: pickingStatus,
-                			pageNo: page,
-                			pageSize: pageSize,
-                		},
+                		data: postData,
                 		success: function(data){
                 			var resData = data.data;
                 			var total = resData.totalPage;
-                			if(!hasChecked){
+                			if(selectTabs === 1){
                 				totalPageLeft = total;
                 			}else{
                 				totalPageRight = total;
                 			}
                 			if(resData.list.length < pageSize){
-								var i = !hasChecked ? 0 : 1;
+								var i = selectTabs === 1 ? 0 : 1;
                 				document.querySelectorAll('.mui-pull-loading')[i].innerHTML = '没有更多数据';
                 				isMore = false;
                 				self.endPullDownToRefresh(true);
+                			}else{
+                				isMore = true;
+                				self.endPullDownToRefresh(false);
+                				self.refresh(true);
                 			}
-                			self.refresh(true);
-                			self.endPullDownToRefresh();
-//              			console.log(totalPageRight)
 							return template(selected,resData,false)
                 			
                 		},
@@ -192,14 +204,14 @@
 				function pullupRefresh(){
 					var self = this;
 					if(isMore){
-						if(!hasChecked){
+						if(selectTabs === 1){
 							pageLeft ++
 						}else{
 							pageRight ++;
 						}
-						page = !hasChecked ? pageLeft: pageRight;
-						totalPage = !hasChecked ? totalPageLeft: totalPageRight;
-						pickingStatus = !hasChecked ? '1': '2';
+						page = selectTabs === 1 ? pageLeft: pageRight;
+						totalPage = selectTabs === 1 ? totalPageLeft: totalPageRight;
+						pickingStatus = selectTabs === 1 ? '1': '2';
 						
 						if(page <= totalPage){
 							mui.ajaxRequest(requestUrl,{
@@ -212,12 +224,15 @@
 		                    	contentType: "application/json",
 		                		success: function(data){
 		                			var resData = data.data;
-		                			if(page = totalPage){
-		                				self.endPullUpToRefresh(true);
-		                			}else{
-		                				self.endPullUpToRefresh(false);
-		                			}
-		                			return page < resData.totalPage ? template(selected,resData,false): template(selected,resData,true)	
+		                			if(resData.pageNo === resData.totalPage){
+			            				isMore = false;
+			            				self.endPullUpToRefresh(true);
+			            			}else{
+			            				isMore = true;
+			            				self.endPullUpToRefresh(false);
+			            				self.refresh(true);
+			            			}
+									return template(selected,resData,true);
 		                		},
 		                		error: function(xhr,type,errorThrown){
 									alert(xhr.responseText)
@@ -225,13 +240,28 @@
 		            		});
 						}
 					}else{
-						var i = !hasChecked ? 0 : 1;
+						var i = selectTabs === 1 ? 0 : 1;
 						document.querySelectorAll('.mui-pull-loading')[i].innerHTML = '没有更多数据';
 						self.endPullUpToRefresh(true);
 					}
 				}
 				
 				$.plusReady(function(){
+					
+					
+					searchPlaceholder = document.querySelector('.mui-placeholder');
+					search_clear = document.querySelector('.mui-input-clear');
+					console.log(searchPlaceholder)
+					// 触发刷新 搜索页面搜的值
+					window.addEventListener('search',function(event){
+						console.log(event.detail)
+						query.applyOrderNo = JSON.parse(event.detail.searchParams).pickingOrderNo;
+						query.pickingStatus = JSON.parse(event.detail.searchParams).auditStatus;
+						search_clear.placeholder = '';
+						searchPlaceholder.style.display = 'none';
+						search_clear.value = query.applyOrderNo;
+						mui(".mui-slider-group .mui-scroll").pullToRefresh()[0].pullDownLoading();
+					})
 					
 					// 页面刷新
 					window.addEventListener('pagefresh',function(){
@@ -259,16 +289,24 @@
 					// 第一个tab 默认加载一次数据
 					mui(".mui-slider-group .mui-scroll").pullToRefresh()[0].pullDownLoading();
 					
-	            	var item2 = document.getElementById('item2mobile');
+					var item2 = document.querySelector('#item2mobile');
+					var item1 = document.querySelector('#item1mobile');
 					document.getElementById('slider').addEventListener('slide', function(e) {
 						currSelected();
-						if (e.detail.slideNumber === 1) {
+						let index = e.detail.slideNumber;
+						if (index === 1) {
+							$('.mui-slider-group .mui-scroll .mui-tab2')[0].innerHTML = '';
 							if (!item2.querySelector('.am-card')) {
-								mui(".mui-slider-group .mui-scroll").pullToRefresh()[1].pullDownLoading();
+								mui(".mui-slider-group .mui-scroll").pullToRefresh()[index].pullDownLoading();
+							}
+						}
+						if(index === 0){
+							$('.mui-slider-group .mui-scroll .mui-tab1')[0].innerHTML = '';
+							if (!item1.querySelector('.am-card')) {
+								mui(".mui-slider-group .mui-scroll").pullToRefresh()[index].pullDownLoading();
 							}
 						}
 					});
-					
 					//tab页切的点击事件
 					var sliderSegmentedControl = document.getElementById('sliderSegmentedControl');
 					$('.mui-input-group').on('change', 'input', function() {
@@ -283,7 +321,7 @@
 					
 					$('#slider').on('tap','.am-card',function(){
 						let itemData = this.dataset;
-						itemData.currentSelected = hasChecked ? 'right': 'left';
+						itemData.currentSelected = selectTabs === 1 ? 'left': 'right';
 						console.log(JSON.stringify(itemData))
 						document.activeElement.blur();
 						common.openwin('pickingOffList',{ params: JSON.stringify(itemData) },false)
@@ -292,10 +330,6 @@
 				})
 				
 		})(mui);
-		//去详情页面
-		function toSearchPage (){
-			common.openwin('../commonPages/searchPage')
-		}
 		</script>
 	</body>
 

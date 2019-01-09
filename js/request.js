@@ -3,10 +3,14 @@
  * 封装mui.ajax请求，调用方式与一致
  */
 (function($, doc) {
-	var baseUrl = "http://192.168.31.200:8888/medicinal-web" // 测试地址
-//	var baseUrl = 'http://39.105.75.193:8080/medicinal-web'; // 线上地址
-//	var baseUrl = 'http://39.105.75.193:8088/medicinal-web'; // 演示地址
-//	var baseUrl = 'http://116.62.143.29:8080/medicinal-web'; // 线上地址2（快）
+//	var baseUrl = "http://192.168.31.200:8888/medicinal-web" // 测试地址///
+//	var baseUrl = "http://192.168.31.223:8080/medicinal-web" // 测试地址/
+	var baseUrl = 'http://116.62.143.29:8088/medicinal-web'; // 线上地址2（快）
+
+//	var baseUrl = 'http://10.146.9.50:8080/medicinal-web';// 合肥正式环境
+//	var baseUrl = 'http://10.146.8.221:9002/medicinal-web'; // 合肥测试环境
+
+
     mui.extend({
         ajaxRequest: function(url , options){
             var defaults = commonDefaules(options);
@@ -32,7 +36,7 @@
             waitMessage: "努力奔跑中，等等我...",
             onBeforeSend : function(xhr){
             	if(options.showWaiting){
-            		plus.nativeUI.showWaiting();
+            		plus.nativeUI.showWaiting('加载中......');
             	}
             	
                 if(defaults.wait == true){

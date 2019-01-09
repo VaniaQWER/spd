@@ -134,13 +134,18 @@
 				});
 			}
 			var accountStoreNumNode = document.querySelector('#accountStoreNum');
-			var checkNumNode = document.querySelector('#checkNum');
-//			accountStoreNumNode.onkeyup = function(){
-//				checkNumNode.innerText = 
-//			}
-			console.log(accountStoreNumNode)
-			console.log(checkNumNode)
-			
+			var checkNumNode = document.querySelector('#checkNum');// 实际数量
+			var accountNum = document.querySelector('#accountNum');// 账面库存
+			var total = document.querySelector('#total');
+			var referencePrice = document.querySelector('#referencePrice');
+			accountStoreNumNode.onkeyup = function(e){
+				console.log(e.target.value);
+				console.log(accountNum.innerHTML)
+				let amount = e.target.value - (accountNum.innerHTML * 1);
+				checkNumNode.innerHTML = amount;
+				total.innerHTML = (amount * (referencePrice.innerHTML *1)).toFixed(4);
+				
+			}
 				mui('.detailRow').on('tap','#checkBtn',function(event){
 					
 					var phList = document.querySelector('#List').querySelectorAll('.mui-input-ph'); // 新增批号数据
@@ -197,29 +202,29 @@
 					var btnArray = ['否', '是'];
 					mui.confirm('是否确认提交？','警告',btnArray,function(e){
 						if (e.index == 1) {
-//							mui.ajaxRequest(checkUrl,{
-//								type: 'POST',
-//								data: submitData,
-//								showWaiting: true,
-//								contentType: "application/json",
-//								success: function(data){
-//									if(data.code === 200){
-//										mui.toast('提交成功');
-//										var parmasData = {};
-//										parmasData.finishUrl = '../check/index';
-//										parmasData.keepUrl = 'checkList';
-//										parmasData.resultType = 'check';
-//										parmasData.itemData = details.orderInfo;
-//										common.openwin('../result/index',{ parmas: JSON.stringify(parmasData) },{
-//											titleText: '结果',
-//											autoBackButton: false
-//										})
-//									}
-//								},
-//								error: function(xhr,type,errorThrown){
-//									alert(xhr.responseText)
-//		                		}
-//							})
+							mui.ajaxRequest(checkUrl,{
+								type: 'POST',
+								data: submitData,
+								showWaiting: true,
+								contentType: "application/json",
+								success: function(data){
+									if(data.code === 200){
+										mui.toast('提交成功');
+										var parmasData = {};
+										parmasData.finishUrl = '../check/index';
+										parmasData.keepUrl = 'checkList';
+										parmasData.resultType = 'check';
+										parmasData.itemData = details.orderInfo;
+										common.openwin('../result/index',{ parmas: JSON.stringify(parmasData) },{
+											titleText: '结果',
+											autoBackButton: false
+										})
+									}
+								},
+								error: function(xhr,type,errorThrown){
+									alert(xhr.responseText)
+		                		}
+							})
 						}
 					},'div')
 					

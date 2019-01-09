@@ -73,7 +73,11 @@
 								<label class="font-warning">实际货位</label>
 								<select class="editInput realReceiveStore">
 									{{ each value.acceptoodsVo item i }}
-									<option value={{ item.id }} selected={{ value.realReceiveStore === item.id }}>{{ item.positionName }}</option>
+										{{ if value.realReceiveStore === item.id }}
+											<option value={{ item.id }} selected="selected">{{ item.positionName }}</option>
+										{{ else }}
+											<option value={{ item.id }}>{{ item.positionName }}</option>
+										{{ /if }}
 									{{ /each }}
 								</select>
 							{{ else }}

@@ -131,6 +131,37 @@
             		success: function(data){
             			if(data.code === 200){
             				mui.toast('设置当前系统成功');
+            				let history = undefined;// 设置历史记录数据结构
+            				if(currDept.deptType === '3' || currDept.deptType === '4' ){
+            					history = {
+            						'acceptance':{
+            							'main_list': [],
+            							'sub_list':[]
+            						},
+            						'grounding':{
+            							'main_list': [],
+            							'sub_list':[]
+            						},
+            						'pickingOff':{
+            							'main_list': [],
+            							'sub_list':[]
+            						},
+            						'stock':{
+            							'main_list': [], 
+            						}
+            					}
+            				}else{
+            					history = {
+            						'acceptance':{
+            							'main_list': [],
+            							'sub_list':[]
+            						},
+            						'stock':{
+            							'main_list': [], 
+            						}
+            					}
+            				}
+            				plus.storage.setItem('searchHistory',JSON.stringify(history));
             			}else{
             				mui.toast('设置切换系统失败,请重新登陆');
             				return false

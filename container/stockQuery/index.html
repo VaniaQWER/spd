@@ -24,10 +24,10 @@
 				<input type="search" class="mui-input-clear" id="search" placeholder="通用名/商品名" onclick="toSearchPage()"> 
 			</div>
 			<div id="slider" class="mui-slider themes_tab mui-fullscreen" style="top: 102px;">
-				<div id="sliderSegmentedControl" class="mui-slider-indicator mui-segmented-control mui-segmented-control-inverted">
+				<!--<div id="sliderSegmentedControl" class="mui-slider-indicator mui-segmented-control mui-segmented-control-inverted">
 					<a class="mui-control-item themes_font_color_tab" href="#item1mobile">全部</a>
 					<a class="mui-control-item themes_font_color_tab item2mobile" href="#item2mobile">更多筛选</a>
-				</div>
+				</div>-->
 				<div id="sliderProgressBar" class="mui-slider-progress-bar mui-col-xs-6"></div>
 				
 				<div class="mui-slider-group">
@@ -64,7 +64,8 @@
 			//去搜索页面
 			function toSearchPage (){
 				var params = {};
-				params.key = 'material';
+				params.module = 'stock';
+				params.location = 'main_list';
 				params.route = '../stockQuery/index';
 				common.openwin('../commonPages/searchPage',{ params: JSON.stringify(params) },false)
 			}
@@ -73,7 +74,7 @@
 				$.init({
 					beforeback:function(){
 						var list = plus.webview.currentWebview().opener();
-						 mui.fire(list, 'refresh');
+						 mui.fire(list, 'refresh',{ getCountFlag: true });
 						 return true;
 					}
 				});
@@ -90,7 +91,7 @@
 				utils.appendModule('#card_view');
 				
 				var url = '/a/StoreDetail/list';
-				var page = 1, totalPage = undefined, pageSize = 10, isMore = true, query = {};
+				var page = 1, totalPage = undefined, pageSize = 30, isMore = true, query = {};
             	
             	/* 渲染模板   */
 				function template(data, insertType){
@@ -117,14 +118,15 @@
                 		success: function(data){
                 			var resData = data.data;
                 			totalPage = data.totalPage;
-                			if(resData.list.length <= pageSize){
+                			if(resData.pageNo >= resData.totalPage){
                 				document.querySelector('.mui-pull-loading').innerHTML = '没有更多数据';
                 				isMore = false;
                 				self.endPullDownToRefresh(true);
                 			}else{
-                				self.endPullDownToRefresh();
+                				isMore = true;
+                				self.endPullDownToRefresh(false);
+                				self.refresh(true);
                 			}
-							self.refresh(true);
 							return template(resData, false)
                 		},
                 		error: function(xhr,type,errorThrown){
@@ -139,28 +141,33 @@
 				 * */
 				function pullupRefresh(){
 					var self = this;
+					console.log(isMore,'isMore')
 					if(isMore){
 						page++;
-						if( page <= totalPage ){
-							mui.ajaxRequest(url,{
-		                		type: 'POST',
-		                		data:{
-		                			pageNo: page,
-		                			pageSize: pageSize
-		                		},
-		                		contentType: "application/json",
-		                		success: function(data){
-		                			var resData = data.data;
-		                			self.endPullUpToRefresh(page >= totalPage);
-		                			
-									return template(resData, true)
-		                			
-		                		},
-		                		error: function(xhr,type,errorThrown){
-									alert(xhr.responseText)
-		                		}
-		            		});
-						}
+						mui.ajaxRequest(url,{
+	                		type: 'POST',
+	                		data:{
+	                			pageNo: page,
+	                			pageSize: pageSize
+	                		},
+	                		contentType: "application/json",
+	                		success: function(data){
+	                			var resData = data.data;
+	                			if(resData.pageNo === resData.totalPage){
+		            				isMore = false;
+		            				self.endPullUpToRefresh(true);
+		            			}else{
+		            				isMore = true;
+		            				self.endPullUpToRefresh(false);
+		            				self.refresh(true);
+		            			}
+								return template(resData, true)
+	                			
+	                		},
+	                		error: function(xhr,type,errorThrown){
+								alert(xhr.responseText)
+	                		}
+	            		});
 					}else{
 						document.querySelector('.mui-pull-loading').innerHTML = '没有更多数据';
 						self.endPullUpToRefresh(true);
@@ -172,8 +179,9 @@
 					
 					// 触发刷新 搜索页面搜的值
 					window.addEventListener('search',function(event){
-						query.bigDrugCode = JSON.parse(event.detail.drugInfo).bigDrugCode;
-						query.ctmmParam = JSON.parse(event.detail.drugInfo).ctmmParam;
+						console.log(event.detail)
+						query.bigDrugCode = JSON.parse(event.detail.searchParams).bigDrugCode;
+						query.ctmmParam = JSON.parse(event.detail.searchParams).ctmmParam;
 						document.querySelector('.mui-input-clear').placeholder = '';
 						document.querySelector('.mui-placeholder').style.display = 'none';
 						document.querySelector('.mui-input-clear').value = query.ctmmParam;
@@ -200,25 +208,25 @@
 					mui(".mui-scroll").pullToRefresh().pullDownLoading();
 					
 					//tab页切的点击事件
-					var sliderSegmentedControl = document.getElementById('sliderSegmentedControl');
-					$('.mui-input-group').on('change', 'input', function() {
-						if (this.checked) {
-							sliderSegmentedControl.className = 'mui-slider-indicator mui-segmented-control mui-segmented-control-inverted mui-segmented-control-' + this.value;
-							//force repaint
-							sliderProgressBar.setAttribute('style', sliderProgressBar.getAttribute('style'));
-						}
-					});
+//					var sliderSegmentedControl = document.getElementById('sliderSegmentedControl');
+//					$('.mui-input-group').on('change', 'input', function() {
+//						if (this.checked) {
+//							sliderSegmentedControl.className = 'mui-slider-indicator mui-segmented-control mui-segmented-control-inverted mui-segmented-control-' + this.value;
+//							//force repaint
+//							sliderProgressBar.setAttribute('style', sliderProgressBar.getAttribute('style'));
+//						}
+//					});
 					// 更多筛选
-					$('#sliderSegmentedControl').on('tap','.item2mobile',function(){
-						var moreCondition = document.querySelector('.moreCondition');
-						moreCondition.style.display = moreCondition.style.display === 'none'? 'block':'none';
-					});
+//					$('#sliderSegmentedControl').on('tap','.item2mobile',function(){
+//						var moreCondition = document.querySelector('.moreCondition');
+//						moreCondition.style.display = moreCondition.style.display === 'none'? 'block':'none';
+//					});
 					
 					// 更多筛选条件查询
-					$('.moreCondition').on('tap','.mui-table-view-cell',function(){
-						this.parentNode.parentNode.style.display = 'none';
-						console.log(this.dataset.search)
-					})
+//					$('.moreCondition').on('tap','.mui-table-view-cell',function(){
+//						this.parentNode.parentNode.style.display = 'none';
+//						console.log(this.dataset.search)
+//					})
 					
 					//绑定点击事件  - 进入详情页
 					

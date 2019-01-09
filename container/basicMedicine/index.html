@@ -88,7 +88,7 @@
 				$.init({
 					beforeback:function(){
 						var list = plus.webview.currentWebview().opener();
-						 mui.fire(list, 'refresh');
+						 mui.fire(list, 'refresh',{ getCountFlag: true });
 						 return true;
 					}
 				});
@@ -237,8 +237,8 @@
 					
 					// 触发刷新 搜索页面搜的值
 					window.addEventListener('search',function(event){
-						query.supplierCode = JSON.parse(event.detail.supplier).supplierCode;
-						query.supplierName = JSON.parse(event.detail.supplier).supplierName;
+						query.supplierCode = JSON.parse(event.detail.searchParams).supplierCode;
+						query.supplierName = JSON.parse(event.detail.searchParams).supplierName;
 						document.querySelector('.mui-input-clear').placeholder = '';
 						document.querySelector('.mui-placeholder').style.display = 'none';
 						document.querySelector('.mui-input-clear').value = query.supplierName;

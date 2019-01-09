@@ -52,7 +52,10 @@
 				
 				function showData(data){
 					var html = template('detail_tpl', data);
-					document.getElementById('detailContent').innerHTML = html;
+					if(html){
+						document.getElementById('detailContent').innerHTML = html;
+					}
+					
 				}
 				var checkType = undefined, type = undefined, data = null, details = undefined, checkUrl = '/a/checkacceptdetail/checkList';
 				$.plusReady(function(){
@@ -90,6 +93,8 @@
 					data.hasAcceptance = details.hasAcceptance;
 					data.isShowTemprature = details.isShowTemprature;
 					data.list = [];
+					data.statusname = details.statusname;
+					data.isPsList = details.isPsList;
 					data.list.push(details.allData[currentIndex]);
 					data.checkType = checkType;
 					if(currentIndex === 0){
@@ -100,7 +105,7 @@
 					}
 					document.querySelector('.currentPage').innerText = (currentIndex + 1);
 					if(details.hasAcceptance){
-						showOrHideBtn()
+						showOrHideBtn(data)
 						var acceptanceBtn = '<button type="button" id="acceptance" class="mui-btn mui-btn-warning mui-btn-block" style="margin-bottom: 20px;" data-loading-text = "提交中" data-loading-icon-position="right">确认验收</button>'
 						document.querySelector('.detailRow').insertAdjacentHTML("beforeEnd",acceptanceBtn);
 						
@@ -110,18 +115,19 @@
 					// type  1 2 4 配送单 可编辑     其余 出库单  不能编辑
 					showData(data);
 					
-					function showOrHideBtn(){
-						if(checkType === 1 && details.isPsList && details.allData[currentIndex].isUsual === 0){
+					function showOrHideBtn(data){
+						
+						if(checkType === 1 && details.isPsList && data.list[0].isUsual === 0 && details.orderInfo.currentSelected === 'left'){
 							var node = '<form id="List"></form><div id="addBtn"><button class="mui-btn mui-btn-block btn">+ 增加批号</button></div>';
 							document.querySelector('#detailContent').insertAdjacentHTML('afterEnd',node);
 						}else{
-							var content = document.querySelector('.detailRow');
-							var List = document.querySelector('#List');
-							var btn = document.querySelector('#addBtn');
-							if(List&&btn){
-								content.removeChild(List);
-								content.removeChild(btn);
-							}
+								var content = document.querySelector('.detailRow');
+								var List = document.querySelector('#List');
+								var btn = document.querySelector('#addBtn');
+								if(List&&btn){
+									content.removeChild(List);
+									content.removeChild(btn);
+								}
 						}
 					}
 						// 上一个
@@ -136,8 +142,9 @@
 							data.list = [];
 							data.list.push(details.allData[currentIndex]);
 							plus.nativeUI.closeWaiting();
+							console.log(data)
 							showData(data);
-							showOrHideBtn();
+							showOrHideBtn(data);
 						},200)
 					});
 				
@@ -156,7 +163,7 @@
 							plus.nativeUI.closeWaiting();
 							console.log(data)
 							showData(data);
-							showOrHideBtn();
+							showOrHideBtn(data);
 						},200)
 					});
 					
@@ -180,7 +187,7 @@
 							'</div>' +
 							'<div class="mui-input-row">' +
 							'<label>数量</label>' +
-							'<input type="number" name="acc_num" class="mui-input-clear mui-input mui-input-num"  placeholder="请输入" >' +
+							'<input type="number" name="acc_num" class="mui-input-clear mui-input mui-input-num"  value="0" placeholder="请输入" >' +
 							'</div>' +
 							'</div>' +
 							'</div>' +
@@ -303,29 +310,29 @@
 						var btnArray = ['否', '是'];
 						mui.confirm('是否确认验收？', '确认', btnArray, function(e) {
 							if (e.index == 1) {
-//								mui.ajaxRequest(checkUrl,{
-//									type: 'POST',
-//									data: submitData,
-//									showWaiting: true,
-//									contentType: "application/json",
-//									success: function(data){
-//										if(data.code === 200){
-//											mui.toast('验收成功');
-//											var parmasData = {};
-//											parmasData.finishUrl = '../acceptance/index';
-//											parmasData.keepUrl = 'acc_list';
-//											parmasData.resultType = 'acceptance';
-//											parmasData.itemData = details.orderInfo;
-//											common.openwin('../result/index',{ parmas: JSON.stringify(parmasData) },{
-//												titleText: '结果',
-//												autoBackButton: false
-//											})
-//										}
-//									},
-//									error: function(xhr,type,errorThrown){
-//										alert(xhr.responseText)
-//			                		}
-//								})
+								mui.ajaxRequest(checkUrl,{
+									type: 'POST',
+									data: submitData,
+									showWaiting: true,
+									contentType: "application/json",
+									success: function(data){
+										if(data.code === 200){
+											mui.toast('验收成功');
+											var parmasData = {};
+											parmasData.finishUrl = '../acceptance/index';
+											parmasData.keepUrl = 'acc_list';
+											parmasData.resultType = 'acceptance';
+											parmasData.itemData = details.orderInfo;
+											common.openwin('../result/index',{ parmas: JSON.stringify(parmasData) },{
+												titleText: '结果',
+												autoBackButton: false
+											})
+										}
+									},
+									error: function(xhr,type,errorThrown){
+										alert(xhr.responseText)
+			                		}
+								})
 							}
 						},'div')
 					})

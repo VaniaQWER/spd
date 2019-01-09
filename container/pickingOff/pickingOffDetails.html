@@ -72,6 +72,8 @@
 				var data = Object.assign({},details.orderInfo); 
 				var currentIndex = Number(details.index), pickUrl = '/a/common/pickingorder/finishPicking';
 				data.hasPicked = details.hasPicked;
+				data.pickingTime = details.pickingTime;
+				data.pickingUserName = details.pickingUserName;
 				data.list = [];
 				data.list.push(details.allData[currentIndex]);
 				if(currentIndex === 0){

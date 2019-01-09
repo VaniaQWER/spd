@@ -74,7 +74,7 @@
 						</div>
 						<div class="mui-input-row">
 							<label>账面库存</label>
-							<p class="detailRow_content">{{value.accountStoreNum}}</p>
+							<p class="detailRow_content" id="accountNum">{{value.accountStoreNum}}</p>
 						</div>
 						<div class="mui-input-row">
 							{{ if value.checkDetailStatus === 1 }}
@@ -131,11 +131,11 @@
 						</div>
 						<div class="mui-input-row">
 							<label>单价</label>
-							<p class="detailRow_content">{{ value.referencePrice }}</p>
+							<p class="detailRow_content" id="referencePrice">{{ value.referencePrice }}</p>
 						</div>
 						<div class="mui-input-row">
 							<label>盈亏金额</label>
-							<p class="detailRow_content">{{ (value.referencePrice*value.checkNum).toFixed(4) }}</p>
+							<p class="detailRow_content" id="total">{{ (value.referencePrice*value.checkNum).toFixed(4) }}</p>
 						</div>
 				</div>
 			</li>

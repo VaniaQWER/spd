@@ -39,7 +39,7 @@
 						if(changeFlag){
 							var list = plus.webview.currentWebview().opener();  
 					        //触发列表界面的自定义事件（refresh）,从而进行数据刷新  
-					        mui.fire(list, 'refresh');  
+					        mui.fire(list, 'refresh',{ getCountFlag: true });  
 					        //返回true，继续页面关闭逻辑  
 					        return true;  
 						}
@@ -78,6 +78,37 @@
 									deptType: _this.dataset.depttype,
 									lastSelect: true
 								}
+								let history = undefined;// 设置历史记录数据结构
+	            				if(currentDept.deptType === '3' || currentDept.deptType === '4' ){
+	            					history = {
+	            						'acceptance':{
+	            							'main_list': [],
+	            							'sub_list':[]
+	            						},
+	            						'grounding':{
+	            							'main_list': [],
+	            							'sub_list':[]
+	            						},
+	            						'pickingOff':{
+	            							'main_list': [],
+	            							'sub_list':[]
+	            						},
+	            						'stock':{
+	            							'main_list': [], 
+	            						}
+	            					}
+	            				}else{
+	            					history = {
+	            						'acceptance':{
+	            							'main_list': [],
+	            							'sub_list':[]
+	            						},
+	            						'stock':{
+	            							'main_list': [], 
+	            						}
+	            					}
+	            				}
+	            				
 								plus.storage.setItem('currDept',JSON.stringify(currentDept));
 								console.log(plus.storage.getItem('currDept'));
 								var url = '/a/cacheCurrentDept/'+ currentDept.deptId
@@ -87,6 +118,7 @@
 			                		success: function(data){
 			                			if(data.code === 200){
 			                				changeFlag = true;
+			                				plus.storage.setItem('searchHistory',JSON.stringify(history));
 			                				document.querySelector('.theme_font_warning').className = 'mui-table-view-cell'
 			                				mui.toast('切换系统成功');
 			                				_this.className = 'mui-table-view-cell mui-selected theme_font_warning';

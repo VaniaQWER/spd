@@ -23,8 +23,9 @@
 			</div>
 			<div class="am-card-body">
 				<div class="am-flexbox am-flexbox-align-center">
-					<div class="am-flexbox-item"> 
-						配送/验收单：<span>{{ value.distributeCode }}</span> 
+					<div class="am-flexbox-item">
+						<span>{{ value.checkType === 1 || value.checkType === 3 ? '配送/验收单：': '验收单：' }}</span>
+						<span>{{ value.distributeCode }}</span> 
 					</div>
 					<!--<div class="am-flexbox-item"> 
 						品相数：<span>{{ value.total }}</span> 

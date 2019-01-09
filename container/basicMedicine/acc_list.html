@@ -23,6 +23,9 @@
 		    </a>-->
 		</header>
 		<div class="mui-content">
+			<div class="mui-input-row mui-search search_head">
+				<input type="search" class="mui-input-clear" placeholder="通用名/商品名/生产厂家" onclick="toSearchPage()">
+			</div>
 			<div id="slider" class="mui-slider themes_tab mui-fullscreen">
 				<div id="sliderSegmentedControl" class="mui-slider-indicator mui-segmented-control mui-segmented-control-inverted">
 					<a class="mui-control-item themes_font_color_tab" href="#item1mobile">待验收</a>
@@ -73,6 +76,17 @@
                     plus.webview.currentWebview().close();
                 })
             }
+            
+            //去搜索页面
+			function toSearchPage (){
+				var params = {};
+				params.id = 'basicMedicine_acc_list';
+				params.route = '../basicMedicine/acc_list';
+				params.auditStatus = auditStatus;
+				params.module = 'acceptance';
+				params.location = 'sub_list';
+				common.openwin('../commonPages/searchPage',{ params: JSON.stringify(params) },false)
+			}
 			
 			(function($) {
 				
@@ -105,10 +119,11 @@
 				/*
 				  获取列表数据
 				 * */
-				function genData(url,selected){
+				function genData(url,postData selected){
 					plus.nativeUI.showWaiting();
 					mui.ajaxRequest(url,{
-                		type: 'GET',
+                		type: 'post',
+                		data: postData,
                 		showWaiting: true,
                 		success: function(data){
                 			plus.nativeUI.closeWaiting();
@@ -169,9 +184,26 @@
 				$.plusReady(function(){
 					
 					window.addEventListener('pagefresh',function(event){
-						var query = JSON.parse(event.detail.params);
-						var genUrl = '/a/checkaccept/detail?distributeCode='+ query.distributecode;
-						genData(url,query.currentSelected);
+						var data = {
+							distributeCode: query.distributecode
+						}
+						var genUrl = '/a/checkaccept/detail'
+						genData(url, data, query.currentSelected);
+						
+					})
+					// 触发刷新 搜索页面搜的值
+					window.addEventListener('sub_search',function(event){
+						console.log(event.detail);
+						let searchParams = JSON.parse(event.detail.searchParams);
+						document.querySelector('.mui-input-clear').placeholder = '';
+						document.querySelector('.mui-placeholder').style.display = 'none';
+						document.querySelector('.mui-input-clear').value = searchParams.hisDrugName;
+						var postData = {
+							distributeCode: distributeCode,
+							hisDrugCode: searchParams.hisDrugCode,
+							status: searchParams.type
+						}
+						genData(url, postData, currentSelected);
 					})
 					
 					var  distributeCode, currentSelected,isUsual = undefined;
@@ -185,19 +217,24 @@
 				    currentSelected = params.currentSelected; // 当前选中tabs 
 				    console.log(currentSelected)
 				    if(currentSelected === 'left'){
-				    	document.querySelector('#sliderProgressBar').style.transform = 'translate3d(0px,0px,0px) translateZ(0px)';
-				    	document.querySelector('.mui-slider-group').style.transform = 'translate3d(0px,0px,0px) translateZ(0px)';
+				    	auditStatus = '1';
+				    	document.querySelector('#sliderProgressBar').style.transform = 'translateX(0,0,0) translateZ(0)';
+				    	document.querySelector('.mui-slider-group').style.transform = 'translateX(0,0,0) translateZ(0)';
 				    	document.querySelectorAll('.themes_font_color_tab')[0].className = 'mui-control-item themes_font_color_tab mui-active';
 				    	document.querySelector('#item1mobile').className = 'mui-slider-item mui-control-content mui-active';
 				    }else{
-				    	document.querySelector('#sliderProgressBar').style.transform = 'translate3d(267px,0px,0px) translateZ(0px)';
-				    	document.querySelector('.mui-slider-group').style.transform = 'translate3d(-534px,0px,0px) translateZ(0px)';
+				    	auditStatus = '2';
+				    	document.querySelector('#sliderProgressBar').style.transform = 'translateX(50%,0,0) translateZ(0px)';
+				    	document.querySelector('.mui-slider-group').style.transform = 'translateX(-100%,0,0) translateZ(0px)';
 				    	document.querySelectorAll('.themes_font_color_tab')[1].className = 'mui-control-item themes_font_color_tab mui-active';
 				    	document.querySelector('#item2mobile').className = 'mui-slider-item mui-control-content mui-active';
 				    }
 				    var checkUrl = '/a/checkacceptdetail/basemedic';
-				    var url = '/a/checkaccept/detail?distributeCode='+ distributeCode;
-				    genData(url,currentSelected);
+				    var url = '/a/checkaccept/detail';
+				    var postData = {
+				    	distributeCode: distributeCode
+				    }
+				    genData(url,postData,currentSelected);
 					if(plus.storage.getItem('currDept')){
 						checkType = '3';
 					}

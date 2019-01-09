@@ -18,14 +18,17 @@
 		   		<label class="mui-pull-right theme_back_font">返回</label>
 		   	</a>
 		    <h1 class="mui-title themes_title">药品信息</h1>
-		    <!--<a href="#" class="mui-pull-right batchAccetpance" style="height: 45px;padding-top: 12px;">
+		    <a href="#" class="mui-pull-right batchAccetpance" style="height: 45px;padding-top: 12px;">
 		    	批量上架
-		    </a>-->
+		    </a>
 		</header>
 		<div class="mui-content">
+			<div class="mui-input-row mui-search search_head">
+				<input type="search" class="mui-input-clear" placeholder="通用名/商品名/生产厂家" onclick="toSearchPage()">
+			</div>
 			<div id="slider" class="mui-slider themes_tab mui-fullscreen">
 				<div id="sliderSegmentedControl" class="mui-slider-indicator mui-segmented-control mui-segmented-control-inverted">
-					<a class="mui-control-item themes_font_color_tab item1mobile" href="#item1mobile">待上架</a>
+					<a id="defaultTab"  class="mui-control-item mui-active themes_font_color_tab item1mobile" href="#item1mobile">待上架</a>
 					<a class="mui-control-item themes_font_color_tab item2mobile" href="#item2mobile">已上架</a>
 				</div>
 				<div id="sliderProgressBar" class="mui-slider-progress-bar mui-col-xs-6"></div>
@@ -62,7 +65,7 @@
 		<script src="../../js/common.js" type="text/javascript" charset="utf-8"></script>
 		<script src="../../js/request.js" type="text/javascript" charset="utf-8"></script>
 		<script type="text/javascript">
-			
+			var auditStatus = undefined, selected = undefined;// 上架状态   1 待上架  2 已上架
 			if(window.plus) {
                 plusready();
             } else {
@@ -73,10 +76,29 @@
                     plus.webview.currentWebview().close();
                 })
             }
+            //去搜索页面
+			function toSearchPage (){
+				var params = {};
+				params.route = '../grounding/ground_list';
+				params.id = 'ground_list';
+				params.auditStatus = auditStatus;
+				params.selected = selected;
+				params.module = 'grounding';
+				params.location = 'sub_list';
+				common.openwin('../commonPages/searchPage',{ params: JSON.stringify(params) },false)
+			}
+            
 			
 			(function($) {
 				
 				var deceleration = mui.os.ios?0.003:0.0009;
+				$.init({
+					beforeback:function(){
+						var list = plus.webview.currentWebview().opener();
+						 mui.fire(list, 'refresh');
+						 return true;
+					}
+				});
 				$('.mui-scroll-wrapper').scroll({
 					bounce: false,
 					indicators: true, //是否显示滚动条
@@ -84,7 +106,7 @@
 				});
 				
 				/* 渲染模板   */
-				var checkType, type, auditStatus// 验收单类型 // 验收状态   1 待验收  2 已验收 
+				var checkType = undefined, type = undefined;
 				var nullDataHtml = '<div class="mui-pull-bottom-tips"><div class="mui-pull-bottom-wrapper">'+
 										'<span class="mui-pull-loading">暂无数据</span></div></div>'
 				
@@ -96,21 +118,47 @@
 				var utils = new Utils();
 				utils.appendModule('#ground_list_tpl');
 				
-				function showData(data,selected){
+				
+				var sliderProgressBar = undefined,
+					slideGroup = undefined,
+					themeFontTabs = undefined,
+					item1 = undefined,
+					item2 = undefined,
+					sliderSegmentedControl = undefined;
+				
+				function slideLeft(){
+					document.querySelector('#sliderProgressBar').style.transform = 'translate3d(0px,0px,0px) translateZ(0px)';
+			    	document.querySelector('.mui-slider-group').style.transform = 'translate3d(0px,0px,0px) translateZ(0px)';
+			    	document.querySelectorAll('.themes_font_color_tab')[0].className = 'mui-control-item themes_font_color_tab mui-active';
+			    	document.querySelector('#item1mobile').className = 'mui-slider-item mui-control-content mui-active';
+				}
+				
+				function slideRight(){
+					document.querySelector('#sliderProgressBar').style.transform = 'translate3d(267px,0px,0px) translateZ(0px)';
+			    	document.querySelector('.mui-slider-group').style.transform = 'translate3d(-534px,0px,0px) translateZ(0px)';
+			    	document.querySelectorAll('.themes_font_color_tab')[1].className = 'mui-control-item themes_font_color_tab mui-active';
+			    	document.querySelector('#item2mobile').className = 'mui-slider-item mui-control-content mui-active';
+			    	document.querySelector('.batchAccetpance').style.display = 'none';
+				}
+				
+				function showData(data,selected,key){
 					if(selected === 'left'){
 						var acceptanceTab1 = document.querySelector('.mui-tab1');
 						var html1;
 						if(data.listwsj.list.length === 0){
 							html1 = nullDataHtml;
-//							document.querySelector('.batchAccetpance').style.display = 'none';
+							document.querySelector('.batchAccetpance').style.display = 'none';
 						}else{
 							mui.each(data.listwsj.list,function(index,item){
 								item.editable = true;
 							})
 							html1 = template('ground_list',data.listwsj);
-//							document.querySelector('.batchAccetpance').style.display = 'block';
+							document.querySelector('.batchAccetpance').style.display = 'block';
 						}
 						acceptanceTab1.innerHTML = html1;
+						if(key){
+							slideLeft();
+						}
 					}else{
 						var acceptanceTab2 = document.querySelector('.mui-tab2');
 						var html2;
@@ -120,23 +168,30 @@
 							html2 = template('ground_list',data.listysj);
 						}
 						acceptanceTab2.innerHTML = html2;
+						if(key){
+							slideRight();
+						}
 					}
 					
 				}
 				
-				function genData(url,selected){
-					plus.nativeUI.showWaiting();
+				function genData(url,selected,key){
+					console.log(selected)
 					mui.ajaxRequest(url,{
                 		type: 'GET',
                 		showWaiting: true,
                 		success: function(data){
                 			plus.nativeUI.closeWaiting();
                 			if(data.code === 200){
-                				detailData.listwsj.list = data.data.listwsj;
+                				detailData = {
+                					listwsj: { list: [] },
+                					listysj: { list: [] }
+                				}
+                				detailData.listwsj.list = data.data.listwsj && data.data.listwsj.length ? data.data.listwsj: []
                 				detailData.listwsj.hasGround = true;
-                				detailData.listysj.list = data.data.listysj;
+                				detailData.listysj.list = data.data.listysj && data.data.listysj.length ? data.data.listysj: []
                 				detailData.listysj.hasGround = false;
-                				showData(detailData,selected)
+                				showData(detailData,selected,key)
                 			}else{
                 				mui.alert(data.msg)
                 			}
@@ -152,8 +207,23 @@
 					
 					window.addEventListener('pagefresh',function(event){
 						var query = JSON.parse(event.detail.params);
+						console.log(query)
 						var genUrl = '/a/checkacceptdetail/shelfInfo?distributeCode='+ query.distributecode;
-						genData(url,query.currentSelected);
+						document.querySelector('.mui-placeholder').style.display = 'block';
+						document.querySelector('.mui-input-clear').value = '';
+						genData(genUrl,query.currentSelected);
+					});
+					
+					// 触发刷新 搜索页面搜的值
+					window.addEventListener('sub_search',function(event){
+						console.log(event.detail);
+
+						let searchParams = JSON.parse(event.detail.searchParams);
+						document.querySelector('.mui-input-clear').placeholder = '';
+						document.querySelector('.mui-placeholder').style.display = 'none';
+						document.querySelector('.mui-input-clear').value = searchParams.hisDrugName;
+						var newUrl = url + '&hisDrugCode='+ searchParams.hisDrugCode +'&type='+ searchParams.type;
+						genData(newUrl,searchParams.selected,'search');
 					})
 					
 					var params, distributeCode, currentSelected = undefined
@@ -163,26 +233,20 @@
 				    distributeCode = params.distributecode;
 				    currentSelected = params.currentSelected; // 当前选中tabs 
 				    console.log(currentSelected)
-				    var sliderProgressBar = document.querySelector('#sliderProgressBar');
-				    var slideGroup = document.querySelector('.mui-slider-group');
-				    var themeFontTabs = document.querySelectorAll('.themes_font_color_tab');
-				    var item1 = document.querySelector('#item1mobile');
-	            	var item2 = document.querySelector('#item2mobile');
-				    var sliderSegmentedControl = document.querySelector('#sliderSegmentedControl');
+				    sliderProgressBar = document.querySelector('#sliderProgressBar');
+				    slideGroup = document.querySelector('.mui-slider-group');
+				    themeFontTabs = document.querySelectorAll('.themes_font_color_tab');
+				    item1 = document.querySelector('#item1mobile');
+	            	item2 = document.querySelector('#item2mobile');
+				    sliderSegmentedControl = document.querySelector('#sliderSegmentedControl');
 				    if(currentSelected === 'left'){
-				    	sliderProgressBar.style.transform = 'translate3d(0px,0px,0px) translateZ(0px)';
-				    	slideGroup.style.transform = 'translate3d(0px,0px,0px) translateZ(0px)';
-				    	themeFontTabs[0].className = 'mui-control-item themes_font_color_tab mui-active';
-				    	item1.className = 'mui-slider-item mui-control-content mui-active';
+				    	auditStatus = '1';
+						selected = 'left';
+						slideLeft();
 				    }else{
-				    	sliderProgressBar.style.transform = 'translate3d(267px,0px,0px) translateZ(0px)';
-				    	sliderProgressBar.style.display = 'none';
-				    	slideGroup.style.transform = 'translate3d(-534px,0px,0px) translateZ(0px)';
-				    	slideGroup.style.top = '-1px';
-				    	themeFontTabs[1].className = 'mui-control-item themes_font_color_tab mui-active';
-				    	item2.className = 'mui-slider-item mui-control-content mui-active';
-				    	sliderSegmentedControl.style.display = 'none';
-//				    	document.querySelector('.batchAccetpance').style.display = 'none';
+				    	auditStatus = '2';
+				    	selected = 'right';
+				    	slideRight();
 				    }
 				    
 				    var groundUrl = '/a/checkacceptdetail/finish';
@@ -192,6 +256,9 @@
 					
 					document.getElementById('slider').addEventListener('slide', function(e) {
 						if (e.detail.slideNumber === 1) {
+							selected = 'right';
+							auditStatus = '2';
+							document.querySelector('.batchAccetpance').style.display = 'none';
 							if (!item2.querySelector('.am-card')) {
 								var acceptanceTab2 = document.querySelector('.mui-tab2');
 								var html2;
@@ -202,19 +269,22 @@
 								}
 								acceptanceTab2.innerHTML = html2;
 							}
-//							document.querySelector('.batchAccetpance').style.display = 'none';
+							document.querySelector('.batchAccetpance').style.display = 'none';
 						}else if(e.detail.slideNumber === 0){
+							selected = 'left';
+							auditStatus = '1';
+							document.querySelector('.batchAccetpance').style.display = 'block';
 							if (!item1.querySelector('.am-card')) {
 								var acceptanceTab1 = document.querySelector('.mui-tab1');
 								var html;
 								if(detailData.listysj.list.length === 0){
 									html = nullDataHtml
+									document.querySelector('.batchAccetpance').style.display = 'none';
 								}else{
 									html = template('ground_list',detailData.listysj);
 								}
 								acceptanceTab1.innerHTML = html;
 							}
-//							document.querySelector('.batchAccetpance').style.display = 'block';
 						}
 					});
 					
@@ -241,7 +311,6 @@
 						let id = this.getAttribute('data-id');
 						let index = this.dataset.index;
 						console.log(index)
-//						var item1mobile = document.querySelector('#item1mobile');
 						var hasGround = item1.className.indexOf('mui-active')>0 ? true: false;
 						
 						let newData = {};
@@ -257,7 +326,7 @@
 					});
 					
 					/* 批量上架 */
-/*					$('.mui-bar').on('tap','.batchAccetpance',function(){
+					$('.mui-bar').on('tap','.batchAccetpance',function(){
 						var paramsData = {};
 						paramsData.list = detailData.listwsj.list;
 						paramsData.distributeCode = distributeCode;
@@ -266,7 +335,7 @@
 						common.openwin('ground_batch',{ params: JSON.stringify(paramsData) },{
 							titleText: '药品信息'
 						})
-					})*/
+					})
 					
 					// 绑定事件 --确认上架
 					$('#slider').on('tap','.ground',function(){

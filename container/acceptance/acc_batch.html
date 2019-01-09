@@ -150,36 +150,57 @@
 							let selectedCards = [], cardFactNum = [];
 							mui.each(selecteIndex,function(index,item){
 							selectedCards.push(cards[item]);
-							cardFactNum.push(cards[item].querySelector('.realReceiveQuantity'));
+							if(cards[index].dataset.isusual === '0'){
+								// 正常单据
+								cardFactNum.push(cards[item].querySelector('.realReceiveQuantity'));
+							}else{
+								// 异常单据
+								cardFactNum.push(cards[item].querySelector('.errorQuantiry'))
+							}
 						});
-							console.log(selectedCards);
+						console.log(cardFactNum,'cardFactNum')
+							console.log(selectedCards,'selectedCards');
 							var flag = true;
 							mui.each(cardFactNum,function(index,item){
-								if(!item.value){
-									flag = false;
+								if(item.tagName === 'INPUT'){
+									if(!item.value){
+										flag = false;
+									}
 								}
+								
 							})
 							if(!flag){
 								return mui.alert('实到数量不能为空','警告',['确定'],function(){},'div');
 							};
 							
 							mui.each(selectedCards,function(index,item){
+								
 								var postData = {};
-								var realReceiveQuantity = item.querySelector('.realReceiveQuantity').value;
-								var realProductTime = item.querySelector('.realProductTime').value;
-								var productBatchNo = item.querySelector('.productBatchNo').value;
-								var realValidEndDate = item.querySelector('.realValidEndDate').value;
-								if(isShowTemprature === 1){
-									var realAcceptanceTemperature = item.querySelector('.realAcceptanceTemperature').value;
-									postData.realAcceptanceTemperature = realAcceptanceTemperature
-								}
-								postData.realReceiveQuantiry = realReceiveQuantity;
-								postData.realProductTime = realProductTime;
-								postData.productBatchNo = productBatchNo;
-								postData.realValidEndDate = realValidEndDate;
 								postData.id = item.dataset.id;
 								postData.isUsual = item.dataset.isusual;
 								postData.drugCode = item.dataset.drugcode;
+								if(item.dataset.isusual === '0'){
+									var realReceiveQuantity = item.querySelector('.realReceiveQuantity').value;
+									var realProductTime = item.querySelector('.realProductTime').value;
+									var productBatchNo = item.querySelector('.productBatchNo').value;
+									var realValidEndDate = item.querySelector('.realValidEndDate').value;
+									if(isShowTemprature === 1){
+										var realAcceptanceTemperature = item.querySelector('.realAcceptanceTemperature').value;
+										postData.realAcceptanceTemperature = realAcceptanceTemperature
+									}
+									postData.realReceiveQuantiry = realReceiveQuantity;
+									postData.realProductTime = realProductTime;
+									postData.productBatchNo = productBatchNo;
+									postData.realValidEndDate = realValidEndDate;
+								}else{
+									var errorQuantiry = item.querySelector('.errorQuantiry').innerText;
+									var errRealProductTime = item.querySelector('.errRealProductTime').innerText;
+									var errVailEndDate = item.querySelector('.errVailEndDate').innerText;
+									postData.realReceiveQuantiry = errorQuantiry;
+									postData.realProductTime = errRealProductTime;
+									postData.productBatchNo = item.dataset.productbatchno;
+									postData.realValidEndDate = errVailEndDate;
+								}
 								detailList.push(postData);
 							});
 						}else{

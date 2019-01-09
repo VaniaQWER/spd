@@ -41,7 +41,11 @@
 									<div class="am-input-control">
 										<select class="editInput select_actualStore" value={{ value.replanStore }}>
 											{{ each value.acceptoodsVo item i }}
-											<option value={{ item.id }}>{{ item.positionName }}</option>
+												{{ if value.realReceiveStore === item.id }}
+														<option value={{ item.id }} selected="selected">{{ item.positionName }}</option>
+													{{ else }}
+														<option value={{ item.id }}>{{ item.positionName }}</option>
+												{{ /if }}
 											{{ /each }}
 										</select>
 									</div>
@@ -49,14 +53,9 @@
 							</div>
 						</div>
 						<div class="am-flexbox-item">
-							<div class="am-list-item am-input-item am-list-item-middle">
-								<div class="am-list-line">
-									<div class="am-input-label am-input-label-5 font-warning">实际上架数量:</div>
-									<div class="am-input-control">
-										<input pattern="[0-9]*" type="number" value={{ value.realNum }} placeholder="请输入" class="realNum"/>
-									</div>
-								</div>
-							</div>
+							<div class="am-flexbox-item">
+							 实际上架数量：<span class="realNum">{{ value.realNum }}</span>
+							 </div>
 						</div>
 					</div>
 				</div>

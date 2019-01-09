@@ -144,7 +144,7 @@
 				$.init({
 					beforeback:function(){
 						var list = plus.webview.currentWebview().opener();
-						 mui.fire(list, 'refresh');
+						 mui.fire(list, 'refresh',{ getCountFlag: true });
 						 return true;
 					}
 				});

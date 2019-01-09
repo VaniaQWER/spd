@@ -42,10 +42,10 @@
 				{{ each tablist itemValue subIndex}}
 				<li class="mui-table-view-cell mui-collapse"  data-id={{ itemValue.id }}>
 					
-					<a class="mui-navigate-right" href="#">
+					<a class="mui-navigate-right" href="#" style="display: flex;">
 						<label class="detailRow_label head_minheight">货位</label> 
 						<p class="detailRow_content head_minheight">{{ itemValue.storeLocName }}</p>
-						<span class="detailRow_right theme_font_danger head_minheight">{{ itemValue.totalQuantity }}</span>
+						<span class="detailRow_right theme_font_danger head_minheight">{{ itemValue.usableQuantity }}</span>
 					</a>
 					<div class="mui-collapse-content">
 							<div class="mui-input-row">
@@ -80,8 +80,6 @@
 				</li>
 			{{/each}}
 		</ul>
-		
-		
 	{{/each}}
 	</div>
 </script>

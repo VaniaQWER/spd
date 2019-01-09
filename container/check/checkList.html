@@ -226,6 +226,8 @@
 										success: function(data){
 											if(data.code === 200){
 												mui(".mui-scroll").pullToRefresh().pullDownLoading();
+											}else{
+												mui.toast(data.msg,3)
 											}
 										},
 										error: function(xhr,type,errorThrown){
