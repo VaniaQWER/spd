@@ -82,6 +82,7 @@
             
             //去搜索页面
 			function toSearchPage (){
+				document.activeElement.blur(); // 隐藏软键盘
 				var params = {};
 				params.route = '../pickingOff/pickingOffList';
 				params.id = 'pickingOffList';
@@ -140,56 +141,47 @@
                 			}
                 		},
                 		error: function(xhr,type,errorThrown){
-							alert(xhr.responseText)
+							console.log(xhr.responseText)
                 		}
             		});
 				}
 			
 			
 			function showData(data,selected,key){
-				console.log(selected,'showData')
-				if(selected === 'left'){
-					var acceptanceTab1 = document.querySelector('.mui-tab1');
-					var html1;
-					if(data.notDetail.list.length === 0){
-						html1 = nullDataHtml;
-					}else{
-						html1 = template('picking_tpl',data.notDetail);
-					}
-					acceptanceTab1.innerHTML = html1;
-					if(key){
-						slideLeft();
-					}
+				var batchAccetpance = document.querySelector('.batchAccetpance');
+				var acceptanceTab1 = document.querySelector('.mui-tab1');
+				var acceptanceTab2 = document.querySelector('.mui-tab2');
+				var html1 = undefined, html2 = undefined;
+				batchAccetpance.style.display = selected === 'left'? 'block': 'none';
+				if(data.notDetail.list.length === 0){
+					html1 = nullDataHtml;
 				}else{
-					var acceptanceTab2 = document.querySelector('.mui-tab2');
-					var html2;
-					if(data.existDetail.list.length === 0){
-						html2 = nullDataHtml
-					}else{
-						html2 = template('picking_tpl',data.existDetail);
-					}
-					acceptanceTab2.innerHTML = html2;
-					if(key){
-						slideRight();
-					}
+					html1 = template('picking_tpl',data.notDetail);
 				}
+				acceptanceTab1.innerHTML = html1;
+				if(data.existDetail.list.length === 0){
+					html2 = nullDataHtml
+				}else{
+					html2 = template('picking_tpl',data.existDetail);
+				}
+				acceptanceTab2.innerHTML = html2;
 			}
 			
 			function slideLeft(){
-					document.querySelector('#sliderProgressBar').style.transform = 'translate3d(0px,0px,0px) translateZ(0px)';
-			    	document.querySelector('.mui-slider-group').style.transform = 'translate3d(0px,0px,0px) translateZ(0px)';
-			    	document.querySelectorAll('.themes_font_color_tab')[0].className = 'mui-control-item themes_font_color_tab mui-active';
-			    	document.querySelector('#item1mobile').className = 'mui-slider-item mui-control-content mui-active';
-				}
-				
-				function slideRight(){
-					document.querySelector('#sliderProgressBar').style.transform = 'translate3d(267px,0px,0px) translateZ(0px)';
-			    	document.querySelector('.mui-slider-group').style.transform = 'translate3d(-534px,0px,0px) translateZ(0px)';
-			    	document.querySelectorAll('.themes_font_color_tab')[1].className = 'mui-control-item themes_font_color_tab mui-active';
-			    	document.querySelector('#item2mobile').className = 'mui-slider-item mui-control-content mui-active';
-			    	document.querySelector('.batchAccetpance').style.display = 'none';
-				}
+				document.querySelector('#sliderProgressBar').style.transform = 'translate3d(0px,0px,0px) translateZ(0px)';
+		    	document.querySelector('.mui-slider-group').style.transform = 'translate3d(0px,0px,0px) translateZ(0px)';
+		    	document.querySelectorAll('.themes_font_color_tab')[0].className = 'mui-control-item themes_font_color_tab mui-active';
+		    	document.querySelector('#item1mobile').className = 'mui-slider-item mui-control-content mui-active';
+			}
 			
+			function slideRight(){
+				document.querySelector('#sliderProgressBar').style.transform = 'translate3d(267px,0px,0px) translateZ(0px)';
+		    	document.querySelector('.mui-slider-group').style.transform = 'translate3d(-534px,0px,0px) translateZ(0px)';
+		    	document.querySelectorAll('.themes_font_color_tab')[1].className = 'mui-control-item themes_font_color_tab mui-active';
+		    	document.querySelector('#item2mobile').className = 'mui-slider-item mui-control-content mui-active';
+		    	document.querySelector('.batchAccetpance').style.display = 'none';
+			}
+		
 			
 			$.plusReady(function(){
 				
@@ -209,7 +201,11 @@
 					document.querySelector('.mui-placeholder').style.display = 'none';
 					document.querySelector('.mui-input-clear').value = searchParams.hisDrugName;
 					var newUrl = url + '&hisDrugCode='+ searchParams.hisDrugCode +'&type='+ searchParams.type;
-					genData(newUrl,searchParams.selected,'search');
+					genData(newUrl,searchParams.selected);
+					// 模拟点击Tabs
+					if(searchParams.selected === 'right'){
+						mui('#slider').slider().gotoItem(1);
+					}
 				})
 				var params, pickingOrderNo, currentSelected = undefined;
 				var self = plus.webview.currentWebview();
@@ -238,37 +234,20 @@
 				
 				var item1 = document.getElementById('item1mobile');
             	var item2 = document.getElementById('item2mobile');
+            	var batchAccetpance = document.querySelector('.batchAccetpance');
 				document.getElementById('slider').addEventListener('slide', function(e) {
 					if (e.detail.slideNumber === 1) {
 						pickingStatus = '1';
 						selected = 'right';
-						if (!item2.querySelector('.am-card')) {
-								var acceptanceTab2 = document.querySelector('.mui-tab2');
-								var html2;
-								if(detailData.existDetail.list.length === 0){
-									html2 = nullDataHtml
-								}else{
-									html2 = template('picking_tpl',detailData.existDetail);
-								}
-								acceptanceTab2.innerHTML = html2;
-							}
-						document.querySelector('.batchAccetpance').style.display = 'none';
+						slideRight();
+						batchAccetpance.style.display = 'none';
+						
 					}else if(e.detail.slideNumber === 0){
 						pickingStatus = '0';
 						selected = 'left';
-						if (!item1.querySelector('.am-card')) {
-							var acceptanceTab1 = document.querySelector('.mui-tab1');
-							var html;
-							if(detailData.notDetail.list.length === 0){
-								html = nullDataHtml
-							}else{
-								html = template('picking_tpl',detailData.notDetail);
-							}
-							acceptanceTab1.innerHTML = html;
-						}
-						document.querySelector('.batchAccetpance').style.display = 'block';
+						slideLeft();
+						batchAccetpance.style.display = 'block';
 					}
-					
 				});
 					
 				
@@ -355,7 +334,7 @@
 		                			}
 		                		},
 		                		error: function(xhr,type,errorThrown){
-									alert(xhr.responseText)
+									console.log(xhr.responseText)
 		                		}
 		            		});
 						}

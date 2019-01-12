@@ -56,6 +56,7 @@
 			</div>
 		</div>
 		<script src="../../js/mui.js"></script>
+		<script src="../../js/jquery.min.js" ></script>
 		<script src="../../js/mui.pullToRefresh.js"></script>
 		<script src="../../js/mui.pullToRefresh.material.js"></script>
 		<script src="../../js/template-web.js" type="text/javascript" charset="utf-8"></script>
@@ -72,6 +73,7 @@
 			}
 			//去搜索页面
 			function toSearchPage (){
+				document.activeElement.blur(); // 隐藏软键盘
 				var params = {};
 				params.key = 'supplier';
 				params.route = '../acceptance/index';
@@ -84,7 +86,7 @@
 //			    location.reload();  
 //			});
 			
-			(function($) {
+			(function($,$$) {
 				
 				$.init({
 					beforeback:function(){
@@ -109,11 +111,13 @@
 				var checkType, type, acceptanceType// 验收单类型 // 验收状态   1 待验收  2 已验收 
 				var requestUrl =  '/a/checkaccept/list'; // 请求地址
 				
-				var pageLeft = 1, pageRight = 1, totalPageLeft, totalPageRight, isMore = true,selectTabs = 1;
-				currSelected();
-				
-				var searchPlaceholder = undefined;
-				var search_clear = undefined;
+				var pageLeft = 1, 
+					pageRight = 1, 
+					totalPageLeft, 
+					totalPageRight, 
+					isMore = true, 
+					selectTabs = 1, // 默认选中第一个tab
+					selected = '.mui-tab1'; // 默认选中内容区块
 				
             	function template(selected, data, insertType){
         			utils.innerTplHtml('acceptance', selected, data, insertType);
@@ -134,55 +138,53 @@
             	 	下拉刷新
             	 * */
             	function pulldownRefresh(){
+            		console.log(query)
             		var self = this;
-            		setTimeout(function(){
-            			if(selectTabs === 1){
-							pageLeft  = 1
-						}else{
-							pageRight = 1;
-						}
-						acceptanceType = selectTabs === 1 ? '1': '2';
-						page = selectTabs === 1 ? pageLeft: pageRight;
-						var postData = {
-							acceptanceType: acceptanceType,
-	                		checkType: checkType,
-	                		pageNo: page,
-	                		pageSize: pageSize
-						}
-						if(query.supplierCode){
-							postData.supplierCodeList = [ query.supplierCode ];
-						}
-						query = {};
-						mui.ajaxRequest(requestUrl,{
-	                		type: 'POST',
-	                		data: postData,
-	                    	contentType: "application/json",
-	                		success: function(data){
-	                			var resData = data.data;
-	                			var total = resData.totalPage;
-	                			if(selectTabs === 1){
-	                				totalPageLeft = total;
-	                			}else{
-	                				totalPageRight = total;
-	                			}
-	                			if(resData.list.length < resData.pageSize){
-	                				var i = selectTabs === 1 ? 0 : 1;
-	                				document.querySelectorAll('.mui-pull-loading')[i].innerHTML = '没有更多数据';
-	                				isMore = false;
-	                				self.endPullDownToRefresh(true);
-	                			}else{
-	                				isMore = true;
-	                				self.endPullDownToRefresh(false);
-	                				self.refresh(true);
-	                			}
-								return template(selected,resData,false)
-	                		},
-	                		error: function(xhr,type,errorThrown){
-	                			console.log(xhr)
-	                		}
-	            		});
-            		},500)
-            		
+        			if(selectTabs === 1){
+						pageLeft  = 1
+					}else{
+						pageRight = 1;
+					}
+					acceptanceType = selectTabs === 1 ? '1': '2';
+					page = selectTabs === 1 ? pageLeft: pageRight;
+					var postData = {
+						acceptanceType: acceptanceType,
+                		checkType: checkType,
+                		pageNo: page,
+                		pageSize: pageSize
+					}
+					if(query.supplierCode){
+						postData.supplierCodeList = [ query.supplierCode ];
+					}
+					query = {};
+					mui.ajaxRequest(requestUrl,{
+                		type: 'POST',
+                		data: postData,
+                    	contentType: "application/json",
+                		success: function(data){
+                			var resData = data.data;
+                			var total = resData.totalPage;
+                			if(selectTabs === 1){
+                				totalPageLeft = total;
+                			}else{
+                				totalPageRight = total;
+                			}
+                			if(resData.list.length <= resData.pageSize && resData.pageNo === resData.totalPage){
+                				var i = selectTabs === 1 ? 0 : 1;
+                				document.querySelectorAll('.mui-pull-loading')[i].innerHTML = '没有更多数据';
+                				isMore = false;
+                				self.endPullDownToRefresh(true);
+                			}else{
+                				isMore = true;
+                				self.endPullDownToRefresh(false);
+                				self.refresh(true);
+                			}
+							return template(selected,resData,false)
+                		},
+                		error: function(xhr,type,errorThrown){
+                			console.log(xhr)
+                		}
+            		});
 				}
             	/*
 					 
@@ -224,7 +226,7 @@
 									return template(selected,resData,true)
 		                		},
 		                		error: function(xhr,type,errorThrown){
-									alert(xhr.responseText)
+									console(xhr.responseText)
 		                		}
 		            		});
 						}
@@ -235,16 +237,15 @@
 					}
 				}
 				$.plusReady(function(){
-					
-					searchPlaceholder = document.querySelector('.mui-placeholder');
-					search_clear = document.querySelector('.mui-input-clear');
+		
 					// 触发刷新 搜索页面搜的值
 					window.addEventListener('search',function(event){
+						console.log(event.detail)
 						query.supplierCode = JSON.parse(event.detail.searchParams).supplierCode;
 						query.supplierName = JSON.parse(event.detail.searchParams).supplierName;
-						search_clear.placeholder = '';
-						searchPlaceholder.style.display = 'none';
-						search_clear.value = query.supplierName;
+						console.log(JSON.stringify(query),'query')
+						$$('.mui-placeholder').hide();
+						$$('.mui-input-clear').val(query.supplierName);
 						mui(".mui-slider-group .mui-scroll").pullToRefresh()[0].pullDownLoading();
 					})
 					
@@ -279,33 +280,27 @@
 					var item2 = document.querySelector('#item2mobile');
 					var item1 = document.querySelector('#item1mobile');
 					document.getElementById('slider').addEventListener('slide', function(e) {
-						currSelected();
+						$$('.mui-input-clear').val('');
 						let index = e.detail.slideNumber;
 						if (index === 1) {
+							selected = '.mui-tab2';
+							selectTabs = 2;
+							mui('#slider').slider().gotoItem(1);
 							$('.mui-slider-group .mui-scroll .mui-tab2')[0].innerHTML = '';
 							if (!item2.querySelector('.am-card')) {
 								mui(".mui-slider-group .mui-scroll").pullToRefresh()[index].pullDownLoading();
 							}
 						}
 						if(index === 0){
+							selected = '.mui-tab1';
+							selectTabs = 1;
+							mui('#slider').slider().gotoItem(0);
 							$('.mui-slider-group .mui-scroll .mui-tab1')[0].innerHTML = '';
 							if (!item1.querySelector('.am-card')) {
 								mui(".mui-slider-group .mui-scroll").pullToRefresh()[index].pullDownLoading();
 							}
 						}
 					});
-					
-					//tab页切的点击事件
-					var sliderSegmentedControl = document.getElementById('sliderSegmentedControl');
-					$('.mui-input-group').on('change', 'input', function() {
-						if (this.checked) {
-							sliderSegmentedControl.className = 'mui-slider-indicator mui-segmented-control mui-segmented-control-inverted mui-segmented-control-' + this.value;
-							//force repaint
-							sliderProgressBar.setAttribute('style', sliderProgressBar.getAttribute('style'));
-						}
-					});
-					
-					
 					//循环初始化所有下拉刷新，上拉加载。
 					$.each(document.querySelectorAll('.mui-slider-group .mui-scroll'), function(index, pullRefreshEl) {
 						
@@ -338,7 +333,7 @@
 					})
 				});
 				
-			})(mui);
+			})(mui,jQuery);
 		
 		</script>
 	</body>

@@ -87,6 +87,7 @@
 			
 //			//去搜索页面
 			function toSearchPage (){
+				document.activeElement.blur(); // 隐藏软键盘
 				var params = {};
 				params.route = '../pickingOff/index';
 				params.auditStatus = pickingStatus;
@@ -179,7 +180,7 @@
                 			}else{
                 				totalPageRight = total;
                 			}
-                			if(resData.list.length < pageSize){
+                			if(resData.list.length <= resData.pageSize && resData.pageNo === resData.totalPage){
 								var i = selectTabs === 1 ? 0 : 1;
                 				document.querySelectorAll('.mui-pull-loading')[i].innerHTML = '没有更多数据';
                 				isMore = false;
@@ -193,7 +194,7 @@
                 			
                 		},
                 		error: function(xhr,type,errorThrown){
-							alert(xhr.responseText)
+							console.log(xhr.responseText)
                 		}
             		});
 				}
@@ -235,7 +236,7 @@
 									return template(selected,resData,true);
 		                		},
 		                		error: function(xhr,type,errorThrown){
-									alert(xhr.responseText)
+									console.log(xhr.responseText)
 		                		}
 		            		});
 						}

@@ -104,6 +104,10 @@
 						 	});
 						 	document.querySelector('.total').innerText = checkList.length;
 						 	selectedRows = acceptList;
+							mui.each(selectedRows,function(index,item){
+								selecteIndex.push(index);
+							});
+							console.log(selecteIndex)
 					    } else { 
 					    	// 取消全选     
 					        mui.each(checkList,function(index,item){
@@ -111,6 +115,7 @@
 						 	});
 						 	document.querySelector('.total').innerText = 0;
 						 	selectedRows = [];
+						 	selecteIndex = []
 					    }
 					    console.log(selectedRows)
 					});
@@ -246,7 +251,7 @@
 										}
 									},
 									error: function(xhr,type,errorThrown){
-										alert(xhr.responseText)
+										console.log(xhr.responseText)
 			                		}
 								})
 							}

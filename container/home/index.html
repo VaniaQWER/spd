@@ -28,11 +28,6 @@
         </div>
         <div class="home-card-wrapper" style="padding: 16px">
             <div class="home-card-title">提醒消息</div>
-            <!--<div id="sliderSegmentedControl" class="mui-slider-indicator mui-segmented-control mui-segmented-control-inverted">
-				<a class="mui-control-item themes_font_color_tab mui-active" data-remindType='lowStock' href="#item1mobile">低库存提醒</a>
-				<a class="mui-control-item themes_font_color_tab" data-remindType='usefulDate' href="#item2mobile">近效期提醒</a>
-			</div>-->
-            
         </div>
         <div id="slider" class="mui-slider themes_tab mui-fullscreen" style="top: 260px;">
 			<div id="sliderSegmentedControl" class="mui-slider-indicator mui-segmented-control mui-segmented-control-inverted">
@@ -193,21 +188,21 @@
 			$('#sliderSegmentedControl').on('tap','.mui-control-item',function(){
 				remindType = this.dataset.remindtype;
 				url = remindType === 'lowStock' ? '/a/pad/drugremind/findPadRemindListTow': '/a/pad/drugremind/findPadRemindList';
-//				toTopResetRefresh();
+//				toTopResetRefresh(remindType);
 			})
 			
-			function toTopResetRefresh(){
+			function toTopResetRefresh(remindType){
 	            page = 1;
 	            pageSize = 10, 
 	            totalPage = 0;
 	            setTimeout(function(){
-//	            	mui('#message-list').pullRefresh().pullupLoading();
-//	            	mui("#message-list").pullRefresh().refresh(true);	
-					mui(".mui-slider-group .mui-scroll").pullToRefresh()[0].pullDownLoading();
+	            	let index = remindType === 'lowStock'? 0 : 1;	
+					mui(".mui-slider-group .mui-scroll").pullToRefresh()[index].pullDownLoading();
 	            },100)
 	        }
 			
 			function template(selected,data,insertType){
+				console.log(selected,'selected')
 				utils.innerTplHtml('message-tpl', selected, data, insertType,function(){
 					$('#message-list').on('tap','.message-detail',function(){
 						console.log(this.dataset,'dataset')
@@ -220,21 +215,10 @@
 						})
 					})
 				});
-//              utils.innerTplHtml('message-tpl', '.mui-table-view', data, insertType, function() {
-//					$('#message-list').on('tap', '.message-detail',function() {
-//						console.log(this.dataset,'dataset')
-//						var dataset = this.dataset;
-//						dataset.remindType = remindType;
-//						common.openwin('./tips', {
-//							tipId: JSON.stringify(dataset)
-//						}, {
-//							titleText: '提醒'
-//						})
-//					})
-//				})
         	}
 			function pullupRefresh(){
 				var self = this;
+				console.log(isMore,'isMore')
 				if(isMore){
 					if(selectTabs === 1){
 						pageLeft ++;
@@ -247,13 +231,14 @@
 						pageNo: page,
 						pageSize: pageSize
 					}
-					if(page<= totalPage){
+					console.log(page,totalPage,'page','pageTotal')
+//					if(page < totalPage){
 						mui.ajaxRequest(url,{
 		            		type: 'POST',
 		            		data: postData,
 		            		success: function(data){
 		            			var resData = data.data;
-		            			if(resData.pageNo === resData.totalPage){
+	                			if(resData.pageNo === resData.totalPage){
 		            				isMore = false;
 		            				self.endPullUpToRefresh(true);
 		            			}else{
@@ -267,8 +252,9 @@
 								alert(xhr.responseText)
 		            		}
 		            	})
-					}
+//					}
 				}else{
+					console.log('sdfadf')
 					var i = selectTabs === 1 ? 0 : 1;
 					document.querySelectorAll('.mui-pull-loading')[i].innerHTML = '没有更多数据';
 					self.endPullUpToRefresh(true);
@@ -284,7 +270,6 @@
 					pageRight = 1;
 				}
 				page = selectTabs === 1 ? pageLeft: pageRight;
-				
 				var postData = {
 					pageNo: 1,
 					pageSize: 10
@@ -301,18 +286,17 @@
             				totalPageRight = total;
             			}
             			page = resData.pageNo;
-            			if(resData.list.length < resData.pageSize){
+            			if(resData.list.length < resData.pageSize && resData.pageNo === resData.totalPage){
             				var i = selectTabs === 1 ? 0 : 1;
             				document.querySelectorAll('.mui-pull-loading')[i].innerHTML = '没有更多数据';
             				isMore = false;
             				self.endPullDownToRefresh(true);
-            				return template(selected,resData,false)
             			}else{
             				isMore = true;
             				self.endPullDownToRefresh(false);
             				self.refresh(true);
-            				return template(selected,resData,true)
             			}
+            			return template(selected,resData,true)
             		},
             		error: function(xhr,type,errorThrown){
 						alert(xhr.responseText)
@@ -338,6 +322,7 @@
 							callback: pulldownRefresh
 						},
 						up: {
+							height: 200,
 							contentrefresh : "正在加载...",//可选，正在加载状态时，上拉加载控件上显示的标题内容
       						contentnomore:'没有更多数据',
 							callback: pullupRefresh
@@ -353,12 +338,20 @@
 					currSelected();
 					let index = e.detail.slideNumber;
 					if (index === 1) {
+						url = '/a/pad/drugremind/findPadRemindList';
+						selected = '.mui-tab2';
+						hasChecked = true;
+						selectTabs = 2;
 						if (!item2.querySelector('.am-card')) {
 							$('.mui-slider-group .mui-scroll .mui-tab2')[0].innerHTML = '';
 							mui(".mui-slider-group .mui-scroll").pullToRefresh()[index].pullDownLoading();
 						}
 					}
 					if(index === 0){
+						url = '/a/pad/drugremind/findPadRemindListTow'
+						selected = '.mui-tab1';
+						hasChecked = false;
+						selectTabs = 1;
 						if (!item1.querySelector('.am-card')) {
 							insertType = false;
 							$('.mui-slider-group .mui-scroll .mui-tab1')[0].innerHTML = '';

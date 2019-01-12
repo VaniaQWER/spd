@@ -66,16 +66,18 @@
 		<script type="text/javascript">
 			
 			
-			
 			function clicked(){
 				common.openwin('../commonPages/qrcode',true,{ titleText: '扫码验收' })
 			}
+			
 			//去搜索页面
 			function toSearchPage (){
+				document.activeElement.blur(); // 隐藏软键盘
 				var params = {};
 				params.key = 'supplier';
-				params.route = '../acceptance/index';
-//				params.to = 'acc_list';
+				params.route = '../basicMedicine/index';
+				params.module = 'basicMedicine';
+				params.location = 'main_list'
 				common.openwin('../commonPages/searchPage',{ params: JSON.stringify(params) },false)
 			}
 			
@@ -108,7 +110,7 @@
 				var checkType, type, auditStatus// 验收单类型 // 验收状态   1 待验收  2 已验收 
 				var requestUrl =  '/a/checkaccept/basicMediclist'; // 请求地址
 				
-				var pageLeft = 1, pageRight = 1, totalPageLeft, totalPageRight, isMore = true;
+				var pageLeft = 1, pageRight = 1, totalPageLeft, totalPageRight, isMore = true, selectTabs = 1;
 				currSelected();
 				
             	function template(selected, data, insertType){
@@ -131,21 +133,20 @@
             	 * */
             	function pulldownRefresh(){
             		var self = this;
-            		setTimeout(function(){
-            			if(!hasChecked){
+//          		setTimeout(function(){
+            			if(selectTabs === 1){
 							pageLeft  = 1
 						}else{
 							pageRight = 1;
 						}
-						auditStatus = !hasChecked ? '1': '3';
-						page = !hasChecked ? pageLeft: pageRight;
+						auditStatus = selectTabs === 1 ? '1': '3';
+						page = selectTabs === 1 ? pageLeft: pageRight;
 						var postData = {
 							auditStatus: auditStatus,
 	                		checkType: checkType,
 	                		pageNo: page,
 	                		pageSize: pageSize
 						}
-						console.log(pageLeft);
 						if(query.supplierCode){
 							postData.supplierCodeList = [ query.supplierCode ];
 						}
@@ -157,27 +158,28 @@
 	                		success: function(data){
 	                			var resData = data.data;
 	                			var total = resData.totalPage;
-	                			if(!hasChecked){
+	                			if(selectTabs === 1){
 	                				totalPageLeft = total;
 	                			}else{
 	                				totalPageRight = total;
 	                			}
-	                			if(resData.list.length < pageSize){
-	                				var i = !hasChecked ? 0 : 1;
+	                			if(resData.list.length <= resData.pageSize && resData.pageNo === resData.totalPage){
+	                				var i = selectTabs === 1 ? 0 : 1;
 	                				document.querySelectorAll('.mui-pull-loading')[i].innerHTML = '没有更多数据';
 	                				isMore = false;
 	                				self.endPullDownToRefresh(true);
 	                			}else{
-	                				self.endPullDownToRefresh();
+	                				isMore = true;
+	                				self.endPullDownToRefresh(false);
+	                				self.refresh(true);
 	                			}
-	                			self.refresh(true);
 								return template(selected,resData,false)
 	                		},
 	                		error: function(xhr,type,errorThrown){
-	                			console.log(xhr)
+	                			console.log(xhr.responseText)
 	                		}
 	            		});
-            		},500)
+//          		},500)
             		
 				}
             	/*
@@ -187,16 +189,16 @@
 				function pullupRefresh(){
 					var self = this;
 					if(isMore){
-						if(!hasChecked){
+						if(selectTabs === 1){
 							pageLeft ++
 						}else{
 							pageRight ++;
 						}
-						page = !hasChecked ? pageLeft: pageRight;
-						totalPage = !hasChecked ? totalPageLeft: totalPageRight;
+						page = selectTabs === 1 ? pageLeft: pageRight;
+						totalPage = selectTabs === 1 ? totalPageLeft: totalPageRight;
 						console.log(page);
 						console.log(totalPage)
-						auditStatus = !hasChecked ? '1': '3';
+						auditStatus = selectTabs === 1 ? '1': '3';
 						var postData = {
 							auditStatus: auditStatus,
 	                		checkType: checkType,
@@ -219,12 +221,12 @@
 		                			return page < resData.totalPage ? template(selected,resData,false): template(selected,resData,true)	
 		                		},
 		                		error: function(xhr,type,errorThrown){
-									alert(xhr.responseText)
+									console.log(xhr.responseText)
 		                		}
 		            		});
 						}
 					}else{
-						var i = !hasChecked ? 0 : 1;
+						var i = selectTabs === 1 ? 0 : 1;
 						document.querySelectorAll('.mui-pull-loading')[i].innerHTML = '没有更多数据';
 						self.endPullUpToRefresh(true);
 					}
@@ -237,6 +239,7 @@
 					
 					// 触发刷新 搜索页面搜的值
 					window.addEventListener('search',function(event){
+						console.log(event.detail)
 						query.supplierCode = JSON.parse(event.detail.searchParams).supplierCode;
 						query.supplierName = JSON.parse(event.detail.searchParams).supplierName;
 						document.querySelector('.mui-input-clear').placeholder = '';
@@ -309,7 +312,7 @@
 						itemData.currentSelected = hasChecked ? 'right': 'left';
 						console.log(JSON.stringify(itemData))
 						document.activeElement.blur(); // 隐藏软键盘
-						common.openwin('acc_list',{ params: JSON.stringify(itemData) },false)
+						common.openwin('basic_acc_list',{ params: JSON.stringify(itemData) },false)
 					})
 				});
 				

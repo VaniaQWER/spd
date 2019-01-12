@@ -10,7 +10,7 @@
 		<link href="../../css/mui.min.css" rel="stylesheet" />
 		<link href="../../css/themes.css" rel="stylesheet" />
 		<link href="../../css/index_view.css" rel="stylesheet" />
-		<!--<link rel="stylesheet" href="../../css/mui.picker.min.css" />-->
+		<link rel="stylesheet" href="../../css/mui.picker.min.css" />
 		<link href="../../css/check.css" rel="stylesheet" />
 		<link rel="import" href="../../tpl/check_card.html" id="card_view"/>
 	</head>
@@ -131,7 +131,7 @@
 		<script src="../../js/mui.js"></script>
 		<script src="../../js/mui.pullToRefresh.js"></script>
 		<script src="../../js/mui.pullToRefresh.material.js"></script>
-		<!--<script src="../../js/mui.picker.min.js" ></script>-->
+		<script src="../../js/mui.picker.min.js" ></script>
 		<script src="../../js/template-web.js" type="text/javascript" charset="utf-8"></script>
 		<script src="../../js/utils.js" type="text/javascript" charset="utf-8"></script>
 		<script src="../../js/common.js" type="text/javascript" charset="utf-8"></script>
@@ -189,7 +189,7 @@
                 			}
                 		},
                 		error: function(xhr,type,errorThrown){
-							alert(xhr.responseText)
+							console.log(xhr.responseText)
                 		}
             		});
 				}
@@ -214,7 +214,7 @@
 									return template(resData, true)
 		                		},
 		                		error: function(xhr,type,errorThrown){
-									alert(xhr.responseText)
+									console.log(xhr.responseText)
 		                		}
 		            		});
 						}
@@ -320,7 +320,7 @@
 							}
 						},
 						error: function(xhr,type,errorThrown){
-							alert(xhr.responseText)
+							console.log(xhr.responseText)
                 		}
 					});
 					var position = document.querySelector('#position');
@@ -383,7 +383,7 @@
 								
 							},
 							error: function(xhr,type,errorThrown){
-								alert(xhr.responseText)
+								console.log(xhr.responseText)
 			            	}
 						})
 					}
@@ -521,7 +521,7 @@
 								}
 							},
 							error: function(xhr,type,errorThrown){
-								alert(xhr.responseText)
+								console.log(xhr.responseText)
 	                		}
 						})
 							

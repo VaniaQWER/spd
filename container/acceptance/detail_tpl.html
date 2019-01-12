@@ -117,7 +117,7 @@
 						{{ /if }}
 						<div class="mui-input-row">
 							<label>配送数量</label>
-							<p class="detailRow_content">{{ value && value.realDeliveryQuantiry ? value.realDeliveryQuantiry: '' }}</p>
+							<p class="detailRow_content">{{ value && value.realDeliveryQuantiry ? value.realDeliveryQuantiry: 0 }}</p>
 						</div>
 						<div class="mui-input-row">
 							{{ if (accepttype === '101' || accepttype === '102' || accepttype === '103' ||accepttype === '104') && hasAcceptance && value.isUsual === 0 }}

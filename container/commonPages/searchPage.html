@@ -91,27 +91,32 @@
 					localStorageItem = [] // 判断搜索 供应商 ，商品名 两类
 				$.plusReady(function(){
 					var self = plus.webview.currentWebview();
+					// 输入框聚焦
+					document.getElementById("search").focus();
+//					document.activeElement.focus();
 					params = JSON.parse(self.params);//获得参数
 					console.log(self.params);
 				    key = params.key;
 				    selected = params.selected;
 				    module = params.module;
 				    location = params.location;
-				    console.log(selected)
-				    console.log(module);
-				    console.log(location)
+//				    console.log(selected)
+//				    console.log(module);
+//				    console.log(location)
 				    var lastChildNode = document.querySelector('.mui-placeholder').lastChild;
 				    if(location === 'sub_list' || module === 'stock'){
 				    	lastChildNode.innerText = '请输入通用名/商品名';
 				    }else{
-				    	if(module === 'acceptance' && location === 'main_list'){
+				    	if((module === 'acceptance' || module === 'basicMedicine') && location === 'main_list'){
 				    		lastChildNode.innerText = '请输入供应商'
 				    	}else if(module === 'grounding' || module === 'pickingOff'){
 				    		lastChildNode.innerText = '请输入单号'
 				    	}
 				    }
 					var searchList = JSON.parse(plus.storage.getItem('searchHistory'));
+					console.log(searchList)
 					let currHistory = searchList[module][location];
+					console.log(currHistory)
 					if(currHistory && currHistory.length){
 						
 						// 创建 删除历史记录标签
@@ -128,7 +133,7 @@
 								div.setAttribute('data-hisDrugName',item.hisDrugName);
 								div.setAttribute('data-hisDrugCode',item.hisDrugCode)
 							}
-							if(module === 'acceptance'){
+							if(module === 'acceptance' || module === 'basicMedicine'){
 								if(location === 'main_list'){
 									div.innerHTML = item.supplierName
 									div.setAttribute('data-supplierCode',item.supplierCode);
@@ -184,8 +189,8 @@
 					  		if(location === 'main_list'){
 					  			if(dataset.suppliercode){
 					  				searchParams = {
-							  			hisDrugCode: dataset.hisdrugcode,
-							  			hisDrugName: dataset.hisdrugname
+							  			supplierCode: dataset.suppliercode,
+							  			supplierName: dataset.suppliername
 							  		}
 					  			}
 					  		}
@@ -207,16 +212,14 @@
 					  		}
 					  	}
 				  		var page = undefined;
+				  		console.log(searchParams)
 					  	if(location === 'main_list'){
 					  		page =  plus.webview.getWebviewById(params.route);
+					  		mui.fire(page,'search',{ searchParams: JSON.stringify(searchParams) });
 					  	}else{
 					  		page = plus.webview.getWebviewById(params.id);
+					  		mui.fire(page,'sub_search',{ searchParams: JSON.stringify(searchParams) });
 					  	}
-				  		if(location === 'main_list'){
-				  			mui.fire(page,'search',{ searchParams: JSON.stringify(searchParams) });
-				  		}else{
-				  			mui.fire(page,'sub_search',{ searchParams: JSON.stringify(searchParams) });
-				  		}
 				    	mui.back()
 				    })
 				    
@@ -226,7 +229,7 @@
 				    	var paramName  = e.target.value;
 				    	var url = null, data = {}, contentType = null;
 						if(paramName){
-							if(module === 'acceptance'){
+							if(module === 'acceptance' || module === 'basicMedicine'){
 								if(location === 'main_list'){
 									url = '/a/depot/supplier/all';
 									data = { ctmaSupplierName: paramName }
@@ -288,7 +291,7 @@
 									}
 								},
 								error: function(xhr,type,errorThrown){
-									alert(xhr.responseText)
+									console.log(xhr.responseText)
 			            		}
 							})
 						}else{
@@ -312,7 +315,7 @@
 								li.setAttribute('data-hisdrugname',data[i].key);
 								li.innerHTML = data[i].key;
 							}
-							if(module === 'acceptance'){
+							if(module === 'acceptance' || module === 'basicMedicine'){
 								//验收
 								if(location === 'main_list'){
 									li.setAttribute('data-supplierCode',data[i].ctmaSupplierCode);
@@ -354,12 +357,12 @@
 			  					hisDrugName: dataset.hisdrugname
 			  				}
 			  				mui.each(currHistory,function(index,item){
-			  					if(item === dataset.hisdrugcode){
+			  					if(item.hisDrugCode === dataset.hisdrugcode){
 			  						flag = true
 			  					}
 			  				});
 			  				if(!flag){
-			  					console.log('acceptance---sub_list,不存在');
+			  					console.log('sub_list,不存在');
 			  					if(currHistory.length >= 10){
 			  						currHistory.shift();
 			  					}
@@ -454,14 +457,11 @@
 				  	var page = undefined;
 				  	if(location === 'main_list'){
 				  		page =  plus.webview.getWebviewById(params.route);
+				  		mui.fire(page,'search',{ searchParams: JSON.stringify(searchParams) });
 				  	}else{
 				  		page = plus.webview.getWebviewById(params.id);
+				  		mui.fire(page,'sub_search',{ searchParams: JSON.stringify(searchParams) });
 				  	}
-			  		if(location === 'main_list'){
-			  			mui.fire(page,'search',{ searchParams: JSON.stringify(searchParams) });
-			  		}else{
-			  			mui.fire(page,'sub_search',{ searchParams: JSON.stringify(searchParams) });
-			  		}
 			  		mui.back()
 				  });
 				  

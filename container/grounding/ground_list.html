@@ -78,6 +78,7 @@
             }
             //去搜索页面
 			function toSearchPage (){
+				document.activeElement.blur(); // 隐藏软键盘
 				var params = {};
 				params.route = '../grounding/ground_list';
 				params.id = 'ground_list';
@@ -134,45 +135,36 @@
 				}
 				
 				function slideRight(){
-					document.querySelector('#sliderProgressBar').style.transform = 'translate3d(267px,0px,0px) translateZ(0px)';
-			    	document.querySelector('.mui-slider-group').style.transform = 'translate3d(-534px,0px,0px) translateZ(0px)';
-			    	document.querySelectorAll('.themes_font_color_tab')[1].className = 'mui-control-item themes_font_color_tab mui-active';
-			    	document.querySelector('#item2mobile').className = 'mui-slider-item mui-control-content mui-active';
+					document.querySelectorAll('.themes_font_color_tab')[1].className = 'mui-control-item themes_font_color_tab mui-active';
+					document.querySelector('#item2mobile').className = 'mui-slider-item mui-control-content mui-active';
+					document.querySelector('#sliderProgressBar').style.transform = 'translate3d(267px,0px,0px)';
+			    	document.querySelector('.mui-slider-group').style.transform = 'translate3d(-534px,0px,0px)';
+			    	
 			    	document.querySelector('.batchAccetpance').style.display = 'none';
 				}
 				
 				function showData(data,selected,key){
-					if(selected === 'left'){
-						var acceptanceTab1 = document.querySelector('.mui-tab1');
-						var html1;
-						if(data.listwsj.list.length === 0){
-							html1 = nullDataHtml;
-							document.querySelector('.batchAccetpance').style.display = 'none';
-						}else{
-							mui.each(data.listwsj.list,function(index,item){
-								item.editable = true;
-							})
-							html1 = template('ground_list',data.listwsj);
-							document.querySelector('.batchAccetpance').style.display = 'block';
-						}
-						acceptanceTab1.innerHTML = html1;
-						if(key){
-							slideLeft();
-						}
+					var batchAccetpance = document.querySelector('.batchAccetpance');
+					var acceptanceTab1 = document.querySelector('.mui-tab1');
+					var acceptanceTab2 = document.querySelector('.mui-tab2');
+					var html1 = undefined, html2 = undefined;
+					batchAccetpance.style.display = selected === 'left'? 'block': 'none';
+					if(data.listwsj.list.length === 0){
+						html1 = nullDataHtml;
+						document.querySelector('.batchAccetpance').style.display = 'none';
 					}else{
-						var acceptanceTab2 = document.querySelector('.mui-tab2');
-						var html2;
-						if(data.listysj.list.length === 0){
-							html2 = nullDataHtml
-						}else{
-							html2 = template('ground_list',data.listysj);
-						}
-						acceptanceTab2.innerHTML = html2;
-						if(key){
-							slideRight();
-						}
+						mui.each(data.listwsj.list,function(index,item){
+							item.editable = true;
+						})
+						html1 = template('ground_list',data.listwsj);
 					}
-					
+					acceptanceTab1.innerHTML = html1;
+					if(data.listysj.list.length === 0){
+						html2 = nullDataHtml
+					}else{
+						html2 = template('ground_list',data.listysj);
+					}
+					acceptanceTab2.innerHTML = html2;
 				}
 				
 				function genData(url,selected,key){
@@ -197,7 +189,7 @@
                 			}
                 		},
                 		error: function(xhr,type,errorThrown){
-							alert(xhr.responseText)
+							console.log(xhr.responseText)
                 		}
             		});
 				}
@@ -216,14 +208,16 @@
 					
 					// 触发刷新 搜索页面搜的值
 					window.addEventListener('sub_search',function(event){
-						console.log(event.detail);
-
 						let searchParams = JSON.parse(event.detail.searchParams);
 						document.querySelector('.mui-input-clear').placeholder = '';
 						document.querySelector('.mui-placeholder').style.display = 'none';
 						document.querySelector('.mui-input-clear').value = searchParams.hisDrugName;
 						var newUrl = url + '&hisDrugCode='+ searchParams.hisDrugCode +'&type='+ searchParams.type;
-						genData(newUrl,searchParams.selected,'search');
+						genData(newUrl,searchParams.selected);
+						// 模拟点击Tabs
+						if(searchParams.selected === 'right'){
+							mui('#slider').slider().gotoItem(1);
+						}
 					})
 					
 					var params, distributeCode, currentSelected = undefined
@@ -253,38 +247,20 @@
 				    var url = '/a/checkacceptdetail/shelfInfo?distributeCode='+ distributeCode;
 				    genData(url,currentSelected);
 					
-					
+					var batchAccetpance = document.querySelector('.batchAccetpance');
 					document.getElementById('slider').addEventListener('slide', function(e) {
 						if (e.detail.slideNumber === 1) {
 							selected = 'right';
 							auditStatus = '2';
-							document.querySelector('.batchAccetpance').style.display = 'none';
-							if (!item2.querySelector('.am-card')) {
-								var acceptanceTab2 = document.querySelector('.mui-tab2');
-								var html2;
-								if(detailData.listysj.list.length === 0){
-									html2 = nullDataHtml
-								}else{
-									html2 = template('ground_list',detailData.listysj);
-								}
-								acceptanceTab2.innerHTML = html2;
-							}
-							document.querySelector('.batchAccetpance').style.display = 'none';
+							slideRight();
+							batchAccetpance.style.display = 'none';
+//							document.querySelector('.batchAccetpance').style.display = 'none';
 						}else if(e.detail.slideNumber === 0){
 							selected = 'left';
 							auditStatus = '1';
+							slideLeft();
+							batchAccetpance.style.display = 'block';
 							document.querySelector('.batchAccetpance').style.display = 'block';
-							if (!item1.querySelector('.am-card')) {
-								var acceptanceTab1 = document.querySelector('.mui-tab1');
-								var html;
-								if(detailData.listysj.list.length === 0){
-									html = nullDataHtml
-									document.querySelector('.batchAccetpance').style.display = 'none';
-								}else{
-									html = template('ground_list',detailData.listysj);
-								}
-								acceptanceTab1.innerHTML = html;
-							}
 						}
 					});
 					
@@ -390,7 +366,7 @@
 				                			}
 				                		},
 				                		error: function(xhr,type,errorThrown){
-											alert(xhr.responseText)
+											console.log(xhr.responseText)
 				                		}
 				            		});
 							} else {

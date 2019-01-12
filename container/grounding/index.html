@@ -58,6 +58,7 @@
 
 		</div>
 		<script src="../../js/mui.js"></script>
+		<script src="../../js/jquery.min.js" ></script>
 		<script src="../../js/mui.pullToRefresh.js"></script>
 		<script src="../../js/mui.pullToRefresh.material.js"></script>
 		<script src="../../js/template-web.js" type="text/javascript" charset="utf-8"></script>
@@ -75,6 +76,7 @@
 			
 			//去搜索页面
 			function toSearchPage (){
+				document.activeElement.blur(); // 隐藏软键盘
 				var params = {};
 				params.route = '../grounding/index';
 				params.module = 'grounding';
@@ -90,7 +92,7 @@
 					titleText: '药品信息'
 				})
 			}
-			(function($,doc) {
+			(function($,doc,$$) {
 				
 				$.init({
 					beforeback:function(){
@@ -116,8 +118,15 @@
 				var checkType, type, shelfStatus// 上架类型 // 上架状态  1 待上架  2 已上架 
 				var requestUrl =  '/a/checkaccept/shelfList'; // 请求地址
 				
-				var pageLeft = 1, pageRight = 1, totalPageLeft, totalPageRight, isMore = true, selectTabs = 1;
-				currSelected();
+				var pageLeft = 1, 
+					pageRight = 1, 
+					totalPageLeft, 
+					totalPageRight, 
+					isMore = true, 
+					selectTabs = 1, // 默认选中第一个tab
+					selected = '.mui-tab1'; // 默认选中内容区块
+					
+//				currSelected();
 				
             	function template(selected, data, insertType){
             		console.log(selected,'selected')
@@ -169,7 +178,7 @@
                 			}else{
                 				totalPageRight = total;
                 			}
-                			if(resData.list.length < pageSize){
+                			if(resData.list.length <= resData.pageSize && resData.pageNo === resData.totalPage){
                 				var i = selectTabs === 1 ? 0 : 1;
                 				document.querySelectorAll('.mui-pull-loading')[i].innerHTML = '没有更多数据';
                 				isMore = false;
@@ -182,7 +191,7 @@
 							return template(selected,resData,false)
                 		},
                 		error: function(xhr,type,errorThrown){
-							alert(xhr.responseText)
+							console.log(xhr.responseText)
                 		}
             		});
 				}
@@ -224,7 +233,7 @@
 									return template(selected,resData,true)
 		                		},
 		                		error: function(xhr,type,errorThrown){
-									alert(xhr.responseText)
+									console.log(xhr.responseText)
 		                		}
 		            		});
 						}
@@ -254,15 +263,22 @@
 					var item2 = document.querySelector('#item2mobile');
 					var item1 = document.querySelector('#item1mobile');
 					document.getElementById('slider').addEventListener('slide', function(e) {
-						currSelected();
+						$$('.mui-input-clear').val('');
+//						currSelected();
 						let index = e.detail.slideNumber;
 						if (index === 1) {
+							selected = '.mui-tab2';
+							selectTabs = 2;
+							mui('#slider').slider().gotoItem(1);
 							$('.mui-slider-group .mui-scroll .mui-tab2')[0].innerHTML = '';
 							if (!item2.querySelector('.am-card')) {
 								mui(".mui-slider-group .mui-scroll").pullToRefresh()[index].pullDownLoading();
 							}
 						}
 						if(index === 0){
+							selected = '.mui-tab1';
+							selectTabs = 1;
+							mui('#slider').slider().gotoItem(0);
 							$('.mui-slider-group .mui-scroll .mui-tab1')[0].innerHTML = '';
 							if (!item1.querySelector('.am-card')) {
 								mui(".mui-slider-group .mui-scroll").pullToRefresh()[index].pullDownLoading();
@@ -314,7 +330,7 @@
 						common.openwin('ground_list',{ params: JSON.stringify(itemData) }, false)
 					})
 				})
-			})(mui,document);
+			})(mui,document,jQuery);
 		
 		</script>
 	</body>

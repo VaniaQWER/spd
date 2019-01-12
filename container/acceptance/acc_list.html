@@ -28,8 +28,8 @@
 			</div>
 			<div id="slider" class="mui-slider themes_tab mui-fullscreen">
 				<div id="sliderSegmentedControl" class="mui-slider-indicator mui-segmented-control mui-segmented-control-inverted">
-					<a id="defaultTab" class="mui-control-item mui-active themes_font_color_tab" href="#item1mobile">待验收</a>
-					<a id='otherTab' class="mui-control-item themes_font_color_tab" href="#item2mobile">已验收</a>
+					<a class="mui-control-item themes_font_color_tab" href="#item1mobile">待验收</a>
+					<a class="mui-control-item themes_font_color_tab" href="#item2mobile">已验收</a>
 				</div>
 				<div id="sliderProgressBar" class="mui-slider-progress-bar mui-col-xs-6"></div>
 				<div class="mui-slider-group">
@@ -61,6 +61,7 @@
 		</div>
 		
 		<script src="../../js/mui.min.js"></script>
+		<script src="../../js/jquery.min.js" ></script>
 		<script src="../../js/template-web.js" type="text/javascript" charset="utf-8"></script>
 		<script src="../../js/utils.js" type="text/javascript" charset="utf-8"></script>
 		<script src="../../js/common.js" type="text/javascript" charset="utf-8"></script>
@@ -79,6 +80,7 @@
             var auditStatus = undefined,selected = undefined; //验收状态   1 待验收  2 已验收
             //去搜索页面
 			function toSearchPage (){
+//				document.activeElement.blur(); // 隐藏软键盘
 				var params = {};
 				params.id = 'acc_list';
 				params.route = '../acceptance/acc_list';
@@ -89,7 +91,7 @@
 				common.openwin('../commonPages/searchPage',{ params: JSON.stringify(params) },false)
 			}
 			
-			(function($) {
+			(function($,$$) {
 				
 				$.init({
 					beforeback: function() {
@@ -150,62 +152,54 @@
                 			}
                 		},
                 		error: function(xhr,type,errorThrown){
-							alert(xhr.responseText)
+//							console.log(xhr.responseText)
                 		}
             		});
 				}
 				function slideLeft(){
-					document.querySelectorAll('.themes_font_color_tab')[0].className = 'mui-control-item themes_font_color_tab mui-active';
-			    	document.querySelector('#item1mobile').className = 'mui-slider-item mui-control-content mui-active';
 					document.querySelector('#sliderProgressBar').style.transform = 'translate3d(0px,0px,0px) translateZ(0px)';
 			    	document.querySelector('.mui-slider-group').style.transform = 'translate3d(0px,0px,0px) translateZ(0px)';
-			    	
+			    	document.querySelectorAll('.themes_font_color_tab')[0].className = 'mui-control-item themes_font_color_tab mui-active';
+			    	document.querySelectorAll('.themes_font_color_tab')[1].className = 'mui-control-item themes_font_color_tab';
+			    	document.querySelector('#item1mobile').className = 'mui-slider-item mui-control-content mui-active';
+			    	document.querySelector('#item2mobile').className = 'mui-slider-item mui-control-content';
 				}
 				
 				function slideRight(){
-					document.querySelectorAll('.themes_font_color_tab')[1].className = 'mui-control-item themes_font_color_tab mui-active';
-					document.querySelector('#item2mobile').className = 'mui-slider-item mui-control-content mui-active';
 					document.querySelector('#sliderProgressBar').style.transform = 'translate3d(267px,0px,0px) translateZ(0px)';
 			    	document.querySelector('.mui-slider-group').style.transform = 'translate3d(-534px,0px,0px) translateZ(0px)';
+			    	document.querySelectorAll('.themes_font_color_tab')[0].className = 'mui-control-item themes_font_color_tab';
+			    	document.querySelectorAll('.themes_font_color_tab')[1].className = 'mui-control-item themes_font_color_tab mui-active';
+			    	document.querySelector('#item1mobile').className = 'mui-slider-item mui-control-content';
+			    	document.querySelector('#item2mobile').className = 'mui-slider-item mui-control-content mui-active';
 			    	document.querySelector('.batchAccetpance').style.display = 'none';
 				}
 				/*
 				 展示数据
 				 * */
-				function showData(data,selected,key){
-					console.log(selected,'showData')
-					if(selected === 'left'){
-						if(key){
-							slideLeft();
-						}
-						var acceptanceTab1 = document.querySelector('.mui-tab1');
-						var html1;
-						if(data.unVerfiyList.list.length === 0){
-							html1 = nullDataHtml;
-						}else{
-							mui.each(data.unVerfiyList.list,function(index,item){
-								item.editable = (params.accepttype === '101' || params.accepttype === '102' || params.accepttype === '103'|| params.accepttype === '104' ) ? true: false;
-								item.showEditBtn = item.editable;
-							});
-							console.log(data.unVerfiyList)
-							html1 = template('list_tpl_view',data.unVerfiyList);
-						}
-						acceptanceTab1.innerHTML = html1;
-						
+				function showData(data,selected){
+					var batchAccetpance = document.querySelector('.batchAccetpance');
+					var acceptanceTab1 = document.querySelector('.mui-tab1');
+					var acceptanceTab2 = document.querySelector('.mui-tab2');
+					var html1 = undefined, html2 = undefined;
+					batchAccetpance.style.display = selected === 'left'? 'block': 'none';
+					if(data.unVerfiyList.list.length === 0){
+						html1 = nullDataHtml;
 					}else{
-						if(key){
-							slideRight();
-						}
-						var acceptanceTab2 = document.querySelector('.mui-tab2');
-						var html2;
-						if(data.verifyList.list.length === 0){
-							html2 = nullDataHtml
-						}else{
-							html2 = template('list_tpl_view',data.verifyList);
-						}
-						acceptanceTab2.innerHTML = html2;
+						mui.each(data.unVerfiyList.list,function(index,item){
+							item.editable = (params.accepttype === '101' || params.accepttype === '102' || params.accepttype === '103'|| params.accepttype === '104' ) ? true: false;
+							item.showEditBtn = item.editable;
+						});
+						console.log(data.unVerfiyList)
+						html1 = template('list_tpl_view',data.unVerfiyList);
 					}
-					
+					acceptanceTab1.innerHTML = html1;
+					if(data.verifyList.list.length === 0){
+						html2 = nullDataHtml
+					}else{
+						html2 = template('list_tpl_view',data.verifyList);
+					}
+					acceptanceTab2.innerHTML = html2;
 				}
 				// 模板加载
 				$.plusReady(function(){
@@ -228,7 +222,6 @@
 					window.addEventListener('sub_search',function(event){
 						console.log(JSON.stringify(event.detail) );
 						let searchParams = JSON.parse(event.detail.searchParams);
-						
 						document.querySelector('.mui-input-clear').placeholder = '';
 						document.querySelector('.mui-placeholder').style.display = 'none';
 						document.querySelector('.mui-input-clear').value = searchParams.hisDrugName;
@@ -237,7 +230,12 @@
 							hisDrugCode: searchParams.hisDrugCode,
 							status: searchParams.type
 						}
-						genData(url, postData, searchParams.selected,'search');
+						genData(url, postData, searchParams.selected);
+						// 模拟点击Tabs
+						if(searchParams.selected === 'right'){
+							mui('#slider').slider().gotoItem(1);
+						}
+						
 					})
 					
 					var  distributeCode, isUsual = undefined;
@@ -254,11 +252,13 @@
 				    if(currentSelected === 'left'){
 				    	auditStatus = '1';
 				    	selected = 'left'
-				    	slideLeft();
+//				    	slideLeft();
+				    	mui('#slider').slider().gotoItem(0);
 				    }else{
 				    	auditStatus = '2';
 				    	selected = 'right';
-				    	slideRight();
+//				    	slideRight();
+				    	mui('#slider').slider().gotoItem(1);
 				    }
 				    var checkUrl = '/a/checkacceptdetail/checkList';
 				    var url = '/a/checkaccept/detail';
@@ -284,38 +284,19 @@
 					}
 					var item1 = document.getElementById('item1mobile');
 					var item2 = document.getElementById('item2mobile');
+					var batchAccetpance = document.querySelector('.batchAccetpance');
 					document.getElementById('slider').addEventListener('slide', function(e) {
-						let index = e.detail.slideNumber;
-						console.log(index)
+						let index = Number(e.detail.slideNumber);
 						if (index === 1) {
 							auditStatus = '2';
 							selected = 'right';
-							document.querySelector('.batchAccetpance').style.display = 'none';
-							if (!item2.querySelector('.am-card')) {
-								var acceptanceTab2 = document.querySelector('.mui-tab2');
-								var html2;
-								if(detailData.verifyList.list.length === 0){
-									html2 = nullDataHtml
-								}else{
-									html2 = template('list_tpl_view',detailData.verifyList);
-								}
-								acceptanceTab2.innerHTML = html2;
-							}
+							mui('#slider').slider().gotoItem(1);
+							$$('.batchAccetpance').hide();
 						}else if(index === 0){
 							auditStatus = '1';
 							selected = 'left';
-							document.querySelector('.batchAccetpance').style.display = 'block';
-							if (!item1.querySelector('.am-card')) {
-								var acceptanceTab1 = document.querySelector('.mui-tab1');
-								var html;
-								if(detailData.unVerfiyList.list.length === 0){
-									html = nullDataHtml;
-									document.querySelector('.batchAccetpance').style.display = 'none';
-								}else{
-									html = template('list_tpl_view',detailData.unVerfiyList);
-								}
-								acceptanceTab1.innerHTML = html;
-							}
+							mui('#slider').slider().gotoItem(0);
+							$$('.batchAccetpance').show();
 						}
 					});
 					// 展开编辑
@@ -433,7 +414,7 @@
 										}
 									},
 									error: function(xhr,type,errorThrown){
-										(xhr.responseText)
+//										console.log(xhr.responseText)
 			                		}
 								})
 							}
@@ -443,7 +424,7 @@
 					
 				});
 				
-			})(mui);
+			})(mui,jQuery);
 		
 		</script>
 	</body>
