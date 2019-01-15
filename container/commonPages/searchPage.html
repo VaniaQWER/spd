@@ -60,6 +60,7 @@
 				<!--  -->
 			</div>
 		     <a class="mui-action-back mui-pull-right" style="height:45px;line-height: 45px;">取消</a>
+				 <!-- onclick="plus.webview.currentWebview().close()" -->
 		</header>
 		<div class="mui-content">
 			<div id="ulList">
@@ -83,17 +84,71 @@
 		<script type="text/javascript">
 			(function($) {
 				mui.init();
+				// H5 plus事件处理
+				
+				function plusReady(){
+						var Context = plus.android.importClass("android.content.Context");
+						var InputMethodManager = plus.android.importClass("android.view.inputmethod.InputMethodManager");
+						var main = plus.android.runtimeMainActivity();
+						var imm = main.getSystemService(Context.INPUT_METHOD_SERVICE);
+						imm.toggleSoftInput(0,InputMethodManager.SHOW_FORCED);
+				}
+				document.addEventListener("plusready",plusReady,false);
+	
+				function back (){
+					let searchValue = '';
+						let searchParams = {}, saveData = {}, flag = false;
+						// 存储当前搜索记录
+						if(location === 'sub_list'){
+							searchParams = { hisDrugCode : '',hisDrugName: searchValue,type: params.auditStatus,selected: params.selected }
+							saveData = { hisDrugCode: '', hisDrugName: searchValue };
+						}
+						if(module === 'acceptance'){
+						if(location === 'main_list'){
+							searchParams = { supplierCode: '', supplierName: searchValue };
+							saveData = { supplierCode: '', supplierName: searchValue };
+							
+						}
+					}else if(module === 'grounding'){
+						if(location==='main_list'){
+							searchParams = { distributeCode: searchValue, auditStatus: params.auditStatus };
+							saveData = searchValue;
+						}
+					}else if(module === 'pickingOff'){
+						if(location === 'main_list'){
+							searchParams = { pickingOrderNo: searchValue, auditStatus: params.auditStatus };
+							saveData = searchValue;
+						}
+					}else{
+						searchParams = { bigDrugCode : '',ctmmParam: searchValue };
+						saveData = { bigDrugCode: '', ctmmParam: searchValue };
+					}
+						
+						var page = undefined;
+						if(location === 'main_list'){
+							page =  plus.webview.getWebviewById(params.route);
+							mui.fire(page,'search',{ searchParams: JSON.stringify(searchParams) });
+						}else{
+							page = plus.webview.getWebviewById(params.id);
+							mui.fire(page,'sub_search',{ searchParams: JSON.stringify(searchParams) });
+						}
+				}
+				
+				// 重写mui-back**************************
+				var old_back = mui.back;
+				mui.back = function(){
+					//执行mui封装好的窗口关闭逻辑；
+					back();
+					old_back();
+				}
+				
 				var params = undefined, 
 					key = undefined,
 					selected = undefined,
 					module = undefined,// 模块
 					location = undefined;// 入口：主列表/子列表
-					
-				/*
-				 	重写 mui-back,关闭当前 Webview 
-				 * */
+				
 				$.plusReady(function(){
-					
 					var self = plus.webview.currentWebview();
 					params = JSON.parse(self.params);//获得参数
 					console.log(self.params);
@@ -106,13 +161,12 @@
 					console.log(searchList)
 					let currHistory = searchList[module][location];
 					console.log(currHistory)
-					
+				
 					// 键盘搜索按钮
 					document.querySelector('.search_head').addEventListener('keypress',function(e){
 						if(e.keyCode == "13") {
-					        document.activeElement.blur();//收起虚拟键盘
 							console.log(e.target.value);
-							let searchValue = e.target.value;
+							let searchValue =  e.target.value;
 					        e.preventDefault(); // 阻止默认事件---阻止页面刷新
 					        let searchParams = {}, saveData = {}, flag = false;
 					        // 存储当前搜索记录
@@ -180,22 +234,24 @@
 						  		page = plus.webview.getWebviewById(params.id);
 						  		mui.fire(page,'sub_search',{ searchParams: JSON.stringify(searchParams) });
 						  	}
+							setTimeout(function(){
+								document.activeElement.blur(); // 隐藏软键盘
+							},300)
 						  	plus.webview.currentWebview().close();
-					  		mui.back();
 						}
 					})
 					
 					
-				    var lastChildNode = document.querySelector('.mui-placeholder').lastChild;
-				    if(location === 'sub_list' || module === 'stock'){
-				    	lastChildNode.innerText = '请输入通用名/商品名';
-				    }else{
-				    	if((module === 'acceptance' || module === 'basicMedicine') && location === 'main_list'){
-				    		lastChildNode.innerText = '请输入供应商'
-				    	}else if(module === 'grounding' || module === 'pickingOff'){
-				    		lastChildNode.innerText = '请输入单号'
-				    	}
-				    }
+					var lastChildNode = document.querySelector('.mui-placeholder').lastChild;
+					if(location === 'sub_list' || module === 'stock'){
+						lastChildNode.innerText = '请输入通用名/商品名';
+					}else{
+						if((module === 'acceptance' || module === 'basicMedicine') && location === 'main_list'){
+							lastChildNode.innerText = '请输入供应商'
+						}else if(module === 'grounding' || module === 'pickingOff'){
+							lastChildNode.innerText = '请输入单号'
+						}
+					}
 					
 					if(currHistory && currHistory.length){
 						
@@ -268,7 +324,8 @@
 				    	}
 				    	if(module === 'acceptance'){
 					  		if(location === 'main_list'){
-					  			if(dataset.suppliercode){
+								console.log('acceptance main_list')
+					  			if(dataset.suppliercode || dataset.suppliercode ===""){
 					  				searchParams = {
 							  			supplierCode: dataset.suppliercode,
 							  			supplierName: dataset.suppliername
@@ -277,18 +334,18 @@
 					  		}
 					  	}else if(module === 'grounding'){
 					  		if(location==='main_list'){
-					  			if(dataset.distributecode){
+					  			if(dataset.distributecode || dataset.distributecode ===""){
 					  				searchParams = { distributeCode: dataset.distributecode, auditStatus: params.auditStatus }
 					  			}
 					  		}
 					  	}else if(module === 'pickingOff'){
 					  		if(location === 'main_list'){
-								if(dataset.applyorderno){
+								if(dataset.applyorderno || dataset.applyorderno ===""){
 									searchParams = { pickingOrderNo: dataset.applyorderno, auditStatus: params.auditStatus }
 								}
 					  		}
 					  	}else{
-					  		if(dataset.bigdrugcode){
+					  		if(dataset.bigdrugcode || dataset.bigdrugcode ===""){
 					  			searchParams = { bigDrugCode : dataset.bigdrugcode,ctmmParam: dataset.ctmmparam }
 					  		}
 					  	}
@@ -301,89 +358,90 @@
 					  		page = plus.webview.getWebviewById(params.id);
 					  		mui.fire(page,'sub_search',{ searchParams: JSON.stringify(searchParams) });
 					  	}
+						setTimeout(function(){
+							document.activeElement.blur(); // 隐藏软键盘
+						},300)
 					  	plus.webview.currentWebview().close();
-				    	mui.back();
 				    })
-				    
 				    
 				   
 				    $('.search_head').on('keyup','#search',function(e){
 				    	var paramName  = e.target.value;
 				    	var url = null, data = {}, contentType = null;
-						if(paramName){
-							if(module === 'acceptance' || module === 'basicMedicine'){
-								if(location === 'main_list'){
-									url = '/a/depot/supplier/all';
-									data = { ctmaSupplierName: paramName }
+							if(paramName){
+								if(module === 'acceptance' || module === 'basicMedicine'){
+									if(location === 'main_list'){
+										url = '/a/depot/supplier/all';
+										data = { ctmaSupplierName: paramName }
+									}else{
+										url = '/a/common/queryDrugByList';
+										data = { 
+											paramName: paramName,
+											queryType: '4'
+	//					    				type: params.auditStatus === '1'? 'cache_listVoWYS': 'cache_listVoYYS'
+										}
+									}
+								}else if(module === 'grounding'){
+									if(location === 'main_list'){
+										url = '/a/checkaccept/shelfListNoPage';
+										data = {
+												distributeCode: paramName,
+												auditStatus: params.auditStatus
+											}
+									}else{
+										url = '/a/common/queryDrugByList';
+										data = { 
+											paramName: paramName,
+	//										type: params.auditStatus === '1'?'cache_listVoWSJ':'cache_listVoYSJ'
+											queryType: '4'
+										}
+									}
+								}else if(module === 'pickingOff'){
+									if(location === 'main_list'){
+										url = '/a/common/pickingorder/JdCodeList',
+										data = {
+											pickingOrderNo: paramName,
+											type: params.auditStatus
+										}
+									}else{
+										url = '/a/common/queryDrugByList';
+										data = {
+											paramName: paramName,
+											queryType: '4'
+	//										type: params.auditStatus === '0'?'Cache_notDetailList':'Cache_existDetailList'
+										}
+									}
 								}else{
 									url = '/a/common/queryDrugByList';
-									data = { 
-										paramName: paramName,
-										queryType: '4'
-//					    				type: params.auditStatus === '1'? 'cache_listVoWYS': 'cache_listVoYYS'
-									}
-								}
-							}else if(module === 'grounding'){
-								if(location === 'main_list'){
-									url = '/a/checkaccept/shelfListNoPage';
-									data = {
-						    			distributeCode: paramName,
-						    			auditStatus: params.auditStatus
-						    		}
-								}else{
-									url = '/a/common/queryDrugByList';
-									data = { 
-										paramName: paramName,
-//										type: params.auditStatus === '1'?'cache_listVoWSJ':'cache_listVoYSJ'
-										queryType: '4'
-									}
-								}
-							}else if(module === 'pickingOff'){
-								if(location === 'main_list'){
-									url = '/a/common/pickingorder/JdCodeList',
-									data = {
-										pickingOrderNo: paramName,
-										type: params.auditStatus
-									}
-								}else{
-									url = '/a/common/queryDrugByList';
 									data = {
 										paramName: paramName,
-										queryType: '4'
-//										type: params.auditStatus === '0'?'Cache_notDetailList':'Cache_existDetailList'
+										queryType: '3'
 									}
 								}
+								console.log(url)
+								contentType = location === 'sub_list' ? 'application/x-www-form-urlencoded':'application/json';
+								if( module === 'acceptance' || module === 'stock'){
+									contentType = 'application/x-www-form-urlencoded'
+								}
+									mui.ajaxRequest(url,{
+									type:"post",
+									data: data,
+									contentType: contentType,
+									success: function(data){
+										if(data.code === 200){
+											let dataList = data.data;
+											createSelect(dataList,module,location);
+										}
+									},
+									error: function(xhr,type,errorThrown){
+										console.log(xhr.responseText)
+												}
+								})
 							}else{
-								url = '/a/common/queryDrugByList';
-								data = {
-									paramName: paramName,
-									queryType: '3'
-								}
+								document.querySelector('#ulList').innerHTML = '';
 							}
-							console.log(url)
-							contentType = location === 'sub_list' ? 'application/x-www-form-urlencoded':'application/json';
-							if( module === 'acceptance' || module === 'stock'){
-								contentType = 'application/x-www-form-urlencoded'
-							}
-					    	mui.ajaxRequest(url,{
-								type:"post",
-								data: data,
-								contentType: contentType,
-								success: function(data){
-									if(data.code === 200){
-										let dataList = data.data;
-										createSelect(dataList,module,location);
-									}
-								},
-								error: function(xhr,type,errorThrown){
-									console.log(xhr.responseText)
-			            		}
-							})
-						}else{
-							document.querySelector('#ulList').innerHTML = '';
-						}
-				   });
-				   
+					});
+					
 				   
 				   function createSelect(data,module,location){
 						if(document.querySelector('.search-ullist')){
@@ -429,7 +487,7 @@
 						}
 						document.querySelector('#ulList').appendChild(ul)
 					}
-				  $('#ulList').on('tap','.search-ullist-li',function(){
+						$('#ulList').on('tap','.search-ullist-li',function(){
 				  	let dataset = this.dataset;
 				  	console.log(currHistory)
 				  	console.log(dataset);
@@ -548,7 +606,10 @@
 				  		console.log(page)
 				  		mui.fire(page,'sub_search',{ searchParams: JSON.stringify(searchParams) });
 				  	}
-			  		mui.back();
+					setTimeout(function(){
+						document.activeElement.blur(); // 隐藏软键盘
+					},300)
+					plus.webview.currentWebview().close();
 				  });
 				})
 				
