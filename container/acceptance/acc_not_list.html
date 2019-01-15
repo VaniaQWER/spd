@@ -161,8 +161,8 @@
 					if(query.hisDrugCode){
 						postData.hisDrugCode = query.hisDrugCode
 						$$('.mui-input-clear').val(query.hisDrugName);
-
 					}else{
+						globalQuery={}
 						$$('.mui-input-clear').val('');
 						$$('.mui-placeholder').show();
 					}

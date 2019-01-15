@@ -155,19 +155,21 @@
 					} 
 				});
 				mui(".mui-scroll").pullToRefresh().pullDownLoading();
-				
 				function pulldownRefresh (){
 					console.log('下拉');
 					if(query.hisDrugCode){
+						console.log('有query')
 						json.hisDrugCode = query.hisDrugCode
 						$JQ('.mui-placeholder').hide();
 						$JQ('.mui-input-clear').val(query.hisDrugName);
 					}else{
+						console.log('二次刷新')
+						globalQuery={}
 						delete json.hisDrugCode
 						$JQ('.mui-input-clear').val('');
 						$JQ('.mui-placeholder').show();
 					}
-					globalQuery = query = {};
+					query = {};
 					json.pageNo = 1 ;
 					mui.ajaxRequest(url,{
 						type: 'POST',
@@ -176,6 +178,7 @@
 						showWaiting: true,
 						success: function(data){
 							if(data.code === 200){
+								toggle = false;
 								resData = data.data.list;
 								mui.each(resData,function(index,item){
 									item.type = '已拣货'
@@ -223,7 +226,7 @@
 										//已无数据
 										globalPull.refresh(true);
 										console.log('上拉已无数据')
-										baseList = baseList.concat(resData)
+										// baseList = baseList.concat(resData)
 										console.log('baseList',baseList.length)
 										console.log('resData',resData.length)
 										container.innerHTML =  data.length === 0 ? nullDataHtml : template('picking_tpl',{list:baseList}) ;
