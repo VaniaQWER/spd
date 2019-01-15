@@ -144,10 +144,6 @@
             	 	下拉刷新
             	 * */
             	function pulldownRefresh(){
-            		if(!query.hisDrugCode){
-            			$$('.mui-placeholder').show();
-						$$('.mui-input-clear').val('');
-            		}
 					var self = this;
 //					if(selectTabs === 1){
 //						pageLeft = 1
@@ -164,6 +160,11 @@
 					};
 					if(query.hisDrugCode){
 						postData.hisDrugCode = query.hisDrugCode
+						$$('.mui-input-clear').val(query.hisDrugName);
+
+					}else{
+						$$('.mui-input-clear').val('');
+						$$('.mui-placeholder').show();
 					}
 					query = {};
 					mui.ajaxRequest(_url,{
@@ -190,7 +191,6 @@
                 		}
             		});
 				}
-            	
             	
             	/*
 					 
@@ -239,13 +239,12 @@
 
 				// 模板加载
 				$.plusReady(function(){
-
+					let globalQuery = {};
 					window.addEventListener('pagefresh',function(event){
 						console.log('从详情回来')
 						console.log(JSON.stringify(event.detail))
+						query = event.detail.query;
 						let index = event.detail.selectTab === '1' ? 0 : 1;
-						$$('.mui-placeholder').show();
-						$$('.mui-input-clear').val('');
 						if(index === 1){
 							mui('#slider').slider().gotoItem(1);
 						}
@@ -255,7 +254,7 @@
 					window.addEventListener('sub_search',function(event){
 						console.log('从搜索页面回来')
 						console.log(JSON.stringify(event.detail) );
-						query = JSON.parse(event.detail.searchParams);
+						query  = globalQuery = JSON.parse(event.detail.searchParams);
 						$$('.mui-placeholder').hide();
 						$$('.mui-input-clear').val(query.hisDrugName);
 						
@@ -373,6 +372,7 @@
 						newData.status = status;
 						newData.id = id;
 						newData.isPsList = isPsList; // 是否是配送单
+						newData.query = globalQuery;
 						console.log(JSON.stringify(newData))
 						document.activeElement.blur(); // 隐藏软键盘
 						common.openwin('acc_detail',{ details: JSON.stringify(newData) },{

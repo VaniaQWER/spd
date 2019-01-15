@@ -124,6 +124,9 @@
 					};
 					if(query.hisDrugCode){
 						postData.hisDrugCode = query.hisDrugCode
+					}else{
+						$JQ('.mui-input-clear').val('');
+						$JQ('.mui-placeholder').show();
 					}
 					query = {};
 					mui.ajaxRequest(_url,{
@@ -197,9 +200,11 @@
 
 				// 模板加载
 				$.plusReady(function(){
-					
+					let globalQuery = {};
 					window.addEventListener('pagefresh',function(e){
 						console.log('从详情回来')
+						console.log(e.detail.query)
+						query = e.detail.query;
 						setTimeout(function(){
 							console.log('刷新了啊啊啊啊 啊')
 							mui(".mui-scroll").pullToRefresh().pullDownLoading();
@@ -210,7 +215,7 @@
 					window.addEventListener('sub_search',function(event){
 						console.log('从搜索页面回来')
 						console.log(JSON.stringify(event.detail) );
-						query = JSON.parse(event.detail.searchParams);
+						query = globalQuery = JSON.parse(event.detail.searchParams);
 						$JQ('.mui-input-clear').val(query.hisDrugName);
 						$JQ('.mui-placeholder').hide();
 						setTimeout(function(){
@@ -277,7 +282,10 @@
 						newData.status = status;
 						newData.id = id;
 						newData.isPsList = isPsList; // 是否是配送单
-						console.log(newData)
+						newData.query = globalQuery ; 
+						console.log('newData',JSON.stringify(newData))
+						console.log('query',JSON.stringify(globalQuery))
+						console.log(JSON.stringify(Object.assign(newData,globalQuery)))
 						document.activeElement.blur(); // 隐藏软键盘
 						common.openwin('acc_detail',{ details: JSON.stringify(newData) },{
 							titleText: '验收详情'

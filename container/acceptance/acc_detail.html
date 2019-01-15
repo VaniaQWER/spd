@@ -59,7 +59,7 @@
 					$.init({
 						beforeback: function() {
 					        var list = plus.webview.currentWebview().opener();  
-					        mui.fire(list, 'pagefresh',{ selectTab: details.status }); 
+					        mui.fire(list, 'pagefresh',{ selectTab: details.status , query: details.query}); 
 					        return true;  
 				    	}
 					})

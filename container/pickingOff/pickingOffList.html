@@ -165,6 +165,9 @@
 					};
 					if(query.hisDrugCode){
 						postData.hisDrugCode = query.hisDrugCode
+					}else{
+						$$('.mui-input-clear').val('');
+						$$('.mui-placeholder').show();
 					}
 					query = {};
 					mui.ajaxRequest(_url,{
@@ -253,11 +256,13 @@
 					
 					// 触发刷新 搜索页面搜的值
 					window.addEventListener('sub_search',function(event){
+						console.log(JSON.stringify(event.detail))
+						let index = event.detail.selectTab === '1' ? 0 : 1;
 						query = JSON.parse(event.detail.searchParams);
 						console.log(query)
 						$$('.mui-placeholder').hide();
 						$$('.mui-input-clear').val(query.hisDrugName);
-						mui(".mui-scroll").pullToRefresh().pullDownLoading();
+						mui(".mui-scroll").pullToRefresh()[index].pullDownLoading();
 					})
 					
 //					
