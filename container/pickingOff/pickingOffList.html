@@ -260,7 +260,7 @@
 					// 触发刷新 搜索页面搜的值
 					window.addEventListener('sub_search',function(event){
 						console.log(JSON.stringify(event.detail))
-						let index = event.detail.query.selected === 'left' ? 0 : 1;
+						let index = event.detail.searchParams.selected === 'left' ? 0 : 1;
 						query = globalQuery = JSON.parse(event.detail.searchParams);
 						console.log(query)
 						$$('.mui-placeholder').hide();
