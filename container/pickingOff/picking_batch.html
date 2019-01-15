@@ -14,12 +14,23 @@
 
 	<body>
 		<div class="mui-content">
-			<div id="slider" class="themes_tab mui-fullscreen">
-				<ul class="mui-table-view">
-					<li class="mui-tab1">
-						
-					</li>
-				</ul>
+			<div class="home-card-wrapper" style="padding: 8px;margin-top: 0;margin-bottom: 8px;">
+				<div class="home-card-title">待下架</div>
+			</div>
+			<div id="slider" class="mui-slider themes_tab mui-fullscreen" style="margin-top: 45px;padding-bottom: 59px;">
+				<div class="mui-slider-group">
+					<div id="item1mobile" class="mui-slider-item mui-control-content">
+						<div id="scroll1" class="mui-scroll-wrapper">
+							<div class="mui-scroll" id="mui-table-view-tab1">
+								<ul class="mui-table-view">
+									<li class="mui-table-view-cell mui-tab1" style="padding: 0;">
+
+									</li>
+								</ul>
+							</div>
+						</div>
+					</div>
+				</div>
 			</div>
 			<div class="fix_bottom-wraper">
 				<div class="fix-bottom-content">
@@ -34,6 +45,9 @@
 		</div>
 		
 		<script src="../../js/mui.min.js"></script>
+		<script src="../../js/jquery.min.js"></script>
+		<script src="../../js/mui.pullToRefresh.js"></script>
+		<script src="../../js/mui.pullToRefresh.material.js"></script>
 		<script src="../../js/template-web.js" type="text/javascript" charset="utf-8"></script>
 		<script src="../../js/utils.js" type="text/javascript" charset="utf-8"></script>
 		<script src="../../js/common.js" type="text/javascript" charset="utf-8"></script>
@@ -50,51 +64,172 @@
                 })
             }
 			
-			(function($) {
+			(function($,$JQ) {
+				
+				var deceleration = mui.os.ios?0.003:0.0009;
+				$.init({
+					beforeback:function(){
+						var list = plus.webview.currentWebview().opener();
+						 mui.fire(list, 'refresh');
+						 return true;
+					}
+				});
+				$('.mui-scroll-wrapper').scroll({
+					bounce: false,
+					indicators: true, //是否显示滚动条
+					deceleration:deceleration
+				});
+
+				var page = 1, 
+					totalPage = undefined, 
+					pageSize = 15, 
+					isMore = true, 
+					query = {},
+					selected = '.mui-tab1'; // 默认选中内容区块
+					pickingOrderNo = undefined, 
+					pickingStatus = '0',
+					applyOrderNo = undefined;
+				
+				var _url = '/a/common/pickingorderdetail/detailList',
+					pickUrl = '/a/common/pickingorder/finishPicking',
+					pageLeft = 1, 
+					pageRight = 1, 
+					totalPageLeft = undefined, 
+					totalPageRight = undefined;
+				
+				
+				
 				/* 渲染模板   */
-				var checkType, type, auditStatus// 验收单类型 // 验收状态   1 待验收  2 已验收 
-				var nullDataHtml = '<div class="mui-pull-bottom-tips"><div class="mui-pull-bottom-wrapper">'+
-										'<span class="mui-pull-loading">暂无数据</span></div></div>'
-				var detailData = {
-						unVerfiyList: { list: [] },
-						verifyList: { list: [] }
-					};
+				var checkType, type, auditStatus = '1'// 验收单类型 // 验收状态   1 待拣货  2 已拣货
 				var utils = new Utils();
 				utils.appendModule('#list_tpl');
 				
-				/*
-				 展示数据
-				 * */
-				function showData(data){
-					var tabContent = document.querySelector('.mui-tab1');
-					var html1;
-					if(data.list.length === 0){
-						html1 = nullDataHtml;
-					}else{
-						mui.each(data.list,function(index,item){
-							item.editable = true;
-						})
-						html1 = template('picking_tpl',data);
-					}
-					tabContent.innerHTML = html1;
-					if(document.querySelectorAll('.batch-wrapper').length >= 4){
-						document.querySelector('.mui-tab1').style.paddingBottom = '59px';
-					}
+				
+				function template(data, insertType) {
+					utils.innerTplHtml('picking_tpl', '.mui-tab1', data, insertType);
 				}
-            	
+				/*
+            	 	下拉刷新
+            	 * */
+            	function pulldownRefresh(){
+					var self = this;
+					page = 1;
+					var postData = {
+						pickingOrderNo: pickingOrderNo,
+						pickingStatus:pickingStatus,
+						pageNo: page,
+                		pageSize: pageSize
+					};
+					if(query.hisDrugCode){
+						postData.hisDrugCode = query.hisDrugCode
+					}
+					query = {};
+					mui.ajaxRequest(_url,{
+                		type: 'POST',
+                		data: postData,
+                		success: function(data){
+                			var resData = data.data;
+                			resData.hasPicked = true;
+                			resData.applyOrderNo = applyOrderNo;
+                			totalPage = data.totalPage;
+                			if(resData.list.length === 0 || (resData.list.length <= resData.pageSize && resData.pageNo === resData.totalPage)){
+                				isMore = false;
+                				self.endPullDownToRefresh(true);
+                				document.querySelectorAll('.mui-pull-loading')[0].innerHTML = '没有更多数据';
+                				
+                			}else{
+                				isMore = true;
+                				self.endPullDownToRefresh(false);
+                				self.refresh(true);
+                			}
+							return template(resData, false)
+                		},
+                		error: function(xhr,type,errorThrown){
+							console.log(xhr.responseText)
+                		}
+            		});
+				}
+
+				/*
+					 
+				 *  上拉加载更多
+				 * */
+				function pullupRefresh() {
+					var self = this;
+					if (isMore) {
+						page++;
+						mui.ajaxRequest(_url, {
+							type: 'POST',
+							data: {
+								pickingOrderNo: pickingOrderNo,
+								pickingStatus:pickingStatus,
+								pageNo: page,
+								pageSize: pageSize
+							},
+							success: function(data) {
+								var resData = data.data;
+								resData.acceptance = true;
+								if (resData.pageNo === resData.totalPage) {
+									isMore = false;
+									self.endPullUpToRefresh(true);
+								} else {
+									isMore = true;
+									self.endPullUpToRefresh(false);
+									self.refresh(true);
+								}
+								return template(resData, true)
+
+							},
+							error: function(xhr, type, errorThrown) {
+								console.log(xhr.responseText)
+							}
+						});
+					} else {
+						document.querySelectorAll('.mui-pull-loading')[0].innerHTML = '没有更多数据';
+						self.endPullUpToRefresh(true);
+					}
+
+				}
+				
 				// 模板加载
 				$.plusReady(function(){
-					var params,  applyNo = undefined, selectedRows = [],selecteIndex = [];
+					var params = undefined, 
+						applyNo = undefined, 
+						selectedRows = [],
+						selecteIndex = [];
 					var self = plus.webview.currentWebview();
 				    params = JSON.parse(self.params);//获得参数
 				   
-				    var acceptList = params.list;
+				    
 				    pickingOrderNo = params.pickingOrderNo;
+				    applyOrderNo = params.applyNo;
 				    applyNo = params.applyNo;
-				    showData(params)
+				    
 				    console.log(params);
 				    
 				    var pickUrl = '/a/common/pickingorder/finishPicking';
+					
+					//循环初始化所有下拉刷新，上拉加载。
+					$.each(document.querySelectorAll('.mui-scroll'), function(index, pullRefreshEl) {
+						
+						$(pullRefreshEl).pullToRefresh({
+							down: {
+								style:'circle',
+								contentdown : "下拉可以刷新",
+								contentover : "释放立即刷新",
+								contentrefresh : "正在刷新...",
+								callback: pulldownRefresh
+							},
+							up: {
+								contentrefresh : "正在加载...",//可选，正在加载状态时，上拉加载控件上显示的标题内容
+	      						contentnomore:'没有更多数据',
+								callback: pullupRefresh
+							}
+						});
+					});
+					// 第一个tab 默认加载一次数据
+					mui(".mui-scroll").pullToRefresh().pullDownLoading();
+					
 					
 					// 全选 及反选
 					$('.fix_bottom-wraper').on('click','#checkall',function(){
@@ -105,7 +240,7 @@
 						 		item.checked = true
 						 	});
 						 	document.querySelector('.total').innerText = checkList.length;
-						 	selectedRows = acceptList;
+//						 	selectedRows = acceptList;
 						 	mui.each(selectedRows,function(index,item){
 								selecteIndex.push(index);
 							});
@@ -121,7 +256,7 @@
 					});
 					
 					// 复选框选中
-					$('.batch-wrapper').on('click','.checkone',function(){
+					$('#slider').on('change','.checkone',function(){
 						selectedRows = [],selecteIndex = [];
 						var checkList = document.querySelectorAll('.checkone')
 						var checkAll = document.querySelector('#checkall');
@@ -130,7 +265,7 @@
 						mui.each(checkList,function(index,item){
 							if(item.checked){
 								len++;
-								selectedRows.push(acceptList[index]);
+//								selectedRows.push(acceptList[index]);
 								selecteIndex.push(this.dataset.index)
 							}
 						});
@@ -139,19 +274,23 @@
 					})
 					
 					
-					// 绑定事件 --确认验收
+					// 绑定事件 --确认拣货
 					$('.fix_bottom-wraper').on('tap','.acceptance',function(){
 						document.activeElement.blur(); // 隐藏软键盘
 						if(Number(document.querySelector('.total').innerText) === 0){
 							return mui.alert('请至少选中一项','警告',['确认'],function(){},'div')
 						}
 						var cards = document.querySelectorAll('.am-card');
+						var selectedCards = [];
+						mui.each(selecteIndex,function(index,item){
+							selectedCards.push(cards[item]);
+						});
 						var pickingDetail = [], submitData = {};
-						mui.each(selectedRows,function(index,item){
+						mui.each(selectedCards,function(index,item){
 							var postData = {};
-							postData.drugCode = item.drugCode;
-							postData.id = item.id;
-							postData.pickingNum = item.allocationNum;
+							postData.drugCode = item.dataset.drugcode;
+							postData.id = item.dataset.id;
+							postData.pickingNum = item.querySelector('.allocationNum').value;
 							pickingDetail.push(postData);
 						});
 						submitData.pickingDetail = pickingDetail;
@@ -169,17 +308,9 @@
 									contentType: "application/json",
 									success: function(data){
 										if(data.code === 200){
-											mui.toast('下架成功');
-											var parmasData = {};
-											parmasData.finishUrl = '../pickingOff/index';
-											parmasData.keepUrl = 'pickingOffList';
-											parmasData.resultType = 'picking';
-											parmasData.itemData = params.itemData;
-											common.openwin('../result/index',{ parmas: JSON.stringify(parmasData) },{
-												titleText: '结果',
-												autoBackButton: false
-											})
-											
+											mui.toast('下架成功',{ type: 'div' });
+											mui(".mui-scroll").pullToRefresh().pullDownLoading();
+											$JQ('.total').text(0);
 										}
 									},
 									error: function(xhr,type,errorThrown){
@@ -192,7 +323,7 @@
 					
 				});
 				
-			})(mui);
+			})(mui,jQuery);
 		
 		</script>
 	</body>

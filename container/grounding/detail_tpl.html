@@ -7,15 +7,15 @@
 				<div class="mui-collapse-content">
 						<div class="mui-input-row">
 							<label>配送单/验收单号</label>
-							<p class="detailRow_content">{{ distributecode ? distributecode: '' }}</p>
+							<p class="detailRow_content">{{ distributeCode ? distributeCode: '' }}</p>
 						</div>
 						<div class="mui-input-row">
 							<label>状态</label>
-							<p class="detailRow_content">{{ statusname ? statusname: '' }}</p>
+							<p class="detailRow_content">{{ value.upFinishType && value.upFinishType===1 ? '已上架': ' 待上架' }}</p>
 						</div>
 						<div class="mui-input-row">
 							<label>验收时间</label>
-							<p class="detailRow_content">{{ receptiontime ? receptiontime: ''}}</p>
+							<p class="detailRow_content">{{ receptionTime ? receptionTime: ''}}</p>
 						</div>
 						<!--<div class="mui-input-row">
 							<label>上架人</label>
@@ -23,7 +23,7 @@
 						</div>-->
 						<div class="mui-input-row">
 							<label>上架时间</label>
-							<p class="detailRow_content">{{ upuserdate ? upuserdate: ''}}</p>
+							<p class="detailRow_content">{{ upUserDate ? upUserDate: ''}}</p>
 						</div>
 				</div>
 			</li>
@@ -69,7 +69,7 @@
 							<p class="detailRow_content">{{value.actualStore}}</p>
 						</div>
 						<div class="mui-input-row">
-							{{ if hasGround }}
+							{{ if value.upFinishType !== 1 }}
 								<label class="font-warning">实际货位</label>
 								<select class="editInput realReceiveStore">
 									{{ each value.acceptoodsVo item i }}

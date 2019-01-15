@@ -1,5 +1,5 @@
 
-<script type="text/html" id='list_tpl_view'>
+<script type="text/html" id='batch_list_tpl_view'>
 	{{ each list value i}}
 		<div class="batch-wrapper">
 			<div>
@@ -36,7 +36,7 @@
 						</div>
 					</div>
 					{{ if acceptance }}
-						{{ if value.editable && value.isUsual === 0 }}
+						{{ if value.isUsual === 0 }}
 							<div class="editForm" style="display: block;">
 								<div class="am-flexbox am-flexbox-align-center">
 									<div class="am-flexbox-item">

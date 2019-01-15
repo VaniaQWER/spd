@@ -119,6 +119,22 @@ input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appear
 .check_wrapper{
 	padding-top: 0 !important;
 }
+.home-card-wrapper {
+	margin-top: 16px;
+	background: #fff;
+	padding: 18px 16px;
+}
+
+.home-card-content .home-card-item{
+	position: relative;
+}
+.home-card-title {
+	border-left: 6px solid #EC971F;
+	font-size: 18px;
+	padding-left: 13px;
+	margin-bottom: 6px;
+}
+
 .check_wrapper #pullrefresh .mui-table-view-cell{
 	padding: 0;
 }

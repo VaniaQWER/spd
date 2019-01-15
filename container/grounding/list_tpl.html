@@ -3,6 +3,8 @@
 	{{ each list value i}}
 		<div class="am-card scrollList-item am-card-full" 
 			data-id={{ value.id }}
+			data-realnum={{ value.realNum }}
+			data-productBatchNo={{ value.productBatchNo }}
 			>
 			<div class="am-card-header">
 				<div class="am-card-header-content">
@@ -25,7 +27,7 @@
 					 	规格：<span>{{ value.ctmmSpecification }}</span>
 					</div>
 				</div>
-				{{ if value.editable }}
+				{{ if hasGround }}
 				<div class="editForm" style="display: block;">
 					<div class="am-flexbox am-flexbox-align-center">
 						<div class="am-flexbox-item">
@@ -64,9 +66,6 @@
 			<div class="am-card-footer">
 				<div class="am-card-footer-content"></div>
 				<div class="am-card-footer-extra">
-					{{ if hasGround }}
-						<button type="button" class="mui-btn mui-btn-blue mui-btn-outlined groundEdit" data-id={{ value.id }} data-index={{ i }} >收起编辑</button>
-					{{ /if }}
 					<button type="button" class="mui-btn mui-btn-blue mui-btn-outlined moreDetail" data-id={{ value.id }} data-index={{ i }} style="margin: 0 5px;">更多详情</button>
 					{{ if hasGround }}
 						<button type="button" class="mui-btn mui-btn-danger ground" data-id={{ value.id }} data-index={{ i }} >确认上架</button>

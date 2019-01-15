@@ -5,34 +5,18 @@
 			<li class="mui-table-view-cell mui-collapse mui-active">
 				<a class="mui-navigate-right" href="#">单据信息</a>
 				<div class="mui-collapse-content">
-					<!--<div class="mui-input-row">
-						<label>配送单号</label>
-						<p class="detailRow_content">{{ distributecode ? distributecode: '' }}</p>
-					</div>
-					<div class="mui-input-row">
-						<label>订单号</label>
-						<p class="detailRow_content">{{ ordercode ? ordercode: '' }}</p>
-					</div>-->
 					<div class="mui-input-row">
 						<label>配送/验收单</label>
-						<p class="detailRow_content">{{ distributecode ? distributecode: '' }}</p>
+						<p class="detailRow_content">{{ distributeCode ? distributeCode: '' }}</p>
 					</div>
 					<div class="mui-input-row">
 						<label>状态</label>
-						<p class="detailRow_content">{{ statusname ? statusname: '' }}</p>
+						<p class="detailRow_content">{{ value.status ? value.status === 1 ? '待验收':'已验收': '' }}</p>
 					</div>
 					<div class="mui-input-row">
 						<label>类型</label>
-						<p class="detailRow_content">{{ typename ? typename: '' }}</p>
+						<p class="detailRow_content">{{ typeName ? typeName: '' }}</p>
 					</div>
-					<!--<div class="mui-input-row">
-						<label>供应商</label>
-						<p class="detailRow_content">{{ suppliername ? suppliername: '' }}</p>
-					</div>
-					<div class="mui-input-row">
-						<label>收货地址</label>
-						<p class="detailRow_content">{{ deptaddress ? deptaddress: '' }}</p>
-					</div>-->
 				</div>
 			</li>
 		</ul>
@@ -73,7 +57,7 @@
 							<p class="detailRow_content">{{ value && value.unit ? value.unit: ''}}</p>
 						</div>
 						<div class="mui-input-row">
-							{{ if (accepttype === '101' || accepttype === '102' || accepttype === '103'|| accepttype === '104') && hasAcceptance && value.isUsual === 0 }}
+							{{ if isPsList && value.status === 1 && value.isUsual === 0 }}
 								<label class="font-warning">生产批号</label>
 								<input class="mui-input editInput BatchNo" value={{ value && value.productBatchNo ? value.productBatchNo: ''}} />
 								{{ else }}
@@ -82,7 +66,7 @@
 							{{ /if }}
 						</div>
 						<div class="mui-input-row">
-							{{ if (accepttype === '101' || accepttype === '102' || accepttype === '103'|| accepttype === '104') && hasAcceptance && value.isUsual === 0 }}
+							{{ if isPsList && value.status === 1 && value.isUsual === 0 }}
 								<label class="font-warning">生产日期</label>
 								<input class="mui-input editInput realProductTime" type='date' value={{ value && value.realProductTime ? value.realProductTime: ''}} />
 								{{ else }}
@@ -96,7 +80,7 @@
 							<p class="detailRow_content">{{value && value.replanStoreName ? value.replanStoreName: ''}}</p>
 						</div>
 						<div class="mui-input-row">
-							{{ if (accepttype === '101' || accepttype === '102' || accepttype === '103' || accepttype === '104') && hasAcceptance && value.isUsual === 0 }}
+							{{ if isPsList && value.status === 1 && isUsual === 0 }}
 								<label class="font-warning">有效期至</label>
 								<input class="mui-input editInput realValidEndDate" type='date' value={{ value && value.realValidEndDate ? value.realValidEndDate: '' }} />
 								{{ else }}
@@ -106,7 +90,7 @@
 						</div>
 						{{ if isShowTemprature === 1 }}
 							<div class="mui-input-row">
-								{{ if (accepttype === '101' || accepttype === '102' || accepttype === '103'|| accepttype === '104') && hasAcceptance && value.isUsual === 0 }}
+								{{ if isPsList && value.status === 1 && isUsual === 0 }}
 									<label class="font-warning">验收温度（℃）</label>
 									<input class="mui-input editInput realAcceptanceTemperature" type='number' value={{ value && value.realAcceptanceTemperature ? value.realAcceptanceTemperature: ''}}/>
 									{{ else }}
@@ -120,7 +104,7 @@
 							<p class="detailRow_content">{{ value && value.realDeliveryQuantiry ? value.realDeliveryQuantiry: 0 }}</p>
 						</div>
 						<div class="mui-input-row">
-							{{ if (accepttype === '101' || accepttype === '102' || accepttype === '103' ||accepttype === '104') && hasAcceptance && value.isUsual === 0 }}
+							{{ if isPsList && value.status === 1 && isUsual === 0 }}
 								<label class="font-warning">实到数量</label>
 								<input class="mui-input editInput realReceiveQuantiry" type="number"  pattern="[0-9]*" value={{ value && value.realReceiveQuantiry ? value.realReceiveQuantiry: value && value.realDeliveryQuantiry ? value.realDeliveryQuantiry: '' }} />
 								{{ else }}

@@ -25,7 +25,7 @@
 		</header>
 		<div class="mui-content">
 		    <div class="mui-input-row mui-search search_head">
-				<input type="search" class="mui-input-clear" placeholder="上架单号" onclick="toSearchPage()">
+				<input type="search" class="mui-input-clear" placeholder="上架单号" readonly="readonly"  onclick="toSearchPage()">
 			</div>
 			<div id="slider" class="mui-slider themes_tab mui-fullscreen" style="top: 102px;">
 				<div id="sliderSegmentedControl" class="mui-slider-indicator mui-segmented-control mui-segmented-control-inverted">
@@ -178,7 +178,7 @@
                 			}else{
                 				totalPageRight = total;
                 			}
-                			if(resData.list.length <= resData.pageSize && resData.pageNo === resData.totalPage){
+                			if(resData.list.length === 0 || (resData.list.length <= resData.pageSize && resData.pageNo === resData.totalPage)){
                 				var i = selectTabs === 1 ? 0 : 1;
                 				document.querySelectorAll('.mui-pull-loading')[i].innerHTML = '没有更多数据';
                 				isMore = false;
@@ -256,9 +256,14 @@
 						mui(".mui-slider-group .mui-scroll").pullToRefresh()[0].pullDownLoading();
 					})
 					 // 页面刷新
-					window.addEventListener('pagefresh',function(){
-						mui(".mui-slider-group .mui-scroll").pullToRefresh()[0].pullDownLoading();
-					})
+					window.addEventListener('pagefresh',function(e){
+						let index = e.detail.hasAcceptance ? 1: 0;
+						if(index === 1){
+							mui('#slider').slider().gotoItem(1);
+						}
+						mui(".mui-slider-group .mui-scroll").pullToRefresh()[index].pullDownLoading();
+					}) 
+
 					
 					var item2 = document.querySelector('#item2mobile');
 					var item1 = document.querySelector('#item1mobile');
@@ -327,7 +332,8 @@
 						console.log(JSON.stringify(itemData))
 						document.activeElement.blur(); // 隐藏软键盘
 						console.log(id,'id');
-						common.openwin('ground_list',{ params: JSON.stringify(itemData) }, false)
+						let openwinUrl = selectTabs === 1 ? 'ground_not_list':'ground_list';
+						common.openwin(openwinUrl,{ params: JSON.stringify(itemData) }, false)
 					})
 				})
 			})(mui,document,jQuery);

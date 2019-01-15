@@ -15,17 +15,6 @@
 
 	<body>
 		<div class="mui-content detailRow">
-			<div class="detail-header-flex">
-				<div class="am-action previous">
-					<a class="mui-icon mui-icon-arrowleft"></a>
-					<a class="theme_back_font">上一个</a>
-				</div>
-				<div class="page-indictor"><span class="currentPage"></span>/<span class="page-total"></span></div>
-				<div class="am-action next">
-					<a class="theme_next_font">下一个</a>
-					<a class="mui-icon mui-icon-arrowright"></a>
-				</div>
-			</div>
 			<form class="mui-input-group" id="detailContent" style="background:none;">
 				<ul class="mui-table-view" style="margin-bottom:12px;">
 					<li class="mui-table-view-cell mui-collapse">
@@ -36,7 +25,9 @@
 					</li>
 				</ul>
 			</form>
-			
+			<form id="List">
+				
+			</form>
 		</div>
 		
 		<script src="../../js/mui.min.js"></script>
@@ -57,117 +48,86 @@
 					}
 					
 				}
-				var checkType = undefined, type = undefined, data = null, details = undefined, checkUrl = '/a/checkacceptdetail/checkList';
+				var checkType = undefined, 
+					type = undefined, 
+					data = null, 
+					details = undefined, 
+					url = '/a/exam/detail', // 分页接口
+					titleUrl = '/a/exam/detailhead',// 头部接口
+					checkUrl = '/a/checkacceptdetail/checkList';
 				$.plusReady(function(){
 					$.init({
 						beforeback: function() {
 					        var list = plus.webview.currentWebview().opener();  
-					        //触发列表界面的自定义事件（refresh）,从而进行数据刷新  
-					        mui.fire(list, 'refresh');  
-					        //返回true，继续页面关闭逻辑  
+					        mui.fire(list, 'pagefresh',{ selectTab: details.status }); 
 					        return true;  
 				    	}
 					})
-					if(plus.storage.getItem('currDept')){
-						type = JSON.parse(plus.storage.getItem('currDept')).deptType;
-						switch(type){
-							case '3':
-								checkType = 1; // 药库
-								break;
-							case '4':
-								checkType = 2; // 药房
-								break;
-							case '5':
-								checkType = 3; // 基数药
-								break;
-							default:
-								break;
-						}
-					}
+					
 					var self = plus.webview.currentWebview();
 					details = JSON.parse(self.details);//获得参数
-					console.log(details)
-					data = Object.assign({},details.orderInfo);
-					var currentIndex = Number(details.index);
-					console.log(currentIndex)
-					data.hasAcceptance = details.hasAcceptance;
-					data.isShowTemprature = details.isShowTemprature;
-					data.list = [];
-					data.statusname = details.statusname;
-					data.isPsList = details.isPsList;
-					data.list.push(details.allData[currentIndex]);
-					data.checkType = checkType;
-					if(currentIndex === 0){
-						document.querySelector('.previous').style.zIndex = -1;
-					}
-					if(currentIndex === details.allData.length -1){
-						document.querySelector('.next').style.zIndex = -1;
-					}
-					document.querySelector('.currentPage').innerText = (currentIndex + 1);
-					if(details.hasAcceptance){
-						showOrHideBtn(data)
-						var acceptanceBtn = '<button type="button" id="acceptance" class="mui-btn mui-btn-warning mui-btn-block" style="margin-bottom: 20px;" data-loading-text = "提交中" data-loading-icon-position="right">确认验收</button>'
-						document.querySelector('.detailRow').insertAdjacentHTML("beforeEnd",acceptanceBtn);
-						
-					}
-					document.querySelector('.page-total').innerHTML = details.allData.length;
-					console.log(data)
-					// type  1 2 4 配送单 可编辑     其余 出库单  不能编辑
-					showData(data);
-					
-					function showOrHideBtn(data){
-						
-						if(checkType === 1 && details.isPsList && data.list[0].isUsual === 0 && details.orderInfo.currentSelected === 'left'){
-							var node = '<form id="List"></form><div id="addBtn"><button class="mui-btn mui-btn-block btn">+ 增加批号</button></div>';
-							document.querySelector('#detailContent').insertAdjacentHTML('afterEnd',node);
-						}else{
-								var content = document.querySelector('.detailRow');
-								var List = document.querySelector('#List');
-								var btn = document.querySelector('#addBtn');
-								if(List&&btn){
-									content.removeChild(List);
-									content.removeChild(btn);
+					checkType = details.checkType;
+					status = details.status;
+					console.log(JSON.stringify(details) );
+					var postData = {
+						distributeCode: details.distributeCode,
+						status: details.status,
+						id: details.id
+					};
+					var detailData = {};
+					plus.nativeUI.showWaiting('加载中...');
+					mui.ajaxRequest(titleUrl,{
+						type: 'POST',
+						data: { distributeCode: postData.distributeCode },
+						success: function(data){
+							if(data.code === 200){
+								for(var key in data.data){
+									detailData[key] = data.data[key];
+									detailData.isPsList = details.isPsList;
 								}
+								mui.ajaxRequest(url,{
+									type: 'POST',
+									data: postData,
+									success: function(data){
+										plus.nativeUI.closeWaiting();
+										if(data.code === 200){
+											detailData.list = data.data.list;
+											console.log(detailData)
+											showData(detailData);
+											if(details.hasAcceptance){
+												setTimeout(function(){
+													showOrHideBtn()
+													var acceptanceBtn = '<button type="button" id="acceptance" class="mui-btn mui-btn-warning mui-btn-block" style="margin-bottom: 20px;" data-loading-text = "提交中" data-loading-icon-position="right">确认验收</button>'
+													document.querySelector('.detailRow').insertAdjacentHTML("beforeEnd",acceptanceBtn);
+												},100)
+											}
+											
+										}else{
+											mui.toast(data.msg,{ type: 'div' });
+										}
+									},
+									error: function(xhr,type,errorThrown){
+										console.log(xhr.responseText)
+			                		}
+								});
+							}else{
+								mui.toast(data.msg,{ type: 'div' });
+							}
+							
+						},
+						error: function(xhr,type,errorThrown){
+							console.log(xhr.responseText)
+                		}
+					});
+					
+					// checkType  1 2 4 配送单 可编辑     其余 出库单  不能编辑
+					function showOrHideBtn(){
+						if(checkType === 1 && details.isPsList && status === '1' && detailData.list[0].isUsual === 0){	
+							var node = '<div id="addBtn"><button class="mui-btn mui-btn-block btn">+ 增加批号</button></div>';
+							document.querySelector('#List').insertAdjacentHTML('afterEnd',node);
 						}
 					}
-						// 上一个
-					$('.detail-header-flex').on('tap','.previous',function(){
-						plus.nativeUI.showWaiting();
-						var _this = this;
-						setTimeout(function(){
-							_this.style.zIndex = currentIndex === 1 ? -1: 1;
-							currentIndex--;
-							$('.next')[0].style.zIndex = 1;
-							document.querySelector('.currentPage').innerText = (currentIndex + 1);
-							data.list = [];
-							data.list.push(details.allData[currentIndex]);
-							plus.nativeUI.closeWaiting();
-							console.log(data)
-							showData(data);
-							showOrHideBtn(data);
-						},200)
-					});
 				
-					// 下一个
-					$('.detail-header-flex').on('tap','.next',function(){
-						plus.nativeUI.showWaiting();
-						var _this = this;
-						setTimeout(function(){
-							console.log('next');
-							currentIndex++;
-							$('.previous')[0].style.zIndex = 1;
-							document.querySelector('.currentPage').innerText = (currentIndex + 1);
-							_this.style.zIndex = currentIndex === details.allData.length-1 ? -1: 1;
-							data.list = [];
-							data.list.push(details.allData[currentIndex]);
-							plus.nativeUI.closeWaiting();
-							console.log(data)
-							showData(data);
-							showOrHideBtn(data);
-						},200)
-					});
-					
-				});
 				
 				/*
 				 *2 点击添加按钮 增加选填项    开始
@@ -218,13 +178,18 @@
 								}
 							},'div');
 						});
-						
 					}
+					
+					mui('#List').on('keypress','input',function(e){
+						if(e.keyCode === 13){
+							
+						}
+					})
+					
 					// 验收
 					mui('.detailRow').on('tap','#acceptance',function(event){
 						let postData = [],submitData = {};
-						if(details.isPsList && data.list[0].isUsual === 0){ // 配送单验收  可以修改
-							
+						if(details.isPsList && detailData.list[0].isUsual === 0){ // 配送单验收  可以修改
 							// 获取产品信息详情中编辑字段值
 							
 							var phValue = document.querySelector('.mui-input').value; // 批号文号
@@ -238,13 +203,13 @@
 							}
 							var realReceiveQuantiry = document.querySelector('.realReceiveQuantiry').value;
 							let parentData = {
-								productBatchNo: data.list[0].productBatchNo,
+								productBatchNo: detailData.list[0].productBatchNo,
 								realReceiveQuantiry: realReceiveQuantiry,
 								realProductTime: realProductTime,
 								realValidEndDate: realValidEndDate,
-								isUsual: data.list[0].isUsual,
-								id: data.list[0].id,
-								drugCode: data.list[0].drugCode,
+								isUsual: detailData.list[0].isUsual,
+								id: detailData.list[0].id,
+								drugCode: detailData.list[0].drugCode,
 								parentId: null,
 							}
 							if(phList.length){
@@ -258,10 +223,10 @@
 									if(details.isShowTemprature === 1){
 										values.realAcceptanceTemperature = realAcceptanceTemperature;
 									}
-									values.isUsual = data.list[0].isUsual;
-									values.drugCode = data.list[0].drugCode;
+									values.isUsual = detailData.list[0].isUsual;
+									values.drugCode = detailData.list[0].drugCode;
 									values.id = null;
-									values.parentId = data.list[0].id;
+									values.parentId = detailData.list[0].id;
 									postData.push(values);
 								}
 							}else{
@@ -273,36 +238,36 @@
 									values.realAcceptanceTemperature = realAcceptanceTemperature;
 								}
 								values.realReceiveQuantiry = realReceiveQuantiry;
-								values.drugCode = data.list[0].drugCode;
-								values.isUsual = data.list[0].isUsual;
-								values.id = data.list[0].id;
+								values.drugCode = detailData.list[0].drugCode;
+								values.isUsual = detailData.list[0].isUsual;
+								values.id = detailData.list[0].id;
 								values.parentId = null;
 								postData.push(values);
 							}
 						}else{
 							// 非配送单验收，不能修改
 							let values = {};
-							values.productBatchNo = data.list[0].productBatchNo;
-							values.realProductTime = data.list[0].realProductTime;
-							values.realValidEndDate = data.list[0].realValidEndDate;
+							values.productBatchNo = detailData.list[0].productBatchNo;
+							values.realProductTime = detailData.list[0].realProductTime;
+							values.realValidEndDate = detailData.list[0].realValidEndDate;
 							if(defaultStatus.isShowTemprature === 1){
-								values.realAcceptanceTemperature = data.list[0].realAcceptanceTemperature;
+								values.realAcceptanceTemperature = detailData.list[0].realAcceptanceTemperature;
 							}
-							values.realReceiveQuantiry = data.list[0].realReceiveQuantiry;
-							values.drugCode = data.list[0].drugCode;
-							values.isUsual = data.list[0].isUsual;
-							values.id = data.list[0].id;
-							values.parentId = data.list[0].id;
+							values.realReceiveQuantiry = detailData.list[0].realReceiveQuantiry;
+							values.drugCode = detailData.list[0].drugCode;
+							values.isUsual = detailData.list[0].isUsual;
+							values.id = detailData.list[0].id;
+							values.parentId = detailData.list[0].id;
 							postData.push(values);
 						}
 						
 						submitData.detailList = postData;
-						submitData.distributeCode = data.distributecode;
+						submitData.distributeCode = detailData.distributeCode;
 						let count = 0;
 						mui.each(submitData.detailList,function(index,item){
 							count += Number(item.realReceiveQuantiry)
 						});
-						if(count > data.list[0].realReceiveQuantiry){
+						if(count > detailData.list[0].realReceiveQuantiry){
 							mui.toast('请注意：实到数量比配送数量多');
 						}
 						console.log(submitData,'submitData'); // 批号 数据
@@ -317,25 +282,31 @@
 									contentType: "application/json",
 									success: function(data){
 										if(data.code === 200){
-											mui.toast('验收成功');
-											var parmasData = {};
-											parmasData.finishUrl = '../acceptance/index';
-											parmasData.keepUrl = 'acc_list';
-											parmasData.resultType = 'acceptance';
-											parmasData.itemData = details.orderInfo;
-											common.openwin('../result/index',{ parmas: JSON.stringify(parmasData) },{
-												titleText: '结果',
-												autoBackButton: false
-											})
+											mui.toast('验收成功',{ type: 'div' });
+											
+											var page =  plus.webview.getWebviewById('acc_not_list');
+											mui.fire(page,'pagefresh',{ selectTab: '1' });
+											common.gotowin('acc_not_list',{  });
+											plus.webview.currentWebview().close();
+//											var parmasData = {};
+//											parmasData.finishUrl = '../acceptance/index';
+//											parmasData.keepUrl = 'acc_not_list';
+//											parmasData.resultType = 'acceptance';
+//											parmasData.itemData = details.orderInfo;
+//											common.openwin('../result/index',{ parmas: JSON.stringify(parmasData) },{
+//												titleText: '结果',
+//												autoBackButton: false
+//											})
 										}
 									},
 									error: function(xhr,type,errorThrown){
-//										console.log(xhr.responseText)
+										console.log(xhr.responseText)
 			                		}
 								})
 							}
 						},'div')
 					})
+				})
 			})(mui);
 		
 		</script>

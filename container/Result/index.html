@@ -95,8 +95,10 @@
 				// 继续操作
 				$('.result-footer').on('click','.keep',function(){
 					var page =  plus.webview.getWebviewById(parmas.keepUrl);
-					mui.fire(page,'pagefresh',{ params: JSON.stringify(parmas.itemData) });
-					common.gotowin(parmas.keepUrl,{ params: JSON.stringify(parmas.itemData) })
+					mui.fire(page,'pagefresh',{ params: JSON.stringify(parmas.itemData),selectTab: '1' });
+					common.gotowin(parmas.keepUrl,{ params: JSON.stringify(parmas.itemData) });
+//					plus.webview.currentWebview().close();
+					
 				});
 				
 				
@@ -104,7 +106,7 @@
 				$('.result-footer').on('tap','.finish',function(){
 					var page =  plus.webview.getWebviewById(parmas.finishUrl);
 					console.log(page);
-					mui.fire(page,'pagefresh',{ });
+					mui.fire(page,'pagefresh',{ hasAcceptance: true });
 					common.gotowin(parmas.finishUrl, {}, false)
 				})
 				

@@ -1,7 +1,13 @@
 
 <script type="text/html" id='picking_tpl'>
 	{{ each list value i}}
-		<div class="am-card scrollList-item am-card-full" data-id={{ value.id }}>
+		<div class="am-card scrollList-item am-card-full" 
+			data-id={{ value.id }}
+			data-applyOrderNo={{ applyOrderNo }}
+			data-allocationNum={{ value.allocationNum }}
+			data-drugCode={{ value.drugCode }}
+			data-pickingNum={{ value.pickingNum }}
+		>
 			<div class="am-card-header">
 				<div class="am-card-header-content">
 					<span style="font-size: 18px; color: rgb(51, 51, 51); font-weight: bold;">
@@ -16,9 +22,22 @@
 					<div class="am-flexbox-item"> 
 						单位：<span>{{ value.replanUnit }}</span> 
 					</div>
-					<div class="am-flexbox-item"> 
-						数量：<span>{{ value.allocationNum }}</span> 
-					</div>
+					{{ if  hasPicked }}
+						<div class="am-flexbox-item">
+							<div class="am-list-item am-input-item am-list-item-middle">
+								<div class="am-list-line">
+									<div class="am-input-label am-input-label-4 font-warning">实到数量:</div>
+									<div class="am-input-control">
+										<input pattern="[0-9]*" type="number" value={{ value.allocationNum?value.allocationNum: '' }} placeholder="请输入" class="allocationNum flex-item-input" />
+									</div>
+								</div>
+							</div>
+						</div>
+						{{ else }}
+							<div class="am-flexbox-item"> 
+								数量：<span>{{ value.pickingNum }}</span> 
+							</div>
+					 {{ /if }}
 					<div class="am-flexbox-item">
 					 	规格：<span>{{ value.ctmmSpecification }}</span>
 					</div>
@@ -42,7 +61,7 @@
 			</div>
 			<div class="am-card-footer">
 				<div class="am-card-footer-extra">
-					<button type="button" class="mui-btn mui-btn-blue mui-btn-outlined toPage" style="margin: 0 5px;" data-index={{ i }} >更多详情</button>
+					<button type="button" class="mui-btn mui-btn-blue mui-btn-outlined toPage" style="margin: 0 5px;" data-index={{ i }} data-id={{ value.id }}>更多详情</button>
 					{{ if hasPicked }}
 						<button type="button" class="mui-btn mui-btn-blue mui-btn-danger submitButton" data-index={{ i }}>确认拣货</button>
 					{{ /if }}

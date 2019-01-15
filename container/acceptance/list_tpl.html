@@ -4,8 +4,12 @@
 		<div class="am-card scrollList-item am-card-full" 
 			data-id={{ value.id }}
 			data-isUsual={{ value.isUsual }}
-			data-drugCode={{ value.drugCode }}
-			data-parentId={{ value.parentId }}
+			data-drugCode = {{ value.drugCode }}
+			data-parentId = {{ value.parentId }}
+			data-realReceiveQuantiry = {{ value.realReceiveQuantiry }}
+			data-realProductTime = {{ value.realProductTime }}
+			data-productBatchNo = {{ value.productBatchNo }}
+			data-realValidEndDate = {{ value.realValidEndDate }}
 		>
 			<div class="am-card-header">
 				<div class="am-card-header-content">
@@ -29,7 +33,7 @@
 					</div>
 				</div>
 				{{ if acceptance }}
-					{{ if value.editable && value.isUsual === 0 }}
+					{{ if value.isUsual === 0 }}
 						<div class="editForm" data-index={{ i }} style="display: block;">
 							<div class="am-flexbox am-flexbox-align-center">
 								<div class="am-flexbox-item">

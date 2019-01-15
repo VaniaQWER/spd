@@ -7,27 +7,27 @@
 				<div class="mui-collapse-content">
 						<div class="mui-input-row">
 							<label>拣货单号</label>
-							<p class="detailRow_content">{{ pickingorderno ? pickingorderno: '--'}}</p>
+							<p class="detailRow_content">{{ pickingOredr ? pickingOredr: ''}}</p>
 						</div>
 						<div class="mui-input-row">
 							<label>单号</label>
-							<p class="detailRow_content">{{ applyorderno ? applyorderno: '--'}}</p>
+							<p class="detailRow_content">{{ applyOrder ? applyOrder: ''}}</p>
 						</div>
 						<div class="mui-input-row">
 							<label>申领部门</label>
-							<p class="detailRow_content">{{ deptname ? deptname: '--'}}</p>
+							<p class="detailRow_content">{{ applyDeptName ? applyDeptName: ''}}</p>
 						</div>
 						<div class="mui-input-row">
 							<label>状态</label>
-							<p class="detailRow_content">{{ statusname }}</p>
+							<p class="detailRow_content">{{ value.status === 0 ? '待拣货': '已拣货' }}</p>
 						</div>
 						<div class="mui-input-row">
 							<label>拣货人</label>
-							<p class="detailRow_content">{{ pickingUserName }}</p>
+							<p class="detailRow_content">{{ pickingUserName ? pickingUserName: '' }}</p>
 						</div>
 						<div class="mui-input-row">
 							<label>拣货时间</label>
-							<p class="detailRow_content">{{ pickingTime ? pickingTime: '--'}}</p>
+							<p class="detailRow_content">{{ pickingTime ? pickingTime: ''}}</p>
 						</div>
 				</div>
 			</li>
@@ -82,7 +82,7 @@
 								<input class="mui-input editInput relNum" type="number" pattern="[0-9]*" value={{ value.allocationNum  }} />
 								{{ else }}
 									<label>实际下架数量</label>
-									<p class="detailRow_content">{{ value.allocationNum }}</p>
+									<p class="detailRow_content">{{ value.pickingNum }}</p>
 							{{ /if }}
 						</div>
 				</div>

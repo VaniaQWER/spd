@@ -25,7 +25,7 @@
 		</header>
 		<div class="mui-content">
 		    <div class="mui-input-row mui-search search_head">
-				<input type="search" class="mui-input-clear" value="" placeholder="供应商名称" onclick="toSearchPage()">
+				<input type="search" class="mui-input-clear" readonly="readonly"  value="" placeholder="供应商名称" onclick="toSearchPage()">
 			</div>
 			<div id="slider" class="mui-slider themes_tab mui-fullscreen" style="top: 102px;">
 				<div id="sliderSegmentedControl" class="mui-slider-indicator mui-segmented-control mui-segmented-control-inverted">
@@ -73,18 +73,17 @@
 			}
 			//去搜索页面
 			function toSearchPage (){
-				document.activeElement.blur(); // 隐藏软键盘
+
 				var params = {};
 				params.key = 'supplier';
 				params.route = '../acceptance/index';
 				params.module = 'acceptance';
 				params.location = 'main_list'
 				common.openwin('../commonPages/searchPage',{ params: JSON.stringify(params) },false)
+				document.activeElement.blur(); // 隐藏软键盘
+				
 			}
-			
-//			window.addEventListener('pagefresh', function(e) {  
-//			    location.reload();  
-//			});
+
 			
 			(function($,$$) {
 				
@@ -106,7 +105,7 @@
 				utils.appendModule('#card_view');
 				
 				/* 渲染模板   */
-				var selected = undefined, page = undefined, pageSize = 10,totalPage = undefined, query = {};
+				var page = undefined, pageSize = 10,totalPage = undefined, query = {};
 				
 				var checkType, type, acceptanceType// 验收单类型 // 验收状态   1 待验收  2 已验收 
 				var requestUrl =  '/a/checkaccept/list'; // 请求地址
@@ -123,17 +122,6 @@
         			utils.innerTplHtml('acceptance', selected, data, insertType);
             	}
             	
-            	function currSelected(){
-					var item1mobile = document.querySelector('#item1mobile');
-					var item2mobile = document.querySelector('#item2mobile');
-					if(item1mobile.className.indexOf('mui-active')>0){
-						selected = '.mui-tab1';
-						selectTabs = 1;
-					}else{
-						selected = '.mui-tab2';
-						selectTabs = 2;
-					}
-            	}
             	/*
             	 	下拉刷新
             	 * */
@@ -169,7 +157,7 @@
                 			}else{
                 				totalPageRight = total;
                 			}
-                			if(resData.list.length <= resData.pageSize && resData.pageNo === resData.totalPage){
+                			if(resData.list.length === 0 || (resData.list.length <= resData.pageSize && resData.pageNo === resData.totalPage)){
                 				var i = selectTabs === 1 ? 0 : 1;
                 				document.querySelectorAll('.mui-pull-loading')[i].innerHTML = '没有更多数据';
                 				isMore = false;
@@ -250,7 +238,14 @@
 					})
 					
 					window.addEventListener('pagefresh',function(e){
-						location.reload();
+						console.log(e.detail)
+						let index = e.detail.hasAcceptance ? 0: 1;
+						console.log(index)
+						if(index === 1){
+							mui('#slider').slider().gotoItem(1);
+						}
+						mui(".mui-slider-group .mui-scroll").pullToRefresh()[index].pullDownLoading();
+						
 					})
 					
 					plus.key.addEventListener('backbutton',function(){
@@ -329,7 +324,8 @@
 						itemData.currentSelected = selectTabs === 1 ? 'left': 'right';
 						console.log(JSON.stringify(itemData))
 						document.activeElement.blur(); // 隐藏软键盘
-						common.openwin('acc_list',{ params: JSON.stringify(itemData) },false)
+						let openwinUrl = selectTabs === 1 ? 'acc_not_list':'acc_list';
+						common.openwin(openwinUrl,{ params: JSON.stringify(itemData) },false)
 					})
 				});
 				

@@ -136,7 +136,7 @@
 	        	mui.back = function(){
 	        		 if (!first) {
 			            first = new Date().getTime();
-			            mui.toast('再按一次退出应用');
+			            mui.toast('再按一次退出应用',{ type: 'div' });
 			            setTimeout(function() {
 			                first = null;
 			            }, 1000);
@@ -155,7 +155,7 @@
 											}
 										},
 										error: function(){
-											mui.toast('网络异常,请稍后在试');
+											mui.toast('网络异常,请稍后在试',{ type: 'div' });
 										}
 									})
 								}
@@ -408,7 +408,7 @@
 	            			}
 	            		}
 	            	}else{
-	            		mui.toast('请重新登陆');
+	            		mui.toast('请重新登陆',{ type: 'div' });
 	            		common.openwin('../login/index',{})
 	            	}
 	            }

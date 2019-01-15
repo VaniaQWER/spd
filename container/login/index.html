@@ -50,8 +50,8 @@
 					var btnArray = ['确认'];
 					loginButton.addEventListener('tap', function(event) {
 					document.activeElement.blur(); // 隐藏软键盘
-					if(!accountBox.value) return mui.toast('请输入用户名');
-					if(!passwordBox.value) return mui.toast('请输入密码');
+					if(!accountBox.value) return mui.toast('请输入用户名',{ type: 'div' });
+					if(!passwordBox.value) return mui.toast('请输入密码',{ type: 'div' });
 					mui(this).button('loading');
 					var _this = this;
 						mui.ajaxRequest('/a/entryPass/entryptPassword',{
@@ -76,7 +76,7 @@
 												if(!flag) return mui.toast('请重新进行登陆操作',{ duration:'long', type:'div' });
 												common.openwin('../home/index',{})
 											}else{
-												mui.toast(res.msg);
+												mui.toast(res.msg,{ type: 'div' });
 												mui(_this).button('reset');
 											}
 																					
@@ -95,7 +95,7 @@
 							},
 							error: function(xhr,type,errorThrown){
 								mui(_this).button('reset');
-//								alert(xhr.responseText)
+				
 							}
 						})
 					});
@@ -130,7 +130,7 @@
             		showWaiting: true,
             		success: function(data){
             			if(data.code === 200){
-            				mui.toast('设置当前系统成功');
+            				mui.toast('设置当前系统成功',{ type: 'div' });
             				let history = undefined;// 设置历史记录数据结构
             				if(currDept.deptType === '3' || currDept.deptType === '4' ){
             					history = {
@@ -163,7 +163,7 @@
             				}
             				plus.storage.setItem('searchHistory',JSON.stringify(history));
             			}else{
-            				mui.toast('设置切换系统失败,请重新登陆');
+            				mui.toast('设置切换系统失败,请重新登陆',{ type: 'div' });
             				return false
             			}
             		},

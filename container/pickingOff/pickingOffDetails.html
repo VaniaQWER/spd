@@ -14,25 +14,7 @@
 	</head>
 
 	<body>
-		
-		<!--<header class="mui-bar mui-bar-nav theme_back">
-		   	<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
-		   	<a class="mui-pull-left theme_back_font">返回</a>
-		    <h1 class="mui-title">拣货下架</h1>
-		</header>-->
-		
 		<div class="mui-content detailRow">
-			<div class="detail-header-flex">
-				<div class="am-action previous">
-					<a class="mui-icon mui-icon-arrowleft"></a>
-					<a class="theme_back_font">上一个</a>
-				</div>
-				<div class="page-indictor"><span class="currentPage"></span>/<span class="page-total"></span></div>
-				<div class="am-action next">
-					<a class="theme_next_font">下一个</a>
-					<a class="mui-icon mui-icon-arrowright"></a>
-				</div>
-			</div>
 			<form class="mui-input-group" id="detailContent" style="background:none;">
 				<ul class="mui-table-view" style="margin-bottom:12px;">
 					<li class="mui-table-view-cell mui-collapse">
@@ -65,86 +47,98 @@
 				
 			// 模板加载
 			$.plusReady(function(){
-				//console.log("当前页面URL："+plus.webview.currentWebview().getURL());
+				
+				$.init({
+					beforeback: function() {
+				        var list = plus.webview.currentWebview().opener();  
+				        mui.fire(list, 'pagefresh',{ hasPicked: true }); 
+				        return true;  
+			    	}
+				})
+				
 				var self = plus.webview.currentWebview();
 				var details = JSON.parse(self.details);//获得参数
-				console.log(details)
-				var data = Object.assign({},details.orderInfo); 
-				var currentIndex = Number(details.index), pickUrl = '/a/common/pickingorder/finishPicking';
-				data.hasPicked = details.hasPicked;
-				data.pickingTime = details.pickingTime;
-				data.pickingUserName = details.pickingUserName;
-				data.list = [];
-				data.list.push(details.allData[currentIndex]);
-				if(currentIndex === 0){
-					document.querySelector('.previous').style.zIndex = -1;
-				}
-				if(currentIndex === details.allData.length -1){
-					document.querySelector('.next').style.zIndex = -1;
-				}
-				document.querySelector('.currentPage').innerText = (currentIndex + 1);
+				var detailData = {};
+				console.log(JSON.stringify(details)) 
+				var titleUrl = '/a/common/pickingorderdetail/getPickingDetailPad?pickingOrderNo=' + details.pickingOrderNo,
+					url = '/a/common/pickingorderdetail/detailList',
+					pickUrl = '/a/common/pickingorder/finishPicking';
 				if(details.hasPicked){
 					var groundBtn = '<button type="button" id="picking" class="mui-btn mui-btn-warning mui-btn-block" style="margin-bottom: 20px;" data-loading-text = "提交中" data-loading-icon-position="right">确认拣货</button>'
 					document.querySelector('.detailRow').insertAdjacentHTML("beforeEnd",groundBtn);
 				}
-				document.querySelector('.page-total').innerHTML = details.allData.length;
-				showData(data);
-				// 上一个
-				$('.detail-header-flex').on('tap','.previous',function(){
-					plus.nativeUI.showWaiting();
-					var _this = this;
-					setTimeout(function(){
-						_this.style.zIndex = currentIndex === 1 ? -1: 1;
-						currentIndex--;
-						$('.next')[0].style.zIndex = 1;
-						document.querySelector('.currentPage').innerText = (currentIndex + 1);
-						data.list = [];
-						data.list.push(details.allData[currentIndex]);
-						plus.nativeUI.closeWaiting();
-						showData(data);
-					},200)
-				});
-				
-				// 下一个
-				$('.detail-header-flex').on('tap','.next',function(){
-					plus.nativeUI.showWaiting();
-					var _this = this;
-					setTimeout(function(){
-						console.log('next');
-						currentIndex++;
-						$('.previous')[0].style.zIndex = 1;
-						document.querySelector('.currentPage').innerText = (currentIndex + 1);
-						_this.style.zIndex = currentIndex === details.allData.length-1 ? -1: 1;
-						data.list = [];
-						data.list.push(details.allData[currentIndex]);
-						plus.nativeUI.closeWaiting();
-						showData(data);
-					},200)
-					
-				});
-				
+				var postData = {
+					pickingOrderNo: details.pickingOrderNo,
+					id: details.id,
+					pickingStatus: details.pickingStatus
+				};
+				plus.nativeUI.showWaiting('加载中...');
+				mui.ajaxRequest(titleUrl,{
+						type: 'GET',
+						success: function(data){
+							if(data.code === 200){
+								for(var key in data.data){
+									detailData[key] = data.data[key];
+									detailData.hasPicked = details.hasPicked;
+								}
+								mui.ajaxRequest(url,{
+									type: 'POST',
+									data: postData,
+									success: function(data){
+										plus.nativeUI.closeWaiting();
+										if(data.code === 200){
+											detailData.list = data.data.list;
+											console.log(detailData)
+											showData(detailData);
+											if(details.hasAcceptance){
+												setTimeout(function(){
+													showOrHideBtn()
+													var acceptanceBtn = '<button type="button" id="acceptance" class="mui-btn mui-btn-warning mui-btn-block" style="margin-bottom: 20px;" data-loading-text = "提交中" data-loading-icon-position="right">确认拣货</button>'
+													document.querySelector('.detailRow').insertAdjacentHTML("beforeEnd",acceptanceBtn);
+												},100)
+											}
+											
+										}else{
+											mui.toast(data.msg,{ type: 'div' });
+										}
+									},
+									error: function(xhr,type,errorThrown){
+										console.log(xhr.responseText)
+			                		}
+								});
+							}else{
+								mui.toast(data.msg,{ type: 'div' });
+							}
+							
+						},
+						error: function(xhr,type,errorThrown){
+							console.log(xhr.responseText)
+                		}
+					});
+
+
 				if(details.hasPicked){
 					var picking = document.querySelector('#picking');
 					picking.addEventListener('tap',function(e){
 						var num = details.allocationNum;
 						var realInputNum = document.querySelector('.relNum').value;
 						if(realInputNum > num){
-							return mui.toast('实际上架数量不得大于指示数量');
+							return mui.toast('实际上架数量不得大于指示数量',{ type: 'div' });
 						}
 						if(realInputNum <=0){
-							return mui.toast('实际上架数量不得小于或等于0');
+							return mui.toast('实际上架数量不得小于或等于0',{ type: 'div' });
 						}
 						var btnArray = ['否', '是'];
 							mui.confirm('是否确认拣货？', '操作提示', btnArray, function(e) {
 								if (e.index == 1) {
-									console.log(data)
+									console.log(detailData)
 									var pickingDetail = [],postData = {},submitData = {};
-									postData.drugCode = data.list[0].drugCode;
-									postData.id = data.list[0].id;
+									postData.drugCode = detailData.list[0].drugCode;
+									postData.id = detailData.list[0].id;
 									postData.pickingNum = realInputNum
 									pickingDetail.push(postData);
-									submitData.applyNo = data.applyorderno === '--'?'':data.applyorderno;
-									submitData.pickingOrderNo = data.pickingorderno;
+									submitData.applyNo = detailData.applyOrder;
+									submitData.pickingOrderNo = detailData.pickingOredr;
 									submitData.pickingDetail = pickingDetail;
 									console.log(submitData);
 									mui.ajaxRequest(pickUrl,{
@@ -154,16 +148,24 @@
 				                		showWaiting: true,
 				                		success: function(data){
 				                			if(data.code === 200){
-				                				mui.toast('拣货成功');
-				                				var parmasData = {};
-												parmasData.finishUrl = '../pickingOff/index';
-												parmasData.keepUrl = 'pickingOffList';
-												parmasData.resultType = 'picking';
-												parmasData.itemData = details.orderInfo;
-												common.openwin('../result/index',{ parmas: JSON.stringify(parmasData) },{
-													titleText: '结果',
-													autoBackButton: false
-												})
+//				                				mui.toast('下架成功',{ type: 'div' });
+				                				mui.toast('拣货成功',{ type: 'div' });
+				                				setTimeout(function(){
+				                					var page =  plus.webview.getWebviewById('pickingOffList');
+													mui.fire(page,'pagefresh',{ selectTab: '1' });
+													common.gotowin('pickingOffList',{  });
+													plus.webview.currentWebview().close();
+				                				},300)
+				                				
+//				                				var parmasData = {};
+//												parmasData.finishUrl = '../pickingOff/index';
+//												parmasData.keepUrl = 'pickingOffList';
+//												parmasData.resultType = 'picking';
+//												parmasData.itemData = details.orderInfo;
+//												common.openwin('../result/index',{ parmas: JSON.stringify(parmasData) },{
+//													titleText: '结果',
+//													autoBackButton: false
+//												})
 				                			}else{
 				                				mui.alert(data.msg)
 				                			}

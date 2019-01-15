@@ -56,7 +56,8 @@
 	<body>
 		<header class="mui-bar mui-bar-nav">
 			 <div class="mui-input-row mui-search search_head" style="width:85%;display: inline-block;">
-				<input type="search" id="search" class="mui-input-clear" placeholder="供应商/通用名/商品名">
+				<input type="search" id="search" class="mui-input-clear" autofocus="autofocus" placeholder="供应商/通用名/商品名" >
+				<!--  -->
 			</div>
 		     <a class="mui-action-back mui-pull-right" style="height:45px;line-height: 45px;">取消</a>
 		</header>
@@ -82,27 +83,109 @@
 		<script type="text/javascript">
 			(function($) {
 				mui.init();
-				
 				var params = undefined, 
 					key = undefined,
 					selected = undefined,
 					module = undefined,// 模块
-					location = undefined,// 入口：主列表/子列表
-					localStorageItem = [] // 判断搜索 供应商 ，商品名 两类
+					location = undefined;// 入口：主列表/子列表
+					
+				/*
+				 	重写 mui-back,关闭当前 Webview 
+				 * */
 				$.plusReady(function(){
+					
 					var self = plus.webview.currentWebview();
-					// 输入框聚焦
-					document.getElementById("search").focus();
-//					document.activeElement.focus();
 					params = JSON.parse(self.params);//获得参数
 					console.log(self.params);
 				    key = params.key;
 				    selected = params.selected;
 				    module = params.module;
 				    location = params.location;
-//				    console.log(selected)
-//				    console.log(module);
-//				    console.log(location)
+					// 输入框聚焦
+					var searchList = JSON.parse(plus.storage.getItem('searchHistory'));
+					console.log(searchList)
+					let currHistory = searchList[module][location];
+					console.log(currHistory)
+					
+					// 键盘搜索按钮
+					document.querySelector('.search_head').addEventListener('keypress',function(e){
+						if(e.keyCode == "13") {
+					        document.activeElement.blur();//收起虚拟键盘
+							console.log(e.target.value);
+							let searchValue = e.target.value;
+					        e.preventDefault(); // 阻止默认事件---阻止页面刷新
+					        let searchParams = {}, saveData = {}, flag = false;
+					        // 存储当前搜索记录
+					        if(location === 'sub_list'){
+					        	searchParams = { hisDrugCode : '',hisDrugName: searchValue,type: params.auditStatus,selected: params.selected }
+					        	saveData = { hisDrugCode: '', hisDrugName: searchValue };
+					  			mui.each(currHistory,function(index,item){
+					  				if(item === saveData.hisDrugCode && item.hisDrugName === saveData.hisDrugName){
+					  					flag = true;
+					  				}
+					  			});
+					        }
+					        if(module === 'acceptance'){
+						  		if(location === 'main_list'){
+						  			searchParams = { supplierCode: '', supplierName: searchValue };
+						  			saveData = { supplierCode: '', supplierName: searchValue };
+						  			mui.each(currHistory,function(index,item){
+						  				if(item === saveData.supplierCode && item.supplierName === saveData.supplierName){
+						  					flag = true;
+						  				}
+						  			});
+						  		}
+						  	}else if(module === 'grounding'){
+						  		if(location==='main_list'){
+						  			searchParams = { distributeCode: searchValue, auditStatus: params.auditStatus };
+						  			saveData = searchValue;
+						  			mui.each(currHistory,function(index,item){
+				  					if(item === searchValue){
+				  						flag = true
+				  					}
+				  				});
+						  		}
+						  	}else if(module === 'pickingOff'){
+						  		if(location === 'main_list'){
+									searchParams = { pickingOrderNo: searchValue, auditStatus: params.auditStatus };
+									saveData = searchValue;
+									mui.each(currHistory,function(index,item){
+					  					if(item === searchValue){
+					  						flag = true
+					  					}
+						  			});
+						  		}
+						  	}else{
+						  		searchParams = { bigDrugCode : '',ctmmParam: searchValue };
+						  		saveData = { bigDrugCode: '', ctmmParam: searchValue };
+						  		mui.each(currHistory,function(index,item){
+					  				if(item.bigDrugCode === saveData.bigDrugCode && item.ctmmParam === saveData.ctmmParam){
+					  					flag = true;
+					  				}
+					  			});
+						  	}
+						  	if(!flag){
+						  		if(currHistory.length >= 10){
+			  						currHistory.shift();
+			  					}
+			  					currHistory.push(saveData)
+						  	}
+					        searchList[module][location] = currHistory;
+				  			plus.storage.setItem('searchHistory',JSON.stringify(searchList));
+					        var page = undefined;
+						  	if(location === 'main_list'){
+						  		page =  plus.webview.getWebviewById(params.route);
+						  		mui.fire(page,'search',{ searchParams: JSON.stringify(searchParams) });
+						  	}else{
+						  		page = plus.webview.getWebviewById(params.id);
+						  		mui.fire(page,'sub_search',{ searchParams: JSON.stringify(searchParams) });
+						  	}
+						  	plus.webview.currentWebview().close();
+					  		mui.back();
+						}
+					})
+					
+					
 				    var lastChildNode = document.querySelector('.mui-placeholder').lastChild;
 				    if(location === 'sub_list' || module === 'stock'){
 				    	lastChildNode.innerText = '请输入通用名/商品名';
@@ -113,10 +196,7 @@
 				    		lastChildNode.innerText = '请输入单号'
 				    	}
 				    }
-					var searchList = JSON.parse(plus.storage.getItem('searchHistory'));
-					console.log(searchList)
-					let currHistory = searchList[module][location];
-					console.log(currHistory)
+					
 					if(currHistory && currHistory.length){
 						
 						// 创建 删除历史记录标签
@@ -158,6 +238,7 @@
 							
 						})
 					}
+					
 				    // 删除 历史记录
 				    $('.history-title').on('tap','.clearHistory',function(){
 				    	var btnArray = ['否', '是'];
@@ -220,7 +301,8 @@
 					  		page = plus.webview.getWebviewById(params.id);
 					  		mui.fire(page,'sub_search',{ searchParams: JSON.stringify(searchParams) });
 					  	}
-				    	mui.back()
+					  	plus.webview.currentWebview().close();
+				    	mui.back();
 				    })
 				    
 				    
@@ -234,10 +316,11 @@
 									url = '/a/depot/supplier/all';
 									data = { ctmaSupplierName: paramName }
 								}else{
-									url = '/a/commonCheckQuery/commonInfoSearch';
+									url = '/a/common/queryDrugByList';
 									data = { 
 										paramName: paramName,
-					    				type: params.auditStatus === '1'? 'cache_listVoWYS': 'cache_listVoYYS'
+										queryType: '4'
+//					    				type: params.auditStatus === '1'? 'cache_listVoWYS': 'cache_listVoYYS'
 									}
 								}
 							}else if(module === 'grounding'){
@@ -248,10 +331,11 @@
 						    			auditStatus: params.auditStatus
 						    		}
 								}else{
-									url = '/a/commonCheckQuery/commonInfoSearch'
+									url = '/a/common/queryDrugByList';
 									data = { 
 										paramName: paramName,
-										type: params.auditStatus === '1'?'cache_listVoWSJ':'cache_listVoYSJ'
+//										type: params.auditStatus === '1'?'cache_listVoWSJ':'cache_listVoYSJ'
+										queryType: '4'
 									}
 								}
 							}else if(module === 'pickingOff'){
@@ -262,10 +346,11 @@
 										type: params.auditStatus
 									}
 								}else{
-									url = '/a/commonCheckQuery/commonInfoSearch'
+									url = '/a/common/queryDrugByList';
 									data = {
 										paramName: paramName,
-										type: params.auditStatus === '0'?'Cache_notDetailList':'Cache_existDetailList'
+										queryType: '4'
+//										type: params.auditStatus === '0'?'Cache_notDetailList':'Cache_existDetailList'
 									}
 								}
 							}else{
@@ -311,9 +396,9 @@
 							var li = document.createElement('li');
 							li.className = 'search-ullist-li';
 							if(location === 'sub_list'){
-								li.setAttribute('data-hisDrugCode',data[i].value);
-								li.setAttribute('data-hisdrugname',data[i].key);
-								li.innerHTML = data[i].key;
+								li.setAttribute('data-hisDrugCode',data[i].bigDrugCode);
+								li.setAttribute('data-hisdrugname',data[i].ctmmParam);
+								li.innerHTML = data[i].ctmmParam;
 							}
 							if(module === 'acceptance' || module === 'basicMedicine'){
 								//验收
@@ -460,12 +545,13 @@
 				  		mui.fire(page,'search',{ searchParams: JSON.stringify(searchParams) });
 				  	}else{
 				  		page = plus.webview.getWebviewById(params.id);
+				  		console.log(page)
 				  		mui.fire(page,'sub_search',{ searchParams: JSON.stringify(searchParams) });
 				  	}
-			  		mui.back()
+			  		mui.back();
 				  });
-				  
 				})
+				
 			})(mui);
 			
 		</script>

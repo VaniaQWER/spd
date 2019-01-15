@@ -15,17 +15,6 @@
 
 	<body>
 		<div class="mui-content detailRow">
-			<div class="detail-header-flex">
-				<div class="am-action previous">
-					<a class="mui-icon mui-icon-arrowleft"></a>
-					<a class="theme_back_font">上一个</a>
-				</div>
-				<div class="page-indictor"><span class="currentPage"></span>/<span class="page-total"></span></div>
-				<div class="am-action next">
-					<a class="theme_next_font">下一个</a>
-					<a class="mui-icon mui-icon-arrowright"></a>
-				</div>
-			</div>
 			<form class="mui-input-group" id="detailContent" style="background:none;">
 				<ul class="mui-table-view" style="margin-bottom:12px;">
 					<li class="mui-table-view-cell mui-collapse">
@@ -40,6 +29,7 @@
 		</div>
 		
 		<script src="../../js/mui.min.js"></script>
+		<script src="../../js/jquery.min.js"></script>
 		<script src="../../js/template-web.js" type="text/javascript" charset="utf-8"></script>
 		<script src="../../js/utils.js" type="text/javascript" charset="utf-8"></script>
 		<script src="../../js/common.js" type="text/javascript" charset="utf-8"></script>
@@ -47,7 +37,7 @@
 		<script type="text/javascript">
 			
 
-			(function($) {
+			(function($,$$) {
 				var utils = new Utils();
 				utils.appendModule('#ground_detail_tpl');
 				
@@ -60,91 +50,77 @@
 					
 					var self = plus.webview.currentWebview();
 					var details = JSON.parse(self.details);//获得参数
-					console.log(details)
-					
-					var data = Object.assign({},details.orderInfo); 
-					var currentIndex = Number(details.index), groundUrl = '/a/checkacceptdetail/finish';
-					data.hasGround = details.hasGround;
-					data.list = [];
-					data.list.push(details.allData[currentIndex]);
-					
-					if(currentIndex === 0){
-						console.log(currentIndex)
-						document.querySelector('.previous').style.zIndex = -1;
-					}
-					if(currentIndex === details.allData.length -1){
-						document.querySelector('.next').style.zIndex = -1;
-					}
-					document.querySelector('.currentPage').innerText = (currentIndex + 1);
-					
-					if(details.hasGround){
-						var groundBtn = '<button type="button" id="ground" class="mui-btn mui-btn-warning mui-btn-block" style="margin-bottom: 20px;" data-loading-text = "提交中" data-loading-icon-position="right">确认上架</button>'
-						document.querySelector('.detailRow').insertAdjacentHTML("beforeEnd",groundBtn);
-					}
-					
-					document.querySelector('.page-total').innerHTML = details.allData.length;
-					showData(data);
-					
-					
-					// 上一个
-					$('.detail-header-flex').on('tap','.previous',function(){
-						plus.nativeUI.showWaiting();
-						var _this = this;
-						setTimeout(function(){
-							_this.style.zIndex = currentIndex === 1 ? -1: 1;
-							currentIndex--;
-							$('.next')[0].style.zIndex = 1;
-							document.querySelector('.currentPage').innerText = (currentIndex + 1);
-							data.list = [];
-							data.list.push(details.allData[currentIndex]);
-							plus.nativeUI.closeWaiting();
-							showData(data);
-						},200)
-					});
-				
-					// 下一个
-					$('.detail-header-flex').on('tap','.next',function(){
-						plus.nativeUI.showWaiting();
-						var _this = this;
-						setTimeout(function(){
-							console.log('next');
-							currentIndex++;
-							$('.previous')[0].style.zIndex = 1;
-							document.querySelector('.currentPage').innerText = (currentIndex + 1);
-							_this.style.zIndex = currentIndex === details.allData.length-1 ? -1: 1;
-							data.list = [];
-							data.list.push(details.allData[currentIndex]);
-							plus.nativeUI.closeWaiting();
-							showData(data);
-						},200)
-						
-					});
+					console.log(details);
+					var postData = {
+						distributeCode: details.distributeCode,
+						upFinishType: details.upFinishType,
+						id: details.id
+					};
+					var detailData = {};
+					var url = '/a/shelfInfo/shelfInfoList',
+						titleUrl = '/a/shelfInfo/shelfInfoTitle',
+						groundUrl = '/a/checkacceptdetail/finish';
+					plus.nativeUI.showWaiting('加载中...');
+					mui.ajaxRequest(titleUrl,{
+						type: 'POST',
+						data: { distributeCode: postData.distributeCode },
+						success: function(data){
+							console.log(JSON.stringify(data))
+							if(data.code === 200){
+								for(var key in data.data){
+									detailData[key] = data.data[key];
+								}
+								mui.ajaxRequest(url,{
+									type: 'POST',
+									data: postData,
+									success: function(data){
+										console.log(JSON.stringify(data))
+										plus.nativeUI.closeWaiting();
+										if(data.code === 200){
+											detailData.list = data.data.list;
+											console.log('detailData********************************')
+											showData(detailData);
+											if(details.upFinishType === '0'){
+												var groundBtn = '<button type="button" id="ground" class="mui-btn mui-btn-warning mui-btn-block" style="margin-bottom: 20px;" data-loading-text = "提交中" data-loading-icon-position="right">确认上架</button>'
+												document.querySelector('.detailRow').insertAdjacentHTML("beforeEnd",groundBtn);
+											}
+										}else{
+											mui.toast(data.msg,{ type: 'div' });
+										}
+									},
+									error: function(xhr,type,errorThrown){
+										console.log(xhr.responseText)
+			                		}
+								});
+							}else{
+								mui.toast(data.msg,{ type: 'div' });
+							}
+							
+						},
+						error: function(xhr,type,errorThrown){
+							console.log(xhr.responseText)
+                		}
+					})
 					
 					// 上架
-					if(details.hasGround){
-						var ground = document.querySelector('#ground');
-						ground.addEventListener('tap',function(e){
-							var realReceiveStore = document.querySelector('.realReceiveStore').value;
-							/*if(realNum <= 0 ){
-								return mui.toast('实际上架数量不能小于或等于0')
-							}
-							if(realNum > details.realNum){
-								return mui.toast('实际数量不得大于指示数量');
-							}*/
-//							var realNum = details.realNum;
+					console.log(details.upFinishType)
+					if(details.upFinishType === '0'){
+						var ground = (document.querySelector('#ground'));
+						$('.detailRow').on('tap','#ground',function(e){
+							var realReceiveStore = $$('.realReceiveStore').val();
 							document.activeElement.blur(); // 隐藏软键盘
 							var btnArray = ['否', '是'];
 							mui.confirm('是否确认上架？', '操作提示', btnArray, function(e) {
 								if (e.index == 1) {
 									var detailListVo = [],postData = {},submitData = {};
-									postData.id = data.list[0].id;
-									postData.realNum = data.list[0].realNum;
-									postData.productBatchNo = data.list[0].productBatchNo;
+									postData.id = detailData.list[0].id;
+									postData.realNum = detailData.list[0].realNum;
+									postData.productBatchNo = detailData.list[0].productBatchNo;
 									postData.realReceiveStore = realReceiveStore;
 									detailListVo.push(postData);
 									submitData.detailListVo = detailListVo;
-									submitData.distributeCode = data.distributecode;
-									console.log(submitData);
+									submitData.distributeCode = detailData.distributecode;
+									console.log(JSON.stringify(submitData));
 									mui.ajaxRequest(groundUrl,{
 				                		type: 'POST',
 				                		data: submitData,
@@ -152,16 +128,11 @@
 				                		showWaiting: true,
 				                		success: function(data){
 				                			if(data.code === 200){
-				                				mui.toast('上架成功');
-				                				var parmasData = {};
-												parmasData.finishUrl = '../grounding/index';
-												parmasData.keepUrl = 'ground_list';
-												parmasData.resultType = 'ground';
-												parmasData.itemData = details.orderInfo;
-												common.openwin('../result/index',{ parmas: JSON.stringify(parmasData) },{
-													titleText: '结果',
-													autoBackButton: false
-												})
+				                				mui.toast('上架成功',{ type: 'div' });
+				                				var page =  plus.webview.getWebviewById('ground_not_list');
+												mui.fire(page,'pagefresh',{ selectTab: '1' });
+												common.gotowin('acc_not_list',{  });
+												plus.webview.currentWebview().close();
 				                			}else{
 				                				mui.alert(data.msg)
 				                			}
@@ -175,7 +146,7 @@
 						});
 					}
 				})
-			})(mui);
+			})(mui,jQuery);
 		
 		</script>
 	</body>
