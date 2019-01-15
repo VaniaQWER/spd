@@ -20,7 +20,7 @@
 		</header>
 		<div class="mui-content">
 			<div class="mui-input-row mui-search search_head">
-				<input type="search" class="mui-input-clear" readonly="readonly" placeholder="通用名/商品名/生产厂家" onclick="toSearchPage()">
+				<input type="search" class="mui-input-clear" readonly="readonly" placeholder="通用名/商品名/生产厂家" onfocus="toSearchPage()">
 			</div>
 			<div class="home-card-wrapper" style="padding: 8px;margin-top: 0;margin-bottom: 8px;">
 	            <div class="home-card-title">已上架</div>
@@ -71,6 +71,7 @@
 				params.route = '../grounding/ground_list';
 				params.id = 'ground_list';
 				params.auditStatus = auditStatus;
+				params.selectTabs = 2;
 				params.selected = selected;
 				params.module = 'grounding';
 				params.location = 'sub_list';
@@ -201,6 +202,7 @@
 						console.log(query)
 						$$('.mui-placeholder').show();
 						$$('.mui-input-clear').val('');
+						mui('.mui-scroll-wrapper').scroll().scrollTo(0,0,100);
 						mui(".mui-scroll").pullToRefresh().pullDownLoading();
 					});
 					
@@ -210,6 +212,7 @@
 						console.log(query)
 						$$('.mui-placeholder').hide();
 						$$('.mui-input-clear').val(query.hisDrugName);
+						mui('.mui-scroll-wrapper').scroll().scrollTo(0,0,100);
 						mui(".mui-scroll").pullToRefresh().pullDownLoading();
 					})
 					

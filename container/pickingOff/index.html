@@ -33,7 +33,7 @@
 		</header>
 		<div class="mui-content">
 		    <div class="mui-input-row mui-search search_head">
-				<input type="search" class="mui-input-clear" readonly="readonly" placeholder="下架单号" onclick="toSearchPage()">
+				<input type="search" class="mui-input-clear" readonly="readonly" placeholder="下架单号" onfocus="toSearchPage()">
 			</div>
 			<div id="slider" class="mui-slider themes_tab mui-fullscreen" style="top: 102px;">
 				<div id="sliderSegmentedControl" class="mui-slider-indicator mui-segmented-control mui-segmented-control-inverted">
@@ -77,13 +77,12 @@
 		
 		<script type="text/javascript">
 			
-			var pickingStatus = undefined;// 上架类型 // 上架状态  1 待上架  2 已上架 
+			var pickingStatus = undefined,// 上架类型 // 上架状态  1 待上架  2 已上架 
+				selectTabs = 1;
 			
 			function clicked(){
 				common.openwin('../commonPages/qrcode',true,{ titleText: '扫码下架' })
 			}
-			
-			
 			
 //			//去搜索页面
 			function toSearchPage (){
@@ -91,6 +90,7 @@
 				var params = {};
 				params.route = '../pickingOff/index';
 				params.auditStatus = pickingStatus;
+				params.selectTabs = selectTabs;
 				params.location = 'main_list';// 主列表
 				params.module = 'pickingOff';// 所属模块
 				common.openwin('../commonPages/searchPage',{ params: JSON.stringify(params) },false)
@@ -127,7 +127,7 @@
 				var checkType, type;
 				var requestUrl =  '/a/common/pickingorder/list'; // 请求地址
 				
-				var pageLeft = 1, pageRight = 1, totalPageLeft, totalPageRight, isMore = true,selectTabs = 1;
+				var pageLeft = 1, pageRight = 1, totalPageLeft, totalPageRight, isMore = true;
 				currSelected();
 				var searchPlaceholder = undefined;
 				var search_clear = undefined;
@@ -266,6 +266,7 @@
 					
 					// 页面刷新
 					window.addEventListener('pagefresh',function(){
+//						mui('.mui-scroll-wrapper').scroll()[index].scrollTo(0,0,100);
 						mui(".mui-slider-group .mui-scroll").pullToRefresh()[0].pullDownLoading();
 					})
 					

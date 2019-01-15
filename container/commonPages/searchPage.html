@@ -156,10 +156,11 @@
 						var self = plus.webview.currentWebview();
 						params = JSON.parse(self.params);//获得参数
 						console.log(self.params);
-				    key = params.key;
-				    selected = params.selected;
-				    module = params.module;
-				    location = params.location;
+						console.log(params.selectTabs,'sdfad')
+					    key = params.key;
+					    selected = params.selected;
+					    module = params.module;
+					    location = params.location;
 						// 输入框聚焦
 						var searchList = JSON.parse(plus.storage.getItem('searchHistory'));
 						console.log(searchList)
@@ -430,6 +431,7 @@
 								if( module === 'acceptance' || module === 'stock'){
 									contentType = 'application/x-www-form-urlencoded'
 								}
+								console.log(JSON.stringify(data))
 									mui.ajaxRequest(url,{
 									type:"post",
 									data: data,

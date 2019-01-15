@@ -315,6 +315,7 @@
 									success: function(data){
 										if(data.code === 200){
 											mui.toast('下架成功',{ type: 'div' });
+//											mui('.mui-scroll-wrapper').scroll().scrollTo(0,0,100);
 											mui(".mui-scroll").pullToRefresh().pullDownLoading();
 											$JQ('.total').text(0);
 											document.querySelector('#checkall').checked=false;

@@ -22,7 +22,7 @@
 		</header>
 		<div class="mui-content">
 			<div class="mui-input-row mui-search search_head">
-				<input type="search" class="mui-input-clear" placeholder="通用名/商品名/生产厂家" readonly="readonly" onclick="toSearchPage()">
+				<input type="search" class="mui-input-clear" placeholder="通用名/商品名/生产厂家" readonly="readonly" onfocus="toSearchPage()">
 			</div>
 			<div class="home-card-wrapper" style="padding: 8px;margin-top: 0;margin-bottom: 8px;">
 	            <div class="home-card-title">已拣货</div>
@@ -101,7 +101,8 @@
 					
 					window.addEventListener('pagefresh',function(event){
 						query = event.detail.query;
-						console.log(JSON.stringify(event.detail))
+						console.log(JSON.stringify(event.detail));
+						mui('.mui-scroll-wrapper').scroll().scrollTo(0,0,100);
 						mui(".mui-scroll").pullToRefresh().pullDownLoading();
 					});
 					
@@ -109,6 +110,7 @@
 					window.addEventListener('sub_search',function(event){
 						console.log(JSON.stringify(event.detail))
 						query = globalQuery = JSON.parse(event.detail.searchParams);
+						mui('.mui-scroll-wrapper').scroll().scrollTo(0,0,100);
 						mui(".mui-scroll").pullToRefresh().pullDownLoading();
 					})
 					

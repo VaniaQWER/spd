@@ -60,7 +60,7 @@
 						beforeback: function() {
 					        var list = plus.webview.currentWebview().opener();  
 					        console.log(details.selectTabs)
-					        mui.fire(list, 'pagefresh',{ selectTabs: details.selectTabs === 1 ? '1': '0' , query: {} }); 
+					        mui.fire(list, 'pagefresh',{ selectTabs: details.selectTabs === 1 ? '1': '0' , query: details.query }); 
 					        return true;  
 				    	}
 					})
@@ -285,9 +285,8 @@
 									success: function(data){
 										if(data.code === 200){
 											mui.toast('验收成功',{ type: 'div' });
-											
 											var page =  plus.webview.getWebviewById('acc_not_list');
-											mui.fire(page,'pagefresh',{ selectTabs: details.selectTabs === 1 ? 1: 0,query:{} });
+											mui.fire(page,'pagefresh',{ selectTabs: '1', query:{} });
 											common.gotowin('acc_not_list',{  });
 											plus.webview.currentWebview().close();
 										}

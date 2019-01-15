@@ -79,13 +79,15 @@
                     plus.webview.currentWebview().close();
                 })
             }
-            var auditStatus = undefined; //验收状态   1 待验收  2 已验收
+            var auditStatus = undefined, //验收状态   1 待验收  2 已验收
+            	selectTabs = 1; // 默认选中第一个tab
             //去搜索页面
 			function toSearchPage (){
 				var params = {};
 				params.id = 'acc_not_list';
 				params.route = '../acceptance/acc_not_list';
 				params.auditStatus = auditStatus;
+				params.selectTabs = selectTabs;
 				params.selected = selected;
 				params.module = 'acceptance';
 				params.location = 'sub_list';
@@ -117,7 +119,6 @@
 					type = undefined, 
 					isShowTemprature = undefined, //是否显示验收温度 1 显示 0 隐藏
 					isPsList = undefined; // 验收单类型     
-					selectTabs = 1, // 默认选中第一个tab
 					selected = '.mui-tab1'; // 默认选中内容区块
 				
 				var utils = new Utils();
@@ -244,12 +245,13 @@
 						console.log('从详情回来')
 						console.log(JSON.stringify(event.detail))
 						query = event.detail.query;
-						console.log(typeof event.detail.selectTabs)
+						console.log(typeof event.detail.selectTabs);
 						let index = event.detail.selectTabs === '1' ? 0 : 1;
 						console.log(index,'index')
 						if(index === 1){
 							mui('#slider').slider().gotoItem(1);
 						}
+						mui('.mui-scroll-wrapper').scroll()[index].scrollTo(0,0,100);
 						mui(".mui-scroll").pullToRefresh()[index].pullDownLoading();
 					});
 					// 触发刷新 搜索页面搜的值

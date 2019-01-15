@@ -25,7 +25,7 @@
 		</header>
 		<div class="mui-content">
 		    <div class="mui-input-row mui-search search_head">
-				<input type="search" class="mui-input-clear" placeholder="上架单号" readonly="readonly"  onclick="toSearchPage()">
+				<input type="search" class="mui-input-clear" placeholder="上架单号" readonly="readonly"  onfocus="toSearchPage()">
 			</div>
 			<div id="slider" class="mui-slider themes_tab mui-fullscreen" style="top: 102px;">
 				<div id="sliderSegmentedControl" class="mui-slider-indicator mui-segmented-control mui-segmented-control-inverted">
@@ -67,6 +67,8 @@
 		<script src="../../js/request.js" type="text/javascript" charset="utf-8"></script>
 		<script type="text/javascript">
 			
+			var selectTabs = 1; // 默认选中第一个tab
+			
 			function clicked(){
 				common.openwin('../commonPages/qrcode',true,{ titleText: '扫码上架' })
 			}
@@ -78,6 +80,7 @@
 				params.route = '../grounding/index';
 				params.module = 'grounding';
 				params.location = 'main_list';
+				params.selectTabs = selectTabs;
 				params.auditStatus = auditStatus;
 				common.openwin('../commonPages/searchPage',{ params: JSON.stringify(params) },false)
 			}
@@ -119,30 +122,15 @@
 					pageRight = 1, 
 					totalPageLeft, 
 					totalPageRight, 
-					isMore = true, 
-					selectTabs = 1, // 默认选中第一个tab
+					isMore = true,
 					selected = '.mui-tab1'; // 默认选中内容区块
 					
-//				currSelected();
 				
             	function template(selected, data, insertType){
             		console.log(selected,'selected')
         			utils.innerTplHtml('ground', selected, data, insertType);
             	}
             	
-            	function currSelected(){
-					var item1mobile = document.querySelector('#item1mobile');
-					var item2mobile = document.querySelector('#item2mobile');
-					if(item1mobile.className.indexOf('mui-active')>0){
-						selected = '.mui-tab1';
-						hasChecked = false;
-						selectTabs = 1;
-					}else{
-						selected = '.mui-tab2';
-						hasChecked = true;
-						selectTabs = 2;
-					}
-            	}
             	/*
             	 	下拉刷新
             	 * */
@@ -255,6 +243,7 @@
 						if(index === 1){
 							mui('#slider').slider().gotoItem(1);
 						}
+						mui('.mui-scroll-wrapper').scroll()[index].scrollTo(0,0,100);
 						mui(".mui-slider-group .mui-scroll").pullToRefresh()[index].pullDownLoading();
 					}) 
 
@@ -263,7 +252,6 @@
 					var item1 = document.querySelector('#item1mobile');
 					document.getElementById('slider').addEventListener('slide', function(e) {
 						$$('.mui-input-clear').val('');
-//						currSelected();
 						let index = e.detail.slideNumber;
 						if (index === 1) {
 							selected = '.mui-tab2';

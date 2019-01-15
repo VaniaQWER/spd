@@ -21,7 +21,7 @@
 		</header>
 		<div class="mui-content">
 			<div class="mui-input-row mui-search search_head">
-				<input type="search" class="mui-input-clear"  readonly="readonly" placeholder="通用名/商品名/生产厂家" onclick="toSearchPage()">
+				<input type="search" class="mui-input-clear"  readonly="readonly" placeholder="通用名/商品名/生产厂家" onfocus="toSearchPage()">
 			</div>
 			<div class="home-card-wrapper" style="padding: 8px;margin-top: 0;margin-bottom: 8px;">
 	            <div class="home-card-title">已验收</div>
@@ -70,6 +70,7 @@
 				params.id = 'acc_list';
 				params.route = '../acceptance/acc_list';
 				params.auditStatus = '2'; // 都是已验收单据
+				params.selectTabs = 2;
 				params.selected = 'right';
 				params.module = 'acceptance';
 				params.location = 'sub_list';
@@ -206,6 +207,7 @@
 						console.log('从详情回来')
 						console.log(e.detail.query)
 						query = e.detail.query;
+						mui('.mui-scroll-wrapper').scroll().scrollTo(0,0,100);
 						setTimeout(function(){
 							console.log('刷新了啊啊啊啊 啊')
 							mui(".mui-scroll").pullToRefresh().pullDownLoading();
