@@ -222,7 +222,7 @@
 						  		if(currHistory.length >= 10){
 			  						currHistory.shift();
 			  					}
-			  					currHistory.push(saveData)
+			  					currHistory.unshift(saveData)
 						  	}
 					        searchList[module][location] = currHistory;
 				  			plus.storage.setItem('searchHistory',JSON.stringify(searchList));
@@ -515,7 +515,7 @@
 			  					if(currHistory.length >= 10){
 			  						currHistory.shift();
 			  					}
-			  					currHistory.push(saveData)
+			  					currHistory.unshift(saveData)
 			  				}
 			  				searchParams = { hisDrugCode : dataset.hisdrugcode,hisDrugName: dataset.hisdrugname,type: params.auditStatus,selected: params.selected }
 			  			}
@@ -540,7 +540,7 @@
 				  					if(currHistory.length >= 10){
 				  						currHistory.shift()
 				  					}
-				  					currHistory.push(supplier)
+				  					currHistory.unshift(supplier)
 				  				}
 				  			}
 				  		}
@@ -560,7 +560,7 @@
 				  					if(currHistory.length >= 10){
 				  						currHistory.shift();
 				  					}
-				  					currHistory.push(dataset.distributecode)
+				  					currHistory.unshift(dataset.distributecode)
 				  				}
 				  			}
 				  		}
@@ -579,7 +579,7 @@
 					  				if(currHistory.length >= 10){
 				  						currHistory.shift();
 				  					}
-				  					currHistory.push(dataset.applyorderno)
+				  					currHistory.unshift(dataset.applyorderno)
 					  			}
 				  			}
 				  		}
@@ -596,7 +596,7 @@
 			  					if(currHistory.length >= 10){
 			  						currHistory.shift();
 			  					}
-			  					currHistory.push({ bigDrugCode: dataset.bigdrugcode,ctmmParam: dataset.ctmmparam })
+			  					currHistory.unshift({ bigDrugCode: dataset.bigdrugcode,ctmmParam: dataset.ctmmparam })
 				  			}
 				  			searchParams = { bigDrugCode : dataset.bigdrugcode,ctmmParam: dataset.ctmmparam }
 				  		}

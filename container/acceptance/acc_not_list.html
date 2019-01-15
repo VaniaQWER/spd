@@ -82,7 +82,6 @@
             var auditStatus = undefined; //验收状态   1 待验收  2 已验收
             //去搜索页面
 			function toSearchPage (){
-				console.log(11111111111111111)
 				var params = {};
 				params.id = 'acc_not_list';
 				params.route = '../acceptance/acc_not_list';
@@ -92,7 +91,6 @@
 				params.location = 'sub_list';
 				common.openwin('../commonPages/searchPage',{ params: JSON.stringify(params) },false);
 				document.activeElement.blur(); // 隐藏软键盘
-				
 			}
 			
 			(function($,$$) {
