@@ -93,8 +93,7 @@
 					page = 1;
 					var postData = {
 						distributeCode: distributeCode,
-						status,
-						status,
+						status: status,
 						pageNo: page,
 						pageSize: pageSize
 					};
@@ -135,8 +134,7 @@
 							type: 'POST',
 							data: {
 								distributeCode: distributeCode,
-								status,
-								status,
+								status: status,
 								pageNo: page,
 								pageSize: pageSize
 							},
@@ -167,11 +165,9 @@
 
 				// 模板加载
 				$.plusReady(function() {
-
 					window.addEventListener('pagefresh',function(event){
 						mui(".mui-scroll").pullToRefresh().pullDownLoading();
 					});
-					
 					
 					var self = plus.webview.currentWebview();
 					params = JSON.parse(self.params); //获得参数

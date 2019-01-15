@@ -82,7 +82,7 @@
             var auditStatus = undefined; //验收状态   1 待验收  2 已验收
             //去搜索页面
 			function toSearchPage (){
-				document.activeElement.blur(); // 隐藏软键盘
+				console.log(11111111111111111)
 				var params = {};
 				params.id = 'acc_not_list';
 				params.route = '../acceptance/acc_not_list';
@@ -90,7 +90,9 @@
 				params.selected = selected;
 				params.module = 'acceptance';
 				params.location = 'sub_list';
-				common.openwin('../commonPages/searchPage',{ params: JSON.stringify(params) },false)
+				common.openwin('../commonPages/searchPage',{ params: JSON.stringify(params) },false);
+				document.activeElement.blur(); // 隐藏软键盘
+				
 			}
 			
 			(function($,$$) {
@@ -149,11 +151,12 @@
 						$$('.mui-input-clear').val('');
             		}
 					var self = this;
-					if(selectTabs === 1){
-						pageLeft = 1
-					}else{
-						pageRight = 1;
-					}
+//					if(selectTabs === 1){
+//						pageLeft = 1
+//					}else{
+//						pageRight = 1;
+//					}
+					pageLeft = 1; pageRight = 1;
 					status = selectTabs === 1 ? '1': '2';
 					var postData = {
 						distributeCode: distributeCode,
@@ -170,7 +173,7 @@
                 		data: postData,
                 		success: function(data){
                 			var resData = data.data;
-                			resData.acceptance = status === '1'? true: false;
+                			resData.acceptance = selectTabs === 1 ? true: false;
                 			totalPage = data.totalPage;
                 			if(resData.list.length === 0 || (resData.list.length <= resData.pageSize && resData.pageNo === resData.totalPage)){
                 				var i = selectTabs === 1 ? 0 : 1;

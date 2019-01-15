@@ -90,7 +90,7 @@
 				
 				var checkStatus, 
 				detailData = { list: [] }, url = '/a/checkbilldetail/getListByBillNo';
-				var page = 0, pageSize = 10, totalPage = 0, checkBillNo = null,isMore = false;
+				var page = 0, pageSize = 15, totalPage = 0, checkBillNo = null,isMore = false;
 				checkUrl = '/a/checkbill/submitCheck';
 				begCheckUrl = '/a/checkbill/beginCheck';// 开始盘点接口
 				/* 渲染模板   */
@@ -145,7 +145,7 @@
 					page = 1;
 					var postData = {
 						pageNo: page,
-						pageSize: 10,
+						pageSize: pageSize,
 						checkBillNo: checkBillNo
 					}
 	            	mui.ajaxRequest(url,{

@@ -374,11 +374,12 @@
 										url = '/a/depot/supplier/all';
 										data = { ctmaSupplierName: paramName }
 									}else{
-										url = '/a/common/queryDrugByList';
+//										url = '/a/common/queryDrugByList';
+										url = '/a/commonCheckQuery/commonInfoSearch';
 										data = { 
 											paramName: paramName,
-											queryType: '4'
-	//					    				type: params.auditStatus === '1'? 'cache_listVoWYS': 'cache_listVoYYS'
+//											queryType: '4'
+						    				type: params.auditStatus === '1'? 'cache_listVoWYS': 'cache_listVoYYS'
 										}
 									}
 								}else if(module === 'grounding'){
@@ -389,11 +390,12 @@
 												auditStatus: params.auditStatus
 											}
 									}else{
-										url = '/a/common/queryDrugByList';
+//										url = '/a/common/queryDrugByList';
+										url = '/a/commonCheckQuery/commonInfoSearch';
 										data = { 
 											paramName: paramName,
-	//										type: params.auditStatus === '1'?'cache_listVoWSJ':'cache_listVoYSJ'
-											queryType: '4'
+											type: params.auditStatus === '1'?'cache_listVoWSJ':'cache_listVoYSJ'
+//											queryType: '4'
 										}
 									}
 								}else if(module === 'pickingOff'){
@@ -404,11 +406,12 @@
 											type: params.auditStatus
 										}
 									}else{
-										url = '/a/common/queryDrugByList';
+//										url = '/a/common/queryDrugByList';
+										url = '/a/commonCheckQuery/commonInfoSearch'
 										data = {
 											paramName: paramName,
-											queryType: '4'
-	//										type: params.auditStatus === '0'?'Cache_notDetailList':'Cache_existDetailList'
+//											queryType: '4'
+											type: params.auditStatus === '0'?'Cache_notDetailList':'Cache_existDetailList'
 										}
 									}
 								}else{
@@ -454,9 +457,12 @@
 							var li = document.createElement('li');
 							li.className = 'search-ullist-li';
 							if(location === 'sub_list'){
-								li.setAttribute('data-hisDrugCode',data[i].bigDrugCode);
-								li.setAttribute('data-hisdrugname',data[i].ctmmParam);
-								li.innerHTML = data[i].ctmmParam;
+//								li.setAttribute('data-hisDrugCode',data[i].bigDrugCode);
+//								li.setAttribute('data-hisdrugname',data[i].ctmmParam);
+//								li.innerHTML = data[i].ctmmParam;
+								li.setAttribute('data-hisDrugCode',data[i].value);
+								li.setAttribute('data-hisdrugname',data[i].key);
+								li.innerHTML = data[i].key;
 							}
 							if(module === 'acceptance' || module === 'basicMedicine'){
 								//验收

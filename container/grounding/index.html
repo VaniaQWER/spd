@@ -113,7 +113,7 @@
 				utils.appendModule('#card_view');
 				
 				/* 渲染模板   */
-				var selected = undefined,hasChecked = false,page = undefined, pageSize = 10,totalPage = undefined, query = {};
+				var selected = undefined,hasChecked = false,page = undefined, pageSize = 15,totalPage = undefined, query = {};
 				
 				var checkType, type, shelfStatus// 上架类型 // 上架状态  1 待上架  2 已上架 
 				var requestUrl =  '/a/checkaccept/shelfList'; // 请求地址
@@ -150,11 +150,8 @@
             	 	下拉刷新
             	 * */
             	function pulldownRefresh(){
-					if(selectTabs === 1){
-						pageLeft  = 1
-					}else{
-						pageRight = 1;
-					}
+					pageLeft = 1;
+					pageRight = 1;
 					auditStatus = selectTabs === 1 ? '2': '3';
 					page = selectTabs === 1 ? pageLeft: pageRight;
 					var self = this;

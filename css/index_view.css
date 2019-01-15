@@ -108,7 +108,7 @@ input,button,select,textarea{
 	white-space: pre-wrap;
 	word-wrap: break-word;
 	-webkit-rtl-ordering: logical;
-	user-select: text;
+	user-select: none;
 }
 button{
 	user-select: none !important;
