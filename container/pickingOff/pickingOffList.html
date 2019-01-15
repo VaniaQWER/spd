@@ -102,7 +102,7 @@
 				$.init({
 					beforeback:function(){
 						var list = plus.webview.currentWebview().opener();
-						 mui.fire(list, 'refresh');
+						 mui.fire(list, 'pagefresh', {});
 						 return true;
 					}
 				});
@@ -245,7 +245,7 @@
 			
 				$.plusReady(function(){
 					
-					let globalQuery = { selected : selectTabs === '1'?'left':'right' };
+					let globalQuery = { selected : selectTabs === 1?'left':'right' };
 					window.addEventListener('pagefresh',function(event){
 						let index = event.detail.query.selected === 'left' ? 0 : 1;
 						query = event.detail.query;
@@ -260,7 +260,7 @@
 					// 触发刷新 搜索页面搜的值
 					window.addEventListener('sub_search',function(event){
 						console.log(JSON.stringify(event.detail))
-						let index = event.detail.selectTab === '1' ? 0 : 1;
+						let index = event.detail.query.selected === 'left' ? 0 : 1;
 						query = globalQuery = JSON.parse(event.detail.searchParams);
 						console.log(query)
 						$$('.mui-placeholder').hide();
@@ -322,6 +322,7 @@
 							pickingStatus = '1';
 							selected = '.mui-tab2';
 							selectTabs = 2;
+							globalQuery.selected='right'
 							mui('#slider').slider().gotoItem(1);
 							$$('.batchAccetpance').hide();
 							$('.mui-slider-group .mui-scroll .mui-tab2')[0].innerHTML = '';
@@ -333,6 +334,7 @@
 							pickingStatus = '0';
 							selected = '.mui-tab1';
 							selectTabs = 1;
+							globalQuery.selected='left'
 							$$('.batchAccetpance').show();
 							mui('#slider').slider().gotoItem(0);
 							$('.mui-slider-group .mui-scroll .mui-tab1')[0].innerHTML = '';
