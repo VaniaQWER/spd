@@ -47,18 +47,18 @@
 				
 			// 模板加载
 			$.plusReady(function(){
+				var self = plus.webview.currentWebview();
+				var details = JSON.parse(self.details);//获得参数
+				var detailData = {};
 				
 				$.init({
 					beforeback: function() {
 				        var list = plus.webview.currentWebview().opener();  
-				        mui.fire(list, 'pagefresh',{ hasPicked: true }); 
+				        mui.fire(list, 'pagefresh',{ selectTab: details.selected , hasPicked: true , query : details.query  }); 
 				        return true;  
 			    	}
 				})
-				
-				var self = plus.webview.currentWebview();
-				var details = JSON.parse(self.details);//获得参数
-				var detailData = {};
+				console.log('details*******************') 
 				console.log(JSON.stringify(details)) 
 				var titleUrl = '/a/common/pickingorderdetail/getPickingDetailPad?pickingOrderNo=' + details.pickingOrderNo,
 					url = '/a/common/pickingorderdetail/detailList',
@@ -140,7 +140,7 @@
 									submitData.applyNo = detailData.applyOrder;
 									submitData.pickingOrderNo = detailData.pickingOredr;
 									submitData.pickingDetail = pickingDetail;
-									console.log(submitData);
+									console.log(JSON.stringify(submitData));
 									mui.ajaxRequest(pickUrl,{
 				                		type: 'POST',
 				                		data: submitData,
@@ -152,7 +152,7 @@
 				                				mui.toast('拣货成功',{ type: 'div' });
 				                				setTimeout(function(){
 				                					var page =  plus.webview.getWebviewById('pickingOffList');
-													mui.fire(page,'pagefresh',{ selectTab: '1' });
+													mui.fire(page,'pagefresh',{ selectTab: '1' ,query:{ selected:"right" } });
 													common.gotowin('pickingOffList',{  });
 													plus.webview.currentWebview().close();
 				                				},300)

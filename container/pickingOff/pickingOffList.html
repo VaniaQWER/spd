@@ -165,6 +165,8 @@
 					};
 					if(query.hisDrugCode){
 						postData.hisDrugCode = query.hisDrugCode
+						$$('.mui-placeholder').hide();
+						$$('.mui-input-clear').val(query.hisDrugName);
 					}else{
 						$$('.mui-input-clear').val('');
 						$$('.mui-placeholder').show();
@@ -244,12 +246,12 @@
 				$.plusReady(function(){
 					
 					window.addEventListener('pagefresh',function(event){
-						let index = event.detail.selectTab === '1' ? 0 : 1;
-						$$('.mui-placeholder').show();
+						let index = event.detail.query.selected === 'left' ? 0 : 1;
+						query = event.detail.query;
+						console.log(JSON.stringify(event.detail))
 						$$('.mui-input-clear').val('');
-						if(index === 1){
-							mui('#slider').slider().gotoItem(1);
-						}
+						$$('.mui-placeholder').hide();
+						mui('#slider').slider().gotoItem(index);
 						mui(".mui-scroll").pullToRefresh()[index].pullDownLoading();
 					});
 
@@ -258,7 +260,7 @@
 					window.addEventListener('sub_search',function(event){
 						console.log(JSON.stringify(event.detail))
 						let index = event.detail.selectTab === '1' ? 0 : 1;
-						query = JSON.parse(event.detail.searchParams);
+						query = globalQuery = JSON.parse(event.detail.searchParams);
 						console.log(query)
 						$$('.mui-placeholder').hide();
 						$$('.mui-input-clear').val(query.hisDrugName);
@@ -347,6 +349,8 @@
 						newData.pickingStatus = pickingStatus;
 						newData.hasPicked = pickingStatus === '0'? true: false;
 						newData.id = id;
+						params.selected = selected;
+						newData.query = globalQuery;
 						console.log(newData)
 						document.activeElement.blur();
 						common.openwin('pickingOffDetails',{ details: JSON.stringify(newData) },{

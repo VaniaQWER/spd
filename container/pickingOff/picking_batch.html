@@ -70,8 +70,8 @@
 				$.init({
 					beforeback:function(){
 						var list = plus.webview.currentWebview().opener();
-						 mui.fire(list, 'refresh');
-						 return true;
+						mui.fire(list, 'pagefresh', {});
+						return true;
 					}
 				});
 				$('.mui-scroll-wrapper').scroll({
@@ -302,7 +302,7 @@
 						submitData.pickingDetail = pickingDetail;
 						submitData.applyNo = params.applyNo;;
 						submitData.pickingOrderNo = params.pickingOrderNo;;
-						console.log(submitData)
+						console.log(JSON.stringify(submitData))
 						
 						var btnArray = ['否', '是'];
 						mui.confirm('确认批量下架选中的药品？', '确认', btnArray, function(e) {
