@@ -200,7 +200,10 @@
 					
 					window.addEventListener('pagefresh',function(e){
 						console.log('从详情回来')
-						location.reload();
+						setTimeout(function(){
+							console.log('刷新了啊啊啊啊 啊')
+							mui(".mui-scroll").pullToRefresh().pullDownLoading();
+						},200)
 					});
 					
 					// 触发刷新 搜索页面搜的值
@@ -212,7 +215,7 @@
 						$JQ('.mui-placeholder').hide();
 						setTimeout(function(){
 							mui(".mui-scroll").pullToRefresh().pullDownLoading();
-						},300)
+						},200)
 						console.log('刷新了')
 					})
 					

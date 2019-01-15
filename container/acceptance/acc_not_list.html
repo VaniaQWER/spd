@@ -241,6 +241,7 @@
 				$.plusReady(function(){
 
 					window.addEventListener('pagefresh',function(event){
+						console.log('从详情回来')
 						console.log(JSON.stringify(event.detail))
 						let index = event.detail.selectTab === '1' ? 0 : 1;
 						$$('.mui-placeholder').show();
@@ -252,16 +253,16 @@
 					});
 					// 触发刷新 搜索页面搜的值
 					window.addEventListener('sub_search',function(event){
+						console.log('从搜索页面回来')
 						console.log(JSON.stringify(event.detail) );
 						query = JSON.parse(event.detail.searchParams);
 						$$('.mui-placeholder').hide();
 						$$('.mui-input-clear').val(query.hisDrugName);
-//						var postData = {
-//							distributeCode: distributeCode,
-//							hisDrugCode: searchParams.hisDrugCode,
-//							status: searchParams.type
-//						}
-						mui(".mui-scroll").pullToRefresh()[0].pullDownLoading();
+						
+						setTimeout(function(){
+							mui(".mui-scroll").pullToRefresh()[0].pullDownLoading();
+						},300)
+						console.log('刷新了')
 					})
 					
 					var isUsual = undefined;
@@ -388,10 +389,8 @@
 						paramsData.isShowTemprature = isShowTemprature;
 						paramsData.itemData = params;
 						paramsData.acceptance = true;
-						console.log(paramsData)
-						common.openwin('acc_batch',{ params: JSON.stringify(paramsData) },{
-							titleText: '药品信息'
-						})
+						console.log(JSON.stringify(paramsData));
+						common.openwin('acc_batch',{ params: JSON.stringify(paramsData) },false)
 					})
 					
 					// 绑定事件 --确认验收

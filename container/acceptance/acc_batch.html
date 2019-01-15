@@ -13,11 +13,17 @@
 	</head>
 
 	<body>
+		<header class="mui-bar mui-bar-nav themes_bg_color">
+		   	<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left">
+		   		<label class="mui-pull-right theme_back_font">返回</label>
+		   	</a>
+		    <h1 class="mui-title themes_title">药品信息</h1>
+		</header>
 		<div class="mui-content">
-			<div class="home-card-wrapper" style="padding: 8px;margin-top: 0;margin-bottom: 8px;">
+			<div class="home-card-wrapper" style="padding: 8px;margin-top: 4px;margin-bottom: 0;">
 				<div class="home-card-title">待验收</div>
 			</div>
-			<div id="slider" class="mui-slider themes_tab mui-fullscreen" style="margin-top: 45px;padding-bottom: 59px;">
+			<div id="slider" class="mui-slider themes_tab mui-fullscreen" style="padding-bottom: 59px; top: 90px">
 				<div class="mui-slider-group">
 					<div id="item1mobile" class="mui-slider-item mui-control-content">
 						<div id="scroll1" class="mui-scroll-wrapper">
@@ -58,7 +64,7 @@
 				$.init({
 					beforeback: function() {
 						var list = plus.webview.currentWebview().opener();
-						mui.fire(list, 'pagefresh', {});
+						mui.fire(list, 'pagefresh', { selectTab: '1' });
 						return true;
 					}
 				})
