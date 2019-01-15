@@ -91,9 +91,12 @@
 						var InputMethodManager = plus.android.importClass("android.view.inputmethod.InputMethodManager");
 						var main = plus.android.runtimeMainActivity();
 						var imm = main.getSystemService(Context.INPUT_METHOD_SERVICE);
-						imm.toggleSoftInput(0,InputMethodManager.SHOW_FORCED);
+						setTimeout(function(){
+							imm.toggleSoftInput(0,InputMethodManager.SHOW_FORCED);
+						},200);
 				}
 				document.addEventListener("plusready",plusReady,false);
+						
 	
 				function back (){
 					let searchValue = '';
@@ -132,6 +135,7 @@
 							page = plus.webview.getWebviewById(params.id);
 							mui.fire(page,'sub_search',{ searchParams: JSON.stringify(searchParams) });
 						}
+						document.activeElement.blur();
 				}
 				
 				// 重写mui-back**************************
@@ -149,19 +153,21 @@
 					location = undefined;// 入口：主列表/子列表
 				
 				$.plusReady(function(){
-					var self = plus.webview.currentWebview();
-					params = JSON.parse(self.params);//获得参数
-					console.log(self.params);
+						var self = plus.webview.currentWebview();
+						params = JSON.parse(self.params);//获得参数
+						console.log(self.params);
 				    key = params.key;
 				    selected = params.selected;
 				    module = params.module;
 				    location = params.location;
-					// 输入框聚焦
-					var searchList = JSON.parse(plus.storage.getItem('searchHistory'));
-					console.log(searchList)
-					let currHistory = searchList[module][location];
-					console.log(currHistory)
+						// 输入框聚焦
+						var searchList = JSON.parse(plus.storage.getItem('searchHistory'));
+						console.log(searchList)
+						let currHistory = searchList[module][location];
+						console.log(currHistory)
 				
+						
+						
 					// 键盘搜索按钮
 					document.querySelector('.search_head').addEventListener('keypress',function(e){
 						if(e.keyCode == "13") {
@@ -237,10 +243,9 @@
 							setTimeout(function(){
 								document.activeElement.blur(); // 隐藏软键盘
 							},300)
-						  	plus.webview.currentWebview().close();
+							plus.webview.currentWebview().close();
 						}
 					})
-					
 					
 					var lastChildNode = document.querySelector('.mui-placeholder').lastChild;
 					if(location === 'sub_list' || module === 'stock'){
@@ -253,47 +258,46 @@
 						}
 					}
 					
-					if(currHistory && currHistory.length){
-						
-						// 创建 删除历史记录标签
-						var span = document.createElement('span');
-						span.className = 'mui-icon mui-icon-trash clearHistory';
-						document.querySelector('.history-title').appendChild(span);
-						
-						// 创建 历史记录tag
-						mui.each(currHistory,function(index,item){
-							var div = document.createElement('div');
-							div.className = 'tag';
-							if(location === 'sub_list'){
-								div.innerHTML = item.hisDrugName;
-								div.setAttribute('data-hisDrugName',item.hisDrugName);
-								div.setAttribute('data-hisDrugCode',item.hisDrugCode)
-							}
-							if(module === 'acceptance' || module === 'basicMedicine'){
-								if(location === 'main_list'){
-									div.innerHTML = item.supplierName
-									div.setAttribute('data-supplierCode',item.supplierCode);
-									div.setAttribute('data-supplierName',item.supplierName);
-								}
-							}else if(module === 'grounding'){
-								if(location === 'main_list'){
-									div.innerHTML = item;
-									div.setAttribute('data-distributeCode',item)
-								}
-							}else if(module === 'pickingOff'){
-								if(location === 'main_list'){
-									div.innerHTML = item;
-									div.setAttribute('data-applyOrderNo',item)
-								}
-							}else{
-								div.innerHTML = item.ctmmParam;
-								div.setAttribute('data-bigDrugCode',item.bigDrugCode);
-								div.setAttribute('data-ctmmParam',item.ctmmParam)
-							}
-							document.querySelector('.history-tags').appendChild(div)
+						if(currHistory && currHistory.length){
+							// 创建 删除历史记录标签
+							var span = document.createElement('span');
+							span.className = 'mui-icon mui-icon-trash clearHistory';
+							document.querySelector('.history-title').appendChild(span);
 							
-						})
-					}
+							// 创建 历史记录tag
+							mui.each(currHistory,function(index,item){
+								var div = document.createElement('div');
+								div.className = 'tag';
+								if(location === 'sub_list'){
+									div.innerHTML = item.hisDrugName;
+									div.setAttribute('data-hisDrugName',item.hisDrugName);
+									div.setAttribute('data-hisDrugCode',item.hisDrugCode)
+								}
+								if(module === 'acceptance' || module === 'basicMedicine'){
+									if(location === 'main_list'){
+										div.innerHTML = item.supplierName
+										div.setAttribute('data-supplierCode',item.supplierCode);
+										div.setAttribute('data-supplierName',item.supplierName);
+									}
+								}else if(module === 'grounding'){
+									if(location === 'main_list'){
+										div.innerHTML = item;
+										div.setAttribute('data-distributeCode',item)
+									}
+								}else if(module === 'pickingOff'){
+									if(location === 'main_list'){
+										div.innerHTML = item;
+										div.setAttribute('data-applyOrderNo',item)
+									}
+								}else{
+									div.innerHTML = item.ctmmParam;
+									div.setAttribute('data-bigDrugCode',item.bigDrugCode);
+									div.setAttribute('data-ctmmParam',item.ctmmParam)
+								}
+								document.querySelector('.history-tags').appendChild(div)
+								
+							})
+						}
 					
 				    // 删除 历史记录
 				    $('.history-title').on('tap','.clearHistory',function(){
@@ -358,10 +362,10 @@
 					  		page = plus.webview.getWebviewById(params.id);
 					  		mui.fire(page,'sub_search',{ searchParams: JSON.stringify(searchParams) });
 					  	}
-						setTimeout(function(){
-							document.activeElement.blur(); // 隐藏软键盘
-						},300)
-					  	plus.webview.currentWebview().close();
+							old_back();
+							setTimeout(function(){
+								document.activeElement.blur(); // 隐藏软键盘
+							},500)
 				    })
 				    
 				   
@@ -446,53 +450,55 @@
 					});
 					
 				   
-				   function createSelect(data,module,location){
-						if(document.querySelector('.search-ullist')){
-							var ulList = document.querySelector('.search-ullist');
-							document.querySelector('#ulList').removeChild(ulList);
-						}
-						var ul = document.createElement('ul');
-						ul.className = 'search-ullist';
-						for(var i=0;i<data.length; i++){
-							var li = document.createElement('li');
-							li.className = 'search-ullist-li';
-							if(location === 'sub_list'){
-//								li.setAttribute('data-hisDrugCode',data[i].bigDrugCode);
-//								li.setAttribute('data-hisdrugname',data[i].ctmmParam);
-//								li.innerHTML = data[i].ctmmParam;
-								li.setAttribute('data-hisDrugCode',data[i].value);
-								li.setAttribute('data-hisdrugname',data[i].key);
-								li.innerHTML = data[i].key;
+				    function createSelect(data,module,location){
+							if(document.querySelector('.search-ullist')){
+								var ulList = document.querySelector('.search-ullist');
+								document.querySelector('#ulList').removeChild(ulList);
 							}
-							if(module === 'acceptance' || module === 'basicMedicine'){
-								//验收
-								if(location === 'main_list'){
-									li.setAttribute('data-supplierCode',data[i].ctmaSupplierCode);
-									li.setAttribute('data-supplierName',data[i].ctmaSupplierName);
-									li.innerHTML = data[i].ctmaSupplierName;
+							var ul = document.createElement('ul');
+							ul.className = 'search-ullist';
+							for(var i=0;i<data.length; i++){
+								var li = document.createElement('li');
+								li.className = 'search-ullist-li';
+								if(location === 'sub_list'){
+	//								li.setAttribute('data-hisDrugCode',data[i].bigDrugCode);
+	//								li.setAttribute('data-hisdrugname',data[i].ctmmParam);
+	//								li.innerHTML = data[i].ctmmParam;
+									li.setAttribute('data-hisDrugCode',data[i].value);
+									li.setAttribute('data-hisdrugname',data[i].key);
+									li.innerHTML = data[i].key;
 								}
-							}else if(module === 'grounding'){
-								// 上架
-								if(location === 'main_list'){
-									li.setAttribute('data-distributeCode',data[i].distributeCode);
-									li.innerHTML = data[i].distributeCode;
+								if(module === 'acceptance' || module === 'basicMedicine'){
+									//验收
+									if(location === 'main_list'){
+										li.setAttribute('data-supplierCode',data[i].ctmaSupplierCode);
+										li.setAttribute('data-supplierName',data[i].ctmaSupplierName);
+										li.innerHTML = data[i].ctmaSupplierName;
+									}
+								}else if(module === 'grounding'){
+									// 上架
+									if(location === 'main_list'){
+										li.setAttribute('data-distributeCode',data[i].distributeCode);
+										li.innerHTML = data[i].distributeCode;
+									}
+								}else if(module === 'pickingOff'){
+									// 拣货下架
+									if(location === 'main_list'){
+										li.setAttribute('data-applyOrderNo',data[i]);
+										li.innerHTML = data[i];
+									}
+								}else{
+									// 库存查询
+									li.setAttribute('data-ctmmParam',data[i].ctmmParam);
+									li.setAttribute('data-bigDrugCode',data[i].bigDrugCode);
+									li.innerText = data[i].ctmmParam;
 								}
-							}else if(module === 'pickingOff'){
-								// 拣货下架
-								if(location === 'main_list'){
-									li.setAttribute('data-applyOrderNo',data[i]);
-									li.innerHTML = data[i];
-								}
-							}else{
-								// 库存查询
-								li.setAttribute('data-ctmmParam',data[i].ctmmParam);
-								li.setAttribute('data-bigDrugCode',data[i].bigDrugCode);
-								li.innerText = data[i].ctmmParam;
+								ul.appendChild(li);
 							}
-							ul.appendChild(li);
+							document.querySelector('#ulList').appendChild(ul)
 						}
-						document.querySelector('#ulList').appendChild(ul)
-					}
+						
+						//搜索结果电机
 						$('#ulList').on('tap','.search-ullist-li',function(){
 				  	let dataset = this.dataset;
 				  	console.log(currHistory)
@@ -612,11 +618,13 @@
 				  		console.log(page)
 				  		mui.fire(page,'sub_search',{ searchParams: JSON.stringify(searchParams) });
 				  	}
-					setTimeout(function(){
-						document.activeElement.blur(); // 隐藏软键盘
-					},300)
-					plus.webview.currentWebview().close();
+						old_back();
+						// plus.webview.currentWebview().close();
+						setTimeout(function(){
+							document.activeElement.blur(); // 隐藏软键盘
+						},500)
 				  });
+					
 				})
 				
 			})(mui);
