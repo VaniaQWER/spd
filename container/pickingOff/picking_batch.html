@@ -70,7 +70,7 @@
 				$.init({
 					beforeback:function(){
 						var list = plus.webview.currentWebview().opener();
-						mui.fire(list, 'pagefresh', {});
+						mui.fire(list, 'pagefresh', { query:{ selectTabs:"left" } });
 						return true;
 					}
 				});
@@ -111,7 +111,7 @@
 				/*
             	 	下拉刷新
             	 * */
-            	function pulldownRefresh(){
+			function pulldownRefresh(){
 					var self = this;
 					page = 1;
 					var postData = {

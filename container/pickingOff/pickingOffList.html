@@ -245,6 +245,7 @@
 			
 				$.plusReady(function(){
 					
+					let globalQuery = { selected : selectTabs === '1'?'left':'right' };
 					window.addEventListener('pagefresh',function(event){
 						let index = event.detail.query.selected === 'left' ? 0 : 1;
 						query = event.detail.query;

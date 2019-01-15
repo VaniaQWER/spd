@@ -152,7 +152,7 @@
 				                				mui.toast('拣货成功',{ type: 'div' });
 				                				setTimeout(function(){
 				                					var page =  plus.webview.getWebviewById('pickingOffList');
-													mui.fire(page,'pagefresh',{ selectTab: '1' ,query:{ selected:"right" } });
+													mui.fire(page,'pagefresh',{ selectTab: '1' ,query:{ selected:"left" } });
 													common.gotowin('pickingOffList',{  });
 													plus.webview.currentWebview().close();
 				                				},300)
