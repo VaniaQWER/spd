@@ -220,9 +220,15 @@
 					});
 
 					// 复选框选中
-					$('#slider').on('change', '.checkone', function(e, index) {
+					$('#slider').on('tap', '.checkoneParent', function(e, index) {
 						selectedRows = [], selecteIndex = [];
 						console.log(JSON.stringify(e), this.dataset)
+						let currentCheckbox = $JQ(this).find('.checkone');
+						if(currentCheckbox.prop('checked')){
+							currentCheckbox.prop('checked',false)
+						}else{
+							currentCheckbox.prop('checked',true)
+						}
 						var checkList = document.querySelectorAll('.checkone')
 						var checkAll = document.querySelector('#checkall');
 						var checkLen = checkList.length;

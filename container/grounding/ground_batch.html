@@ -102,88 +102,86 @@
 				/*
             	 	下拉刷新
             	 * */
-            	function pulldownRefresh(){
-					var self = this;
-					page = 1;
-					var postData = {
-						distributeCode: distributeCode,
-						upFinishType:upFinishType,
-						pageNo: page,
-                		pageSize: pageSize
-					};
-					console.log(JSON.stringify(postData))
-					mui.ajaxRequest(_url,{
-                		type: 'POST',
-                		data: postData,
-                		success: function(data){
-                			var resData = data.data;
-                			totalPage = data.totalPage;
-							console.log(JSON.stringify(data))
-							if(resData.list.length === 0 || (resData.list.length <= resData.pageSize && resData.count/resData.pageSize < 1)){
-                				isMore = false;
-								document.querySelectorAll('.mui-pull-loading')[0].innerHTML = '没有更多数据';
-                				self.endPullDownToRefresh(true);
-                			}else{
-                				isMore = true;
-                				self.endPullDownToRefresh(false);
-                				self.refresh(true);
-                			}
-							console.log(JSON.stringify(data.data.list))
-							return template(resData, false)
-                		},
-                		error: function(xhr,type,errorThrown){
-							console.log(xhr.responseText)
-                		}
-            		});
-				}
+							function pulldownRefresh(){
+								var self = this;
+								page = 1;
+								var postData = {
+									distributeCode: distributeCode,
+									upFinishType:upFinishType,
+									pageNo: page,
+													pageSize: pageSize
+								};
+								console.log(JSON.stringify(postData))
+								mui.ajaxRequest(_url,{
+													type: 'POST',
+													data: postData,
+													success: function(data){
+														var resData = data.data;
+														totalPage = data.totalPage;
+										console.log(JSON.stringify(data))
+										if(resData.list.length === 0 || (resData.list.length <= resData.pageSize && resData.count/resData.pageSize < 1)){
+															isMore = false;
+											document.querySelectorAll('.mui-pull-loading')[0].innerHTML = '没有更多数据';
+															self.endPullDownToRefresh(true);
+														}else{
+															isMore = true;
+															self.endPullDownToRefresh(false);
+															self.refresh(true);
+														}
+										console.log(JSON.stringify(data.data.list))
+										return template(resData, false)
+													},
+													error: function(xhr,type,errorThrown){
+										console.log(xhr.responseText)
+													}
+											});
+							}
             	function template(data, insertType) {
             		utils.innerTplHtml('ground_batch_list', '.mui-tab1', data, insertType);
             	}
             	/*
-					 
-				 *  上拉加载更多
-				 * */
-				function pullupRefresh(){
-					var self = this;
-					console.log(isMore,'isMore')
-					if(isMore){
-						page++;
-						mui.ajaxRequest(_url,{
-	                		type: 'POST',
-	                		data:{
-	                			distributeCode: distributeCode,
-	                			upFinishType,upFinishType,
-	                			pageNo: page,
-	                			pageSize: pageSize
-	                		},
-	                		success: function(data){
-	                			var resData = data.data;
-	                			if(resData.pageNo === resData.totalPage){
-		            				isMore = false;
-		            				self.endPullUpToRefresh(true);
-		            			}else{
-		            				isMore = true;
-		            				self.endPullUpToRefresh(false);
-		            				self.refresh(true);
-		            			}
-								return template(resData, true)
-	                			
-	                		},
-	                		error: function(xhr,type,errorThrown){
-								console.log(xhr.responseText)
-	                		}
-	            		});
-					}else{
-						document.querySelectorAll('.mui-pull-loading')[0].innerHTML = '没有更多数据';
-						self.endPullUpToRefresh(true);
-					}
-					
-				}
-            
+							 *  上拉加载更多
+							 * */
+							function pullupRefresh(){
+								var self = this;
+								console.log(isMore,'isMore')
+								if(isMore){
+									page++;
+									mui.ajaxRequest(_url,{
+														type: 'POST',
+														data:{
+															distributeCode: distributeCode,
+															upFinishType,upFinishType,
+															pageNo: page,
+															pageSize: pageSize
+														},
+														success: function(data){
+															var resData = data.data;
+															if(resData.pageNo === resData.totalPage){
+															isMore = false;
+															self.endPullUpToRefresh(true);
+														}else{
+															isMore = true;
+															self.endPullUpToRefresh(false);
+															self.refresh(true);
+														}
+											return template(resData, true)
+															
+														},
+														error: function(xhr,type,errorThrown){
+											console.log(xhr.responseText)
+														}
+												});
+								}else{
+									document.querySelectorAll('.mui-pull-loading')[0].innerHTML = '没有更多数据';
+									self.endPullUpToRefresh(true);
+								}
+								
+							}
+									
 				$.plusReady(function(){
 					
 					window.addEventListener('pagefresh',function(event){
-						
 						mui(".mui-scroll").pullToRefresh().pullDownLoading();
 					});
 					
@@ -245,9 +243,14 @@
 					});
 					
 					// 复选框选中
-					$('#slider').on('change','.checkone',function(){
+					$('#slider').on('tap', '.checkoneParent',function(){
 						selectedRows = [],selecteIndex = [];
-						
+						let currentCheckbox = $JQ(this).find('.checkone');
+						if(currentCheckbox.prop('checked')){
+							currentCheckbox.prop('checked',false)
+						}else{
+							currentCheckbox.prop('checked',true)
+						}
 						var checkList = document.querySelectorAll('.checkone')
 						var checkAll = document.querySelector('#checkall');
 						var checkLen = checkList.length;
