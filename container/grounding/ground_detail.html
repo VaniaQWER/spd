@@ -47,10 +47,17 @@
 				}
 				
 				$.plusReady(function(){
+					$.init({
+						beforeback: function() {
+					        var list = plus.webview.currentWebview().opener();  
+					        mui.fire(list, 'pagefresh',{ selectTabs: details.selectTabs === 1 ? 0: 1, query: details.query }); 
+					        return true;  
+				    	}
+					})
 					
 					var self = plus.webview.currentWebview();
 					var details = JSON.parse(self.details);//获得参数
-					console.log(details);
+					console.log(JSON.stringify(details.selectTabs) );
 					var postData = {
 						distributeCode: details.distributeCode,
 						upFinishType: details.upFinishType,

@@ -359,7 +359,8 @@
 				"resources": [],
 				"refer": [
 					"container/grounding/ground_detail.html",
-					"container/grounding/ground_batch.html"
+					"container/grounding/ground_batch.html",
+					"container/commonPages/searchPage.html"
 				],
 				"priority": 0
 			}

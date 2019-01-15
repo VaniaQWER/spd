@@ -67,7 +67,9 @@
 		<script src="../../js/common.js" type="text/javascript" charset="utf-8"></script>
 		<script src="../../js/request.js" type="text/javascript" charset="utf-8"></script>
 		<script type="text/javascript">
-			var auditStatus = undefined,selected = undefined; // 上架状态   1 待上架  2 已上架
+			var auditStatus = undefined,
+				selected = '.mui-tab1', // 默认选中内容区块 ,
+				selectTabs = 1;// 上架状态   1 待上架  2 已上架
 				
 			if(window.plus) {
                 plusready();
@@ -87,22 +89,24 @@
 				params.id = 'ground_not_list';
 				params.auditStatus = auditStatus;
 				params.selected = selected;
+				params.selectTabs = selectTabs;
 				params.module = 'grounding';
 				params.location = 'sub_list';
+				console.log(JSON.stringify(params))
 				common.openwin('../commonPages/searchPage',{ params: JSON.stringify(params) },false)
 			}
             
 			
 			(function($,$$) {
 				
-				var deceleration = mui.os.ios?0.003:0.0009;
 				$.init({
-					beforeback:function(){
-						var list = plus.webview.currentWebview().opener();
-						 mui.fire(list, 'refresh');
-						 return true;
-					}
+					beforeback: function() {
+				        var list = plus.webview.currentWebview().opener();  
+				        mui.fire(list, 'pagefresh',{ selectTabs:  0 }); 
+				        return true;  
+			    	}
 				});
+				var deceleration = mui.os.ios?0.003:0.0009;
 				$('.mui-scroll-wrapper').scroll({
 					bounce: false,
 					indicators: true, //是否显示滚动条
@@ -117,8 +121,7 @@
 					query = {},
 					checkType = undefined,
 					type = undefined,
-					selectTabs = 1,
-					selected = '.mui-tab1'; // 默认选中内容区块
+					
 					distributeCode = undefined, 
 					upFinishType = undefined;
 				
@@ -156,7 +159,6 @@
 						postData.hisDrugCode = query.hisDrugCode
 					}
 					query = {};
-					console.log(JSON.stringify(postData))
 					mui.ajaxRequest(_url,{
                 		type: 'POST',
                 		data: postData,
@@ -164,7 +166,6 @@
                 			var resData = data.data;
                 			resData.hasGround = upFinishType === '0'? true: false;
                 			totalPage = data.totalPage;
-							console.log(JSON.stringify(resData))
                 			if(resData.list.length === 0 || (resData.list.length <= resData.pageSize && resData.pageNo === resData.totalPage)){
                 				var i = selectTabs === 1 ? 0 : 1;
                 				isMore = false;
@@ -228,18 +229,11 @@
 				}
             
 				$.plusReady(function(){
-					
-					$.init({
-						beforeback: function() {
-					        var list = plus.webview.currentWebview().opener();  
-					        mui.fire(list, 'pagefresh',{ hasAcceptance:  selectTabs === 1 ? true: false}); 
-					        return true;  
-				    	}
-					})
-					
-					
+
 					window.addEventListener('pagefresh',function(event){
-						let index = event.detail.selectTab === '1' ? 0 : 1;
+						console.log('从详情回来')
+						console.log(JSON.stringify(event.detail))
+						let index = event.detail.selectTab === 0 ? 0 : 1;
 						$$('.mui-placeholder').show();
 						$$('.mui-input-clear').val('');
 						if(index === 1){
@@ -250,11 +244,19 @@
 					
 					// 触发刷新 搜索页面搜的值
 					window.addEventListener('sub_search',function(event){
+						console.log('从搜索页面回来')
+						console.log(JSON.stringify(event.detail) );
 						query = JSON.parse(event.detail.searchParams);
+						let index = query.selectTabs === 1 ? 0: 1;
 						console.log(query)
 						$$('.mui-placeholder').hide();
 						$$('.mui-input-clear').val(query.hisDrugName);
-						mui(".mui-scroll").pullToRefresh().pullDownLoading();
+						if(index === 1){
+							mui('#slider').slider().gotoItem(1);
+						}
+						setTimeout(function(){
+							mui(".mui-scroll").pullToRefresh()[index].pullDownLoading();
+						},300)
 					})
 					
 					var params, currentSelected = undefined
@@ -342,6 +344,8 @@
 						newData.id = id;
 						newData.upFinishType = upFinishType ;
 						newData.distributeCode = distributeCode;
+						newData.selectTabs = selectTabs;
+						newData.query = query;
 						console.log(newData)
 						document.activeElement.blur();
 						common.openwin('ground_detail',{ details: JSON.stringify(newData) },{
@@ -354,6 +358,7 @@
 						var paramsData = {};
 						paramsData.distributeCode = distributeCode;
 						paramsData.upFinishType = '0';
+						paramsData.selectTabs = 1;
 						paramsData.itemData = params;
 						console.log(paramsData)
 						common.openwin('ground_batch',{ params: JSON.stringify(paramsData) },{

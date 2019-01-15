@@ -59,7 +59,8 @@
 					$.init({
 						beforeback: function() {
 					        var list = plus.webview.currentWebview().opener();  
-					        mui.fire(list, 'pagefresh',{ selectTab: details.status , query: details.query}); 
+					        console.log(details.selectTabs)
+					        mui.fire(list, 'pagefresh',{ selectTabs: details.selectTabs === 1 ? '1': '0' , query: {} }); 
 					        return true;  
 				    	}
 					})
@@ -69,6 +70,7 @@
 					checkType = details.checkType;
 					status = details.status;
 					console.log(JSON.stringify(details) );
+					console.log(typeof details.selectTabs)
 					var postData = {
 						distributeCode: details.distributeCode,
 						status: details.status,
@@ -285,18 +287,9 @@
 											mui.toast('验收成功',{ type: 'div' });
 											
 											var page =  plus.webview.getWebviewById('acc_not_list');
-											mui.fire(page,'pagefresh',{ selectTab: '1' });
+											mui.fire(page,'pagefresh',{ selectTabs: details.selectTabs === 1 ? 1: 0,query:{} });
 											common.gotowin('acc_not_list',{  });
 											plus.webview.currentWebview().close();
-//											var parmasData = {};
-//											parmasData.finishUrl = '../acceptance/index';
-//											parmasData.keepUrl = 'acc_not_list';
-//											parmasData.resultType = 'acceptance';
-//											parmasData.itemData = details.orderInfo;
-//											common.openwin('../result/index',{ parmas: JSON.stringify(parmasData) },{
-//												titleText: '结果',
-//												autoBackButton: false
-//											})
 										}
 									},
 									error: function(xhr,type,errorThrown){

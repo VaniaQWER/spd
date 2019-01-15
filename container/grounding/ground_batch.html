@@ -72,7 +72,7 @@
 				$.init({
 					beforeback:function(){
 						var list = plus.webview.currentWebview().opener();
-						 mui.fire(list, 'refresh');
+						 mui.fire(list, 'pagefresh',{ selectTab: 0 });
 						 return true;
 					}
 				});
@@ -192,7 +192,7 @@
 				    distributeCode =  params.distributeCode;
 				    upFinishType = params.upFinishType;
 					console.log(params.upFinishType)
-				    console.log(params)
+				    console.log(JSON.stringify(params))
 //				    showData(params);
 				    
 				    //循环初始化所有下拉刷新，上拉加载。
@@ -243,14 +243,14 @@
 					});
 					
 					// 复选框选中
-					$('#slider').on('tap', '.checkoneParent',function(){
+					$('#slider').on('change', '.checkone',function(){
 						selectedRows = [],selecteIndex = [];
-						let currentCheckbox = $JQ(this).find('.checkone');
-						if(currentCheckbox.prop('checked')){
-							currentCheckbox.prop('checked',false)
-						}else{
-							currentCheckbox.prop('checked',true)
-						}
+//						let currentCheckbox = $JQ(this).find('.checkone');
+//						if(currentCheckbox.prop('checked')){
+//							currentCheckbox.prop('checked',false)
+//						}else{
+//							currentCheckbox.prop('checked',true)
+//						}
 						var checkList = document.querySelectorAll('.checkone')
 						var checkAll = document.querySelector('#checkall');
 						var checkLen = checkList.length;
@@ -315,6 +315,7 @@
 											mui.toast('上架成功',{ type: 'div' });
 											mui(".mui-scroll").pullToRefresh().pullDownLoading();
 											$JQ('.total').text(0);
+											document.querySelector('#checkall').checked=false;
 										}
 									},
 									error: function(xhr,type,errorThrown){

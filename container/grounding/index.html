@@ -67,9 +67,6 @@
 		<script src="../../js/request.js" type="text/javascript" charset="utf-8"></script>
 		<script type="text/javascript">
 			
-			
-			
-			
 			function clicked(){
 				common.openwin('../commonPages/qrcode',true,{ titleText: '扫码上架' })
 			}
@@ -254,7 +251,7 @@
 					})
 					 // 页面刷新
 					window.addEventListener('pagefresh',function(e){
-						let index = e.detail.hasAcceptance ? 1: 0;
+						let index = e.detail.selectTabs === 0 ? 0: 1;
 						if(index === 1){
 							mui('#slider').slider().gotoItem(1);
 						}

@@ -240,7 +240,6 @@
 					
 					window.addEventListener('pagefresh',function(e){
 						let index = e.detail.hasAcceptance ? 0: 1;
-						console.log(index)
 						if(index === 1){
 							mui('#slider').slider().gotoItem(1);
 						}

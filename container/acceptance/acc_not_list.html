@@ -244,7 +244,9 @@
 						console.log('从详情回来')
 						console.log(JSON.stringify(event.detail))
 						query = event.detail.query;
-						let index = event.detail.selectTab === '1' ? 0 : 1;
+						console.log(typeof event.detail.selectTabs)
+						let index = event.detail.selectTabs === '1' ? 0 : 1;
+						console.log(index,'index')
 						if(index === 1){
 							mui('#slider').slider().gotoItem(1);
 						}
@@ -371,6 +373,7 @@
 						newData.hasAcceptance = hasAcceptance;// 判断 详情页面是否有验收按钮
 						newData.status = status;
 						newData.id = id;
+						newData.selectTabs = selectTabs;
 						newData.isPsList = isPsList; // 是否是配送单
 						newData.query = globalQuery;
 						console.log(JSON.stringify(newData))

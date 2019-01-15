@@ -80,14 +80,14 @@
 			
 			(function($,$$) {
 				
-				var deceleration = mui.os.ios?0.003:0.0009;
 				$.init({
-					beforeback:function(){
-						var list = plus.webview.currentWebview().opener();
-						 mui.fire(list, 'refresh',{ hasAcceptance: true });
-						 return true;
-					}
+					beforeback: function() {
+				        var list = plus.webview.currentWebview().opener();  
+				        mui.fire(list, 'pagefresh',{ selectTabs: 0 });  // 参数判断是某一个Tabs 右侧tabs 刷寻右侧列表
+				        return true;  
+			    	}
 				});
+				var deceleration = mui.os.ios?0.003:0.0009;
 				$('.mui-scroll-wrapper').scroll({
 					bounce: false,
 					indicators: true, //是否显示滚动条

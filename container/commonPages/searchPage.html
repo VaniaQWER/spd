@@ -130,10 +130,10 @@
 						var page = undefined;
 						if(location === 'main_list'){
 							page =  plus.webview.getWebviewById(params.route);
-							mui.fire(page,'search',{ searchParams: JSON.stringify(searchParams) });
+							mui.fire(page,'search',{ searchParams: JSON.stringify(searchParams),selectTabs: params.selectTabs });
 						}else{
 							page = plus.webview.getWebviewById(params.id);
-							mui.fire(page,'sub_search',{ searchParams: JSON.stringify(searchParams) });
+							mui.fire(page,'sub_search',{ searchParams: JSON.stringify(searchParams),selectTabs: params.selectTabs });
 						}
 						document.activeElement.blur();
 				}
@@ -360,7 +360,7 @@
 					  		mui.fire(page,'search',{ searchParams: JSON.stringify(searchParams) });
 					  	}else{
 					  		page = plus.webview.getWebviewById(params.id);
-					  		mui.fire(page,'sub_search',{ searchParams: JSON.stringify(searchParams) });
+					  		mui.fire(page,'sub_search',{ searchParams: JSON.stringify(searchParams),selectTabs: params.selectTabs });
 					  	}
 							old_back();
 							setTimeout(function(){
@@ -383,7 +383,7 @@
 										data = { 
 											paramName: paramName,
 //											queryType: '4'
-						    				type: params.auditStatus === '1'? 'cache_listVoWYS': 'cache_listVoYYS'
+						    				type: params.selectTabs === 1 ? 'cache_listVoWYS': 'cache_listVoYYS'
 										}
 									}
 								}else if(module === 'grounding'){
@@ -398,7 +398,7 @@
 										url = '/a/commonCheckQuery/commonInfoSearch';
 										data = { 
 											paramName: paramName,
-											type: params.auditStatus === '1'?'cache_listVoWSJ':'cache_listVoYSJ'
+											type: params.selectTabs === 1 ?'cache_listVoWSJ':'cache_listVoYSJ'
 //											queryType: '4'
 										}
 									}
@@ -415,7 +415,7 @@
 										data = {
 											paramName: paramName,
 //											queryType: '4'
-											type: params.auditStatus === '0'?'Cache_notDetailList':'Cache_existDetailList'
+											type: params.selectTabs === 1 ?'Cache_notDetailList':'Cache_existDetailList'
 										}
 									}
 								}else{
@@ -615,8 +615,9 @@
 				  		mui.fire(page,'search',{ searchParams: JSON.stringify(searchParams) });
 				  	}else{
 				  		page = plus.webview.getWebviewById(params.id);
-				  		console.log(page)
-				  		mui.fire(page,'sub_search',{ searchParams: JSON.stringify(searchParams) });
+//				  		console.log(page);
+				  		console.log(JSON.stringify(searchParams))
+				  		mui.fire(page,'sub_search',{ searchParams: JSON.stringify(searchParams),selectTabs: params.selectTabs});
 				  	}
 						old_back();
 						// plus.webview.currentWebview().close();

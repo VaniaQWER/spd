@@ -241,7 +241,7 @@
 						 	});
 						 	document.querySelector('.total').innerText = checkList.length;
 //						 	selectedRows = acceptList;
-						 	mui.each(selectedRows,function(index,item){
+						 	mui.each(checkList,function(index,item){
 								selecteIndex.push(index);
 							});
 					    } else { 
@@ -256,14 +256,14 @@
 					});
 					
 					// 复选框选中
-					$('#slider').on('tap','.checkoneParent',function(){
+					$('#slider').on('change','.checkone',function(){
 						selectedRows = [],selecteIndex = [];
-						let currentCheckbox = $JQ(this).find('.checkone');
-						if(currentCheckbox.prop('checked')){
-							currentCheckbox.prop('checked',false)
-						}else{
-							currentCheckbox.prop('checked',true)
-						}
+//						let currentCheckbox = $JQ(this).find('.checkone');
+//						if(currentCheckbox.prop('checked')){
+//							currentCheckbox.prop('checked',false)
+//						}else{
+//							currentCheckbox.prop('checked',true)
+//						}
 						var checkList = document.querySelectorAll('.checkone')
 						var checkAll = document.querySelector('#checkall');
 						var checkLen = checkList.length;
@@ -317,6 +317,7 @@
 											mui.toast('下架成功',{ type: 'div' });
 											mui(".mui-scroll").pullToRefresh().pullDownLoading();
 											$JQ('.total').text(0);
+											document.querySelector('#checkall').checked=false;
 										}
 									},
 									error: function(xhr,type,errorThrown){
