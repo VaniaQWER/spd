@@ -3,11 +3,11 @@
  * 封装mui.ajax请求，调用方式与一致
  */
 (function($, doc) {
-	var baseUrl = "http://192.168.31.200:8888/medicinal-web" // 测试地址///
+//	var baseUrl = "http://192.168.31.200:8888/medicinal-web" // 测试地址///
 //	var baseUrl = "http://192.168.31.223:8080/medicinal-web" // 测试地址/
 //	var baseUrl = 'http://116.62.143.29:8088/medicinal-web'; // 线上地址2（快）
 
-//	var baseUrl = 'http://10.146.8.221:9002/medicinal-web'; // 合肥测试环境
+	var baseUrl = 'http://10.146.8.221:9002/medicinal-web'; // 合肥测试环境
 //	var baseUrl = 'http://10.146.9.50:8080/medicinal-web';// 合肥正式环境
 
 
