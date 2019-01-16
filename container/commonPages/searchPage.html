@@ -7,6 +7,12 @@
 		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
 		<link href="../../css/mui.min.css" rel="stylesheet" />
 		<style>
+			#noResult{
+				display: none;
+				padding: 5px 10px;
+				font-size: 14px;
+				color: #666;
+			}
 			#ulList{
 				padding-top: 10px;
 			}
@@ -57,20 +63,18 @@
 		<header class="mui-bar mui-bar-nav">
 			 <div class="mui-input-row mui-search search_head" style="width:85%;display: inline-block;">
 				<input type="search" id="search" class="mui-input-clear" autofocus="autofocus" placeholder="供应商/通用名/商品名" >
-				<!--  -->
 			</div>
 		     <a class="mui-action-back mui-pull-right" style="height:45px;line-height: 45px;">取消</a>
-				 <!-- onclick="plus.webview.currentWebview().close()" -->
 		</header>
 		<div class="mui-content">
 			<div id="ulList">
 					
 			</div>
+			<div id="noResult">暂无搜索结果</div>
 			<div style="padding:10px;">
 				<div class="history-title">
 					<h4>历史搜索记录</h4>
 				</div>
-				
 				<div class="history-tags">
 					
 				</div>
@@ -79,10 +83,11 @@
 		</div>
 		
 		<script src="../../js/mui.min.js"></script>
+		<script src="../../js/jquery.min.js"></script>
 		<script src="../../js/common.js" type="text/javascript" charset="utf-8"></script>
 		<script src="../../js/request.js" type="text/javascript" charset="utf-8"></script>
 		<script type="text/javascript">
-			(function($) {
+			(function($,$JQ) {
 				mui.init();
 				// H5 plus事件处理
 				
@@ -441,6 +446,11 @@
 									contentType: contentType,
 									success: function(data){
 										if(data.code === 200){
+											if(!data.data.length){
+												$JQ('#noResult').show()
+											}else{
+												$JQ('#noResult').hide()
+											}
 											let dataList = data.data;
 											createSelect(dataList,module,location);
 										}
@@ -634,7 +644,7 @@
 					
 				})
 				
-			})(mui);
+			})(mui,jQuery);
 			
 		</script>
 	</body>
