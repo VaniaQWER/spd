@@ -96,7 +96,10 @@
 				            	 	下拉刷新
 				            	 * */
 				function pulldownRefresh() {
+					// 重置 勾选项
 					document.querySelector('.total').innerText = 0;
+					selecteIndex = [];
+					
 					var self = this;
 					page = 1;
 					var postData = {
@@ -138,6 +141,7 @@
 				 * */
 				function pullupRefresh() {
 					var self = this;
+					console.log(selecteIndex,'selectIndex')
 					console.log(isMore, 'isMore')
 					if (isMore) {
 						page++;
