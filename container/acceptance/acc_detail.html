@@ -46,7 +46,6 @@
 					if(html){
 						document.getElementById('detailContent').innerHTML = html;
 					}
-					
 				}
 				var checkType = undefined, 
 					type = undefined, 
@@ -98,7 +97,7 @@
 											showData(detailData);
 											if(details.hasAcceptance){
 												setTimeout(function(){
-													showOrHideBtn()
+													// showOrHideBtn()
 													var acceptanceBtn = '<button type="button" id="acceptance" class="mui-btn mui-btn-warning mui-btn-block" style="margin-bottom: 20px;" data-loading-text = "提交中" data-loading-icon-position="right">确认验收</button>'
 													document.querySelector('.detailRow').insertAdjacentHTML("beforeEnd",acceptanceBtn);
 												},100)

@@ -61,24 +61,27 @@
 		</div>
 		
 		<script src="../../js/mui.min.js"></script>
+		<script src="../../js/jquery.min.js" ></script>
+		<script src="../../js/mui.pullToRefresh.js"></script>
+		<script src="../../js/mui.pullToRefresh.material.js"></script>
 		<script src="../../js/template-web.js" type="text/javascript" charset="utf-8"></script>
 		<script src="../../js/utils.js" type="text/javascript" charset="utf-8"></script>
 		<script src="../../js/common.js" type="text/javascript" charset="utf-8"></script>
 		<script src="../../js/request.js" type="text/javascript" charset="utf-8"></script>
 		<script type="text/javascript">
 			if(window.plus) {
-                plusready();
-            } else {
-                document.addEventListener('plusready', plusready, false);
-            }
-            function plusready() {
-                plus.key.addEventListener('backbutton',function(){
-                    plus.webview.currentWebview().close();
-                })
-            }
-            var auditStatus = undefined,
-            	selected = undefined, //验收状态   1 待验收  2 已验收
-            	selectTabs = 1;
+					plusready();
+			} else {
+					document.addEventListener('plusready', plusready, false);
+			}
+			function plusready() {
+					plus.key.addEventListener('backbutton',function(){
+							plus.webview.currentWebview().close();
+					})
+			}
+			var auditStatus = undefined,
+				selected = undefined, //验收状态   1 待验收  2 已验收
+				selectTabs = 1;
             	
             
             //去搜索页面
@@ -95,14 +98,14 @@
 				common.openwin('../commonPages/searchPage',{ params: JSON.stringify(params) },false)
 			}
 			
-			(function($) {
+			(function($,$$) {
 				
 				$.init({
 					beforeback: function() {
-				        var list = plus.webview.currentWebview().opener();  
-				        mui.fire(list, 'pagefresh'); 
-				        return true;  
-			    	}
+						var list = plus.webview.currentWebview().opener();  
+						mui.fire(list, 'pagefresh',{ hasAcceptance:  selectTabs === 1 ? true: false}); 
+						return true;  
+					}
 				})
 				var deceleration = mui.os.ios?0.003:0.0009;
 				$('.mui-scroll-wrapper').scroll({
@@ -110,218 +113,358 @@
 					indicators: true, //是否显示滚动条
 					deceleration:deceleration
 				});
-				
+				var currentSelected = undefined;
 				
 				/* 渲染模板   */
-				var params, checkType, type, isShowTemprature, isPsList// 验收单类型 // 验收状态   1 待验收  2 已验收   是否显示验收温度 1 显示 0 隐藏 
-				var nullDataHtml = '<div class="mui-pull-bottom-tips"><div class="mui-pull-bottom-wrapper">'+
-										'<span class="mui-pull-loading">暂无数据</span></div></div>'
-				var detailData = {
-						unVerfiyList: { list: [] },
-						verifyList: { list: [] }
-					};
+				var params = undefined, 
+					checkType = undefined,
+					type = undefined, 
+					isShowTemprature = undefined, //是否显示验收温度 1 显示 0 隐藏
+					isPsList = undefined; // 验收单类型     
+					selected = '.mui-tab1'; // 默认选中内容区块
+				
 				var utils = new Utils();
 				utils.appendModule('#list_tpl');
 				
-				/*
-				  获取列表数据
-				 * */
-				function genData(url,postData,selected){
-					mui.ajaxRequest(url,{
-                		type: 'post',
-                		data: postData,
-                		showWaiting: true,
-                		success: function(data){
-                			plus.nativeUI.closeWaiting();
-                			if(data.code === 200){
-                				detailData = {
-            						unVerfiyList: { list: [] },
-									verifyList: { list: [] }
-                				}
-                				isShowTemprature = data.data.isShowTemprature;
-                				detailData.unVerfiyList.list = data.data.unVerfiyList && data.data.unVerfiyList.length ? data.data.unVerfiyList: [];
-                				detailData.unVerfiyList.acceptance = true;
-                				detailData.unVerfiyList.checkType = checkType;
-                				detailData.unVerfiyList.isShowTemprature = data.data.isShowTemprature;
-                				detailData.verifyList.list = data.data.verifyList && data.data.verifyList.length ? data.data.verifyList: [] ;
-                				detailData.verifyList.acceptance = false;
-                				detailData.verifyList.isShowTemprature = data.data.isShowTemprature;
-                				showData(detailData,selected)
-                			}else{
-                				mui.alert(data.msg)
-                			}
-                		},
-                		error: function(xhr,type,errorThrown){
-							console.log(xhr.responseText)
-                		}
-            		});
-				}
+				var nullDataHtml = '<div class="mui-pull-bottom-tips"><div class="mui-pull-bottom-wrapper">'+
+										'<span class="mui-pull-loading">暂无数据</span></div></div>'
+				var page = 1, totalPage = undefined, pageSize = 15, isMore = true, query = {};
+				var _url = '/a/exam/detail', // 分页接口
+					checkUrl = '/a/checkacceptdetail/checkList';
+					url = '/a/checkaccept/detail',
+					pageLeft = 1, 
+					pageRight = 1, 
+					totalPageLeft = undefined, 
+					totalPageRight = undefined, 
+					isMore = true, 
+					distributeCode = undefined, 
+					status = undefined;
 				
-				function slideLeft(){
-					document.querySelector('#sliderProgressBar').style.transform = 'translate3d(0px,0px,0px) translateZ(0px)';
-			    	document.querySelector('.mui-slider-group').style.transform = 'translate3d(0px,0px,0px) translateZ(0px)';
-			    	document.querySelectorAll('.themes_font_color_tab')[0].className = 'mui-control-item themes_font_color_tab mui-active';
-			    	document.querySelector('#item1mobile').className = 'mui-slider-item mui-control-content mui-active';
+				function template(selected, data, insertType){
+					utils.innerTplHtml('list_tpl_view', selected , data, insertType);
 				}
+			
 				
-				function slideRight(){
-					console.log(document.querySelector('.mui-slider-group'))
-					document.querySelector('#sliderProgressBar').style.transform = 'translate3d(267px,0px,0px) translateZ(0px)';
-			    	document.querySelector('.mui-slider-group').style.transform = 'translate3d(-534px,0px,0px) translateZ(0px)';
-			    	document.querySelectorAll('.themes_font_color_tab')[1].className = 'mui-control-item themes_font_color_tab mui-active';
-			    	document.querySelector('#item2mobile').className = 'mui-slider-item mui-control-content mui-active';
-			    	document.querySelector('.batchAccetpance').style.display = 'none';
-				}
-				
-				/*
-				 展示数据
-				 * */
-				function showData(data,selected){
-					var batchAccetpance = document.querySelector('.batchAccetpance');
-					var acceptanceTab1 = document.querySelector('.mui-tab1');
-					var acceptanceTab2 = document.querySelector('.mui-tab2');
-					var html1 = undefined, html2 = undefined;
-					batchAccetpance.style.display = selected === 'left'? 'block': 'none';
-					if(data.unVerfiyList.list.length === 0){
-						html1 = nullDataHtml;
-					}else{
-						mui.each(data.unVerfiyList.list,function(index,item){
-							item.editable = (params.accepttype === '101' || params.accepttype === '102' || params.accepttype === '103'|| params.accepttype === '104' ) ? true: false;
-							item.showEditBtn = item.editable;
-						});
-						html1 = template('list_tpl_view',data.unVerfiyList);
-					}
-					acceptanceTab1.innerHTML = html1;
-					if(data.verifyList.list.length === 0){
-						html2 = nullDataHtml
-					}else{
-						html2 = template('list_tpl_view',data.verifyList);
-					}
-					acceptanceTab2.innerHTML = html2;
-				}
+// 				/*
+// 				  获取列表数据
+// 				 * */
+// 				function genData(url,postData,selected){
+// 					mui.ajaxRequest(url,{
+//                 		type: 'post',
+//                 		data: postData,
+//                 		showWaiting: true,
+//                 		success: function(data){
+//                 			plus.nativeUI.closeWaiting();
+//                 			if(data.code === 200){
+//                 				detailData = {
+//             						unVerfiyList: { list: [] },
+// 									verifyList: { list: [] }
+//                 				}
+//                 				isShowTemprature = data.data.isShowTemprature;
+//                 				detailData.unVerfiyList.list = data.data.unVerfiyList && data.data.unVerfiyList.length ? data.data.unVerfiyList: [];
+//                 				detailData.unVerfiyList.acceptance = true;
+//                 				detailData.unVerfiyList.checkType = checkType;
+//                 				detailData.unVerfiyList.isShowTemprature = data.data.isShowTemprature;
+//                 				detailData.verifyList.list = data.data.verifyList && data.data.verifyList.length ? data.data.verifyList: [] ;
+//                 				detailData.verifyList.acceptance = false;
+//                 				detailData.verifyList.isShowTemprature = data.data.isShowTemprature;
+//                 				showData(detailData,selected)
+//                 			}else{
+//                 				mui.alert(data.msg)
+//                 			}
+//                 		},
+//                 		error: function(xhr,type,errorThrown){
+// 							console.log(xhr.responseText)
+//                 		}
+//             		});
+// 				}
+// 				
+// 				/*
+// 				 展示数据
+// 				 * */
+// 				function showData(data,selected){
+// 					var batchAccetpance = document.querySelector('.batchAccetpance');
+// 					var acceptanceTab1 = document.querySelector('.mui-tab1');
+// 					var acceptanceTab2 = document.querySelector('.mui-tab2');
+// 					var html1 = undefined, html2 = undefined;
+// 					batchAccetpance.style.display = selected === 'left'? 'block': 'none';
+// 					if(data.unVerfiyList.list.length === 0){
+// 						html1 = nullDataHtml;
+// 					}else{
+// 						mui.each(data.unVerfiyList.list,function(index,item){
+// 							item.editable = (params.accepttype === '101' || params.accepttype === '102' || params.accepttype === '103'|| params.accepttype === '104' ) ? true: false;
+// 							item.showEditBtn = item.editable;
+// 						});
+// 						html1 = template('list_tpl_view',data.unVerfiyList);
+// 					}
+// 					acceptanceTab1.innerHTML = html1;
+// 					if(data.verifyList.list.length === 0){
+// 						html2 = nullDataHtml
+// 					}else{
+// 						html2 = template('list_tpl_view',data.verifyList);
+// 					}
+// 					acceptanceTab2.innerHTML = html2;
+// 				}
+// 				
+		
 				
 				$.plusReady(function(){
-					
+					let globalQuery = {};
 					window.addEventListener('pagefresh',function(event){
-						if(event.detail.params){
-							var query = JSON.parse(event.detail.params);
-							var data = {
-								distributeCode: query.distributecode
-							}
-							document.querySelector('.mui-placeholder').style.display = 'block';
-							document.querySelector('.mui-input-clear').value = '';
-							var genUrl = '/a/checkaccept/detail'
-							genData(url, data, query.currentSelected);
+						console.log('从详情回来')
+						console.log(JSON.stringify(event.detail))
+						query = event.detail.query;
+						console.log(typeof event.detail.selectTabs);
+						let index = event.detail.selectTabs === '1' ? 0 : 1;
+						console.log(index,'index')
+						if(index === 1){
+							mui('#slider').slider().gotoItem(1);
 						}
-						
+						setTimeout(function(){
+							mui('.mui-scroll-wrapper').scroll()[index].scrollTo(0,0,100);
+							mui(".mui-scroll").pullToRefresh()[index].pullDownLoading();
+						},200)
 					});
 					
 					// 触发刷新 搜索页面搜的值
 					window.addEventListener('sub_search',function(event){
-						console.log(event.detail);
-						let searchParams = JSON.parse(event.detail.searchParams);
-						console.log(searchParams)
-						document.querySelector('.mui-input-clear').placeholder = '';
-						document.querySelector('.mui-placeholder').style.display = 'none';
-						document.querySelector('.mui-input-clear').value = searchParams.hisDrugName;
-						var postData = {
-							distributeCode: distributeCode,
-							hisDrugCode: searchParams.hisDrugCode,
-							status: searchParams.type
-						}
-						genData(url, postData, searchParams.selected);
-						// 模拟点击Tabs
-						if(searchParams.selected === 'right'){
-							mui('#slider').slider().gotoItem(1);
-						}
+						console.log('从搜索页面回来')
+						console.log(JSON.stringify(event.detail) );
+						query  = globalQuery = JSON.parse(event.detail.searchParams);
+						console.log(typeof event.detail.selectTabs)
+						let index = event.detail.selectTabs === 1 ? 0 : 1;
+						$$('.mui-input-clear').val(query.hisDrugName);
+						$$('.mui-placeholder').hide();
+
+						setTimeout(function(){
+							mui('.mui-scroll-wrapper').scroll()[index].scrollTo(0,0,100);
+							mui(".mui-scroll").pullToRefresh()[index].pullDownLoading();
+						},300)
+						console.log('刷新了')
 					})
 					
-					var  distributeCode, currentSelected,isUsual = undefined;
+					if(plus.storage.getItem('currDept')){
+						type = JSON.parse(plus.storage.getItem('currDept')).deptType;
+						switch(type){
+							case '3':
+								checkType = 1; // 药库
+								break;
+							case '4':
+								checkType = 2; // 药房
+								break;
+							case '5':
+								checkType = 3; // 基数药
+								break;
+							default:
+								break;
+						}
+					}
+					
+					var isUsual = undefined;
+
 					var self = plus.webview.currentWebview();
 				    params = JSON.parse(self.params);//获得参数
-				    console.log(params)
+				    console.log(self.params)
 				    distributeCode = params.distributecode;
+					isUsual = params.isusual;
 				    // 判断是否是配送单
 				    isPsList = (params.accepttype === '101' || params.accepttype === '102' || params.accepttype === '103' ||params.accepttype === '104' ) ? true: false;
 				    console.log(isPsList)
 				    currentSelected = params.currentSelected; // 当前选中tabs 
 				    console.log(currentSelected)
-				    if(currentSelected === 'left'){
-				    	auditStatus = '1';
-				    	selected = 'left'
-				    	slideLeft();
-				    }else{
-				    	auditStatus = '2';
-				    	selected = 'right';
-				    	slideRight();
-				    }
+					status = currentSelected === 'left'? '1': '2';
+					auditStatus = currentSelected === 'left'? '1': '2';
+					selectTabs = currentSelected === 'left'? 1: 2;
+					console.log('selectTabs')
+					console.log(selectTabs)
+					if(currentSelected === 'left'){
+						$$('.batchAccetpance').show();
+					}else{
+						$$('.batchAccetpance').hide();
+					}
+						
 				    var checkUrl = '/a/checkacceptdetail/basemedic';
 				    var url = '/a/checkaccept/detail';
-				    var postData = {
-				    	distributeCode: distributeCode
-				    }
-				    genData(url,postData,currentSelected);
-					if(plus.storage.getItem('currDept')){
-						checkType = '3';
-					}
-					var item1 = document.getElementById('item1mobile');
-					var item2 = document.getElementById('item2mobile');
-					var batchAccetpance = document.querySelector('.batchAccetpance');
+					
+					var item2 = document.querySelector('#item2mobile');
+					var item1 = document.querySelector('#item1mobile');
 					document.getElementById('slider').addEventListener('slide', function(e) {
+						$$('.mui-input-clear').val('');
 						let index = e.detail.slideNumber;
 						if (index === 1) {
-							auditStatus = '2';
-							selected = 'right';
-							slideRight();
-							batchAccetpance.style.display = 'none';
-						}else if(index === 0){
-							auditStatus = '1';
-							selected = 'left';
-							slideLeft();
-							batchAccetpance.style.display = 'block';
+							status = '2';
+							selected = '.mui-tab2';
+							selectTabs = 2;
+							mui('#slider').slider().gotoItem(1);
+							$$('.batchAccetpance').hide();
+							$('.mui-slider-group .mui-scroll .mui-tab2')[0].innerHTML = '';
+							if (!item2.querySelector('.am-card')) {
+								mui(".mui-slider-group .mui-scroll").pullToRefresh()[index].pullDownLoading();
+							}
+						}
+						if(index === 0){
+							status = '1';
+							selected = '.mui-tab1';
+							selectTabs = 1;
+							$$('.batchAccetpance').show();
+							mui('#slider').slider().gotoItem(0);
+							$('.mui-slider-group .mui-scroll .mui-tab1')[0].innerHTML = '';
+							if (!item1.querySelector('.am-card')) {
+								mui(".mui-slider-group .mui-scroll").pullToRefresh()[index].pullDownLoading();
+							}
 						}
 					});
 					
+					
+					//循环初始化所有下拉刷新，上拉加载。
+					$.each(document.querySelectorAll('.mui-scroll'), function(index, pullRefreshEl) {
+						$(pullRefreshEl).pullToRefresh({
+							down: {
+								style:'circle',
+								contentdown : "下拉可以刷新",
+								contentover : "释放立即刷新",
+								contentrefresh : "正在刷新...",
+								callback: pulldownRefresh
+							},
+							up: {
+								contentrefresh : "正在加载...",//可选，正在加载状态时，上拉加载控件上显示的标题内容
+								contentnomore:'没有更多数据',
+								callback: pullupRefresh
+							}
+						});
+					});
+					// 第一个tab 默认加载一次数据
+					mui(".mui-scroll").pullToRefresh()[ selectTabs -1 ].pullDownLoading();
+					
+					//下拉刷新
+					function pulldownRefresh(){
+						console.log('下拉')
+							var self = this;
+							pageLeft = 1; pageRight = 1;
+							status = selectTabs === 1 ? '1': '2';
+							var postData = {
+								distributeCode: distributeCode,
+								status:status,
+								pageNo: 1,
+								pageSize: pageSize
+							};
+							if(query.hisDrugCode){
+								postData.hisDrugCode = query.hisDrugCode
+								$$('.mui-input-clear').val(query.hisDrugName);
+							}else{
+								globalQuery={}
+								$$('.mui-input-clear').val('');
+								$$('.mui-placeholder').show();
+							}
+							query = {};
+							console.log(JSON.stringify(postData))
+							mui.ajaxRequest(_url,{
+								type: 'POST',
+								data: postData,
+								success: function(data){
+									console.log( '*************************' )
+									var resData = data.data;
+									resData.acceptance = selectTabs === 1 ? true: false;
+									resData.checkType = checkType;
+									totalPage = data.totalPage;
+									if(resData.list.length === 0 || (resData.list.length <= resData.pageSize && resData.pageNo === resData.totalPage)){
+										var i = selectTabs === 1 ? 0 : 1;
+										isMore = false;
+										self.endPullDownToRefresh(true);
+										document.querySelectorAll('.mui-pull-loading')[i].innerHTML = '没有更多数据';
+									}else{
+										isMore = true;
+										self.endPullDownToRefresh(false);
+										self.refresh(true);
+									}
+									return template(selected,resData, false)
+								},
+								error: function(xhr,type,errorThrown){
+									console.log(xhr.responseText)
+								}
+							});
+						}
+									
+					//上拉加载更多
+					function pullupRefresh(){
+						console.log('下拉')
+						var self = this;
+						console.log(isMore,'isMore')
+						if(isMore){
+							page++;
+							mui.ajaxRequest(_url,{
+									type: 'POST',
+									data:{
+										distributeCode: distributeCode,
+										status:status,
+										pageNo: page,
+										pageSize: pageSize
+									},
+									success: function(data){
+													var resData = data.data;
+	//	                			resData.acceptance = selectTabs === 1 && checkType === 1 ? true: false;
+													resData.acceptance = status === '1'? true: false;
+													resData.checkType = checkType;
+													if(resData.list.length <= resData.pageSize && resData.pageNo === resData.totalPage){
+														var i = selectTabs === 1 ? 0 : 1;
+													isMore = false;
+													self.endPullUpToRefresh(true);
+													document.querySelectorAll('.mui-pull-loading')[i].innerHTML = '没有更多数据';
+												}else{
+													isMore = true;
+													self.endPullUpToRefresh(false);
+													self.refresh(true);
+												}
+									return template(selected, resData, true)
+													
+												},
+									error: function(xhr,type,errorThrown){
+											console.log(xhr.responseText)
+									}
+							});
+						}else{
+							var i = selectTabs === 1 ? 0 : 1;
+							document.querySelectorAll('.mui-pull-loading')[i].innerHTML = '没有更多数据';
+							self.endPullUpToRefresh(true);
+						}
+					}
+							
 					//绑定点击事件  - 进入详情页
-						
 					$('#slider').on('tap','.moreDetail',function(){
 						let id = this.dataset.id;
-						let index = this.dataset.index;
-						var item1mobile = document.querySelector('#item1mobile');
-						var hasAcceptance = item1mobile.className.indexOf('mui-active')>0 ? true: false;
 						let newData = {};
-						newData.statusname = hasAcceptance ? '待验收':'已验收';
-						newData.allData = hasAcceptance ? detailData.unVerfiyList.list: detailData.verifyList.list;
-						newData.index = index;
+						newData.checkType = checkType; // 药房，药库，基数药 区分
+						hasAcceptance = selectTabs === 1 ? true: false;
+						newData.distributeCode = distributeCode;
 						newData.isShowTemprature = isShowTemprature;
 						newData.hasAcceptance = hasAcceptance;// 判断 详情页面是否有验收按钮
-						newData.orderInfo = params;
+						newData.status = status;
+						newData.id = id;
+						newData.selectTabs = selectTabs;
 						newData.isPsList = isPsList; // 是否是配送单
+						newData.query = globalQuery;
+						console.log(JSON.stringify(newData))
 						document.activeElement.blur(); // 隐藏软键盘
 						common.openwin('acc_detail',{ details: JSON.stringify(newData) },{
 							titleText: '验收详情'
 						})
 					});
-					
+
 					/* 批量验收 */
 					$('.mui-bar').on('tap','.batchAccetpance',function(){
-						console.log(checkType)
-						var list = detailData.unVerfiyList.list;
-						console.log(list)
-						mui.each(list,function(index,item){
-							item.editable = isPsList;
-						})
 						var paramsData = {};
 						paramsData.isPsList = isPsList;
-						paramsData.list = list;
 						paramsData.distributeCode = distributeCode;
+						paramsData.status = '1';
 						paramsData.isShowTemprature = isShowTemprature;
 						paramsData.itemData = params;
+						paramsData.checkType = checkType;
 						paramsData.acceptance = true;
-						console.log(paramsData)
+						console.log(JSON.stringify(paramsData));
 						common.openwin('basic_acc_batch',{ params: JSON.stringify(paramsData) },{
 							titleText: '药品信息'
 						})
+						// common.openwin('acc_batch',{ params: JSON.stringify(paramsData) },false)
 					})
 					
 					// 绑定事件 --确认验收
@@ -344,26 +487,18 @@
 									success: function(data){
 										if(data.code === 200){
 											mui.toast('验收成功');
-											var parmasData = {};
-											parmasData.finishUrl = '../basicMedicine/index';
-											parmasData.keepUrl = 'acc_list';
-											parmasData.resultType = 'acceptance';
-											parmasData.itemData = params;
-											common.openwin('../result/index',{ parmas: JSON.stringify(parmasData) },{
-												titleText: '结果',
-												autoBackButton: false
-											})
+											mui(".mui-scroll").pullToRefresh()[ selectTabs -1 ].pullDownLoading();
 										}
 									},
 									error: function(xhr,type,errorThrown){
 										console.log(xhr.responseText)
-			                		}
+									}
 								})
 							}
 						},'div')
 					});
 				});
-			})(mui);
+			})(mui,jQuery);
 		</script>
 	</body>
 
