@@ -397,6 +397,7 @@
 						paramsData.status = '1';
 						paramsData.isShowTemprature = isShowTemprature;
 						paramsData.itemData = params;
+						paramsData.checkType = checkType;
 						paramsData.acceptance = true;
 						console.log(JSON.stringify(paramsData));
 						common.openwin('acc_batch',{ params: JSON.stringify(paramsData) },false)

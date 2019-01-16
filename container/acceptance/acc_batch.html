@@ -81,6 +81,7 @@
 					distributeCode = undefined,
 					isShowTemprature = undefined,
 					selectedRows = [],
+					acceptList = [],// 数据
 					selecteIndex = [];
 				var _url = '/a/exam/detail', // 分页接口
 					checkUrl = '/a/checkacceptdetail/checkList';
@@ -95,6 +96,7 @@
 				            	 	下拉刷新
 				            	 * */
 				function pulldownRefresh() {
+					document.querySelector('.total').innerText = 0;
 					var self = this;
 					page = 1;
 					var postData = {
@@ -108,10 +110,12 @@
 						data: postData,
 						success: function(data) {
 							var resData = data.data;
+							acceptList = resData.list;
 							resData.acceptance = true;
+							resData.checkType = checkType;
 							totalPage = data.totalPage;
-							console.log(resData.list.length <= resData.pageSize && resData.pageNo === resData.totalPage)
-							if (resData.list.length <= resData.pageSize && resData.pageNo === resData.totalPage) {
+							console.log( resData.list.length === 0 || (resData.list.length <= resData.pageSize && resData.pageNo === resData.totalPage))
+							if(resData.list.length === 0 || (resData.list.length <= resData.pageSize && resData.pageNo === resData.totalPage)){
 								isMore = false;
 								self.endPullDownToRefresh(true);
 								document.querySelectorAll('.mui-pull-loading')[0].innerHTML = '没有更多数据';
@@ -147,7 +151,9 @@
 							},
 							success: function(data) {
 								var resData = data.data;
+								acceptList = acceptList.push(resData.list)
 								resData.acceptance = true;
+								resData.checkType = checkType;
 								if (resData.pageNo === resData.totalPage) {
 									isMore = false;
 									self.endPullUpToRefresh(true);
@@ -181,7 +187,9 @@
 					params = JSON.parse(self.params); //获得参数
 					distributeCode = params.distributeCode;
 					status = params.status;
+					checkType = params.checkType;
 					isShowTemprature = params.isShowTemprature;
+					console.log(checkType,'checkType')
 					console.log(params);
 
 					//循环初始化所有下拉刷新，上拉加载。
@@ -212,7 +220,8 @@
 						if (document.querySelector('#checkall').checked) {
 							// 全选
 							mui.each(checkList, function(index, item) {
-								item.checked = true
+								item.checked = true;
+								selecteIndex.push(index);
 							});
 							document.querySelector('.total').innerText = checkList.length;
 						} else {
@@ -224,7 +233,7 @@
 							selectedRows = [];
 							selecteIndex = []
 						}
-						console.log(selectedRows)
+						console.log(selecteIndex)
 					});
 
 					// 复选框选中
@@ -294,7 +303,6 @@
 							};
 
 							mui.each(selectedCards, function(index, item) {
-
 								var postData = {};
 								postData.id = item.dataset.id;
 								postData.isUsual = item.dataset.isusual;
@@ -341,7 +349,7 @@
 						}
 						submitData.detailList = detailList;
 						submitData.distributeCode = distributeCode;
-						console.log(JSON.stringify(submitData))
+						console.log(submitData)
 
 						var btnArray = ['否', '是'];
 						mui.confirm('确认批量验收选中的药品？', '确认', btnArray, function(e) {

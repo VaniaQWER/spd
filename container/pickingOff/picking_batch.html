@@ -168,7 +168,7 @@
 							},
 							success: function(data) {
 								var resData = data.data;
-								resData.acceptance = true;
+								resData.hasPicked = true;
 								if (resData.pageNo === resData.totalPage) {
 									isMore = false;
 									self.endPullUpToRefresh(true);

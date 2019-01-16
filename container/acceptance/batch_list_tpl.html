@@ -36,7 +36,7 @@
 						</div>
 					</div>
 					{{ if acceptance }}
-						{{ if value.isUsual === 0 }}
+						{{ if value.isUsual === 0 && checkType === 1 }}
 							<div class="editForm" style="display: block;">
 								<div class="am-flexbox am-flexbox-align-center">
 									<div class="am-flexbox-item">
@@ -93,9 +93,17 @@
 											</div>
 										 </div>
 									 	{{ else }}
-									 		<div class="am-flexbox-item">
-										
-									 		</div>	
+									 		<div class="am-flexbox am-flexbox-align-center">
+												<div class="am-flexbox-item"> 
+													实到数量：<span class='errorQuantiry'>{{ value.realReceiveQuantiry }}</span>
+												</div>
+												<div class="am-flexbox-item am-last-flexItem">
+												 	生产日期：<span class="errRealProductTime">{{ value.realProductTime }}</span>
+												</div>
+												<div class="am-flexbox-item am-last-flexItem">
+												 	有效期至：<span class="errVailEndDate">{{ value.realValidEndDate }}</span>
+												</div>
+											</div>
 									 {{ /if }}
 									 
 									 <div class="am-flexbox-item">
