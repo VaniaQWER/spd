@@ -294,16 +294,15 @@
 //						
 						let detailListVo = [], submitData = {};
 						mui.each(selectedCards,function(index,item){
-							console.log(item)
 							var postData = {};
 							var id = item.dataset.id;
-							console.log(JSON.stringify(item))
-							var realNum = $(item.querySelector('.realNum')).innerText;
-							var realReceiveStore = $(item.querySelector('.select_actualStore')).value;
+							var realNum = item.querySelector('.realNum').innerText;
+							console.log($JQ(item).find('.select_actualStore').find('option:selected').index(),'index')
+							var realReceiveStore = $JQ(item).find('.select_actualStore').find('option:selected').val();
 							var productBatchNo = item.querySelector('#productBatchNo').querySelector('span').innerText;
 							console.log(productBatchNo)
 							console.log(realNum);
-							console.log(realReceiveStore);
+							console.log(realReceiveStore,'realReceiveStore');
 							postData.id = id;
 							postData.realNum = realNum;
 							postData.productBatchNo = productBatchNo;

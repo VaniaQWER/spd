@@ -244,12 +244,6 @@
 					$('#slider').on('change', '.checkone', function(e, index) {
 						selectedRows = [], selecteIndex = [];
 						console.log(JSON.stringify(e), this.dataset)
-//						let currentCheckbox = $JQ(this).find('.checkone');
-//						if(currentCheckbox.prop('checked')){
-//							currentCheckbox.prop('checked',false)
-//						}else{
-//							currentCheckbox.prop('checked',true)
-//						}
 						var checkList = document.querySelectorAll('.checkone')
 						var checkAll = document.querySelector('#checkall');
 						var checkLen = checkList.length;
@@ -291,8 +285,8 @@
 									cardFactNum.push(cards[item].querySelector('.errorQuantiry'))
 								}
 							});
-							console.log(cardFactNum, 'cardFactNum')
-							console.log(selectedCards, 'selectedCards');
+//							console.log(cardFactNum, 'cardFactNum')
+//							console.log(selectedCards, 'selectedCards');
 							var flag = true;
 							mui.each(cardFactNum, function(index, item) {
 								if (item.tagName === 'INPUT') {
