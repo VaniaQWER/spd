@@ -369,9 +369,7 @@
 						paramsData.pickingOrderNo = pickingOrderNo;
 						paramsData.applyNo = applyOrderNo;
 						console.log(paramsData)
-						common.openwin('picking_batch',{ params: JSON.stringify(paramsData) },{
-							titleText: '药品信息'
-						})
+						common.openwin('picking_batch',{ params: JSON.stringify(paramsData) },false)
 					})
 					
 					

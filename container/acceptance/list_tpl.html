@@ -93,22 +93,10 @@
 										</div>
 									 </div>
 								 	{{ else }}
-								 		<div class="am-flexbox am-flexbox-align-center">
-											<div class="am-flexbox-item"> 
-												实到数量：<span>{{ value.realReceiveQuantiry }}</span>
-											</div>
-											<div class="am-flexbox-item am-last-flexItem">
-											 	生产日期：<span>{{ value.realProductTime }}</span>
-											</div>
-											<div class="am-flexbox-item am-last-flexItem">
-											 	有效期至：<span>{{ value.realValidEndDate }}</span>
-											</div>
-										</div>
 								 {{ /if }}
 							</div>
 						</div>
 						{{ else }}
-						
 						<div class="am-flexbox am-flexbox-align-center">
 							<div class="am-flexbox-item"> 
 								实到数量：<span>{{ value.realReceiveQuantiry }}</span>
@@ -125,9 +113,11 @@
 							<div class="am-flexbox-item"> 
 								批准文号: <span>{{ value.approvalNo }}</span>
 							</div>
-							<!--<div class="am-flexbox-item"> 
-								指示货位: <span>{{ value.replanStoreName }}</span>
-							</div>-->
+							{{ if  checkType !== 1}}
+								<div class="am-flexbox-item"> 
+									指示货位: <span>{{ value.replanStoreName }}</span>
+								</div>
+							{{ /if }}
 							<div class="am-flexbox-item am-last-flexItem">
 							 	生产厂家: <span>{{ value.ctmmManufacturerName }}</span>
 							</div>
