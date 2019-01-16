@@ -231,10 +231,9 @@
 				
 				$.plusReady(function(){
 					
-					
 					// 触发刷新 搜索页面搜的值
 					window.addEventListener('search',function(event){
-						console.log(event.detail)
+						console.log(JSON.stringify(event.detail))
 						query.supplierCode = JSON.parse(event.detail.searchParams).supplierCode;
 						query.supplierName = JSON.parse(event.detail.searchParams).supplierName;
 						console.log(JSON.stringify(query),'query')
@@ -242,8 +241,6 @@
 						$$('.mui-input-clear').val(query.supplierName);
 						mui(".mui-slider-group .mui-scroll").pullToRefresh()[0].pullDownLoading();
 					})
-				
-					
 					
 					window.addEventListener('pagefresh',function(e){
 						let index = e.detail.hasAcceptance ? 0: 1;
@@ -315,11 +312,17 @@
 					//绑定点击事件  - 进入详情页
 						
 					$('#slider').on('tap','.am-card',function(){
+						
+						
 						let itemData = this.dataset;
 						itemData.currentSelected = hasChecked ? 'right': 'left';
 						console.log(JSON.stringify(itemData))
 						document.activeElement.blur(); // 隐藏软键盘
-						common.openwin('basic_acc_list',{ params: JSON.stringify(itemData) },false)
+						if(selectTabs===2){
+							common.openwin('basic_has_acc',{ params: JSON.stringify(itemData) },false)
+						}else{
+							common.openwin('basic_acc_list',{ params: JSON.stringify(itemData) },false)
+						}
 					})
 				});
 				

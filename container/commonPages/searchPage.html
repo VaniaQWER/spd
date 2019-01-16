@@ -106,7 +106,7 @@
 							searchParams = { hisDrugCode : '',hisDrugName: searchValue,type: params.auditStatus,selected: params.selected }
 							saveData = { hisDrugCode: '', hisDrugName: searchValue };
 						}
-						if(module === 'acceptance'){
+						if(module === 'acceptance' || module === 'basicMedicine'){
 						if(location === 'main_list'){
 							searchParams = { supplierCode: '', supplierName: searchValue };
 							saveData = { supplierCode: '', supplierName: searchValue };
@@ -186,7 +186,7 @@
 					  				}
 					  			});
 					        }
-					        if(module === 'acceptance'){
+					        if(module === 'acceptance' || module === 'basicMedicine' ){
 						  		if(location === 'main_list'){
 						  			searchParams = { supplierCode: '', supplierName: searchValue };
 						  			saveData = { supplierCode: '', supplierName: searchValue };
@@ -285,6 +285,7 @@
 										div.innerHTML = item;
 										div.setAttribute('data-distributeCode',item)
 									}
+						
 								}else if(module === 'pickingOff'){
 									if(location === 'main_list'){
 										div.innerHTML = item;
@@ -327,7 +328,7 @@
 				    	if(location === 'sub_list'){
 				    		searchParams = { hisDrugCode : dataset.hisdrugcode,hisDrugName: dataset.hisdrugname,type: params.auditStatus,selected: params.selected }
 				    	}
-				    	if(module === 'acceptance'){
+				    	if(module === 'acceptance' || module === 'basicMedicine'){
 					  		if(location === 'main_list'){
 								console.log('acceptance main_list')
 					  			if(dataset.suppliercode || dataset.suppliercode ===""){
@@ -358,6 +359,8 @@
 				  		console.log(searchParams)
 					  	if(location === 'main_list'){
 					  		page =  plus.webview.getWebviewById(params.route);
+								console.log(page)
+								console.log(JSON.stringify(searchParams))
 					  		mui.fire(page,'search',{ searchParams: JSON.stringify(searchParams) });
 					  	}else{
 					  		page = plus.webview.getWebviewById(params.id);
@@ -614,6 +617,7 @@
 				  	var page = undefined;
 				  	if(location === 'main_list'){
 				  		page =  plus.webview.getWebviewById(params.route);
+							console.log(JSON.stringify(searchParams))
 				  		mui.fire(page,'search',{ searchParams: JSON.stringify(searchParams) });
 				  	}else{
 				  		page = plus.webview.getWebviewById(params.id);

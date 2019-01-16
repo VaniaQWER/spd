@@ -108,8 +108,8 @@
 					pageSize = 15, 
 					isMore = true, 
 					query = {};
-				var _url = '/a/exam/detail', // 分页接口
-				var distributeCode = undefined, status = '2';
+				var _url = '/a/exam/detail'; // 分页接口
+				var distributeCode = undefined , status = '2';
 				
 				function template(data, insertType){
         			utils.innerTplHtml('list_tpl_view','.mui-tab1', data, insertType);
@@ -142,7 +142,7 @@
                 			resData.acceptance = false;
                 			console.log(resData)
                 			totalPage = data.totalPage;
-                			if(resData.list.length <= resData.pageSize && resData.pageNo === resData.totalPage){
+                			if(resData.list.length === 0 ||resData.list.length <= resData.pageSize && resData.pageNo === resData.totalPage){
                 				isMore = false;
                 				self.endPullDownToRefresh(true);
                 				document.querySelectorAll('.mui-pull-loading')[0].innerHTML = '没有更多数据';

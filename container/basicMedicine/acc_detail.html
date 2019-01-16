@@ -83,6 +83,8 @@
 						data: { distributeCode: postData.distributeCode },
 						success: function(data){
 							if(data.code === 200){
+								console.log('titleUrl*****************')
+								console.log(JSON.stringify(data))
 								for(var key in data.data){
 									detailData[key] = data.data[key];
 									detailData.isPsList = details.isPsList;
@@ -91,6 +93,8 @@
 									type: 'POST',
 									data: postData,
 									success: function(data){
+										console.log('url*****************')
+										console.log(JSON.stringify(data))
 										plus.nativeUI.closeWaiting();
 										if(data.code === 200){
 											detailData.list = data.data.list;
