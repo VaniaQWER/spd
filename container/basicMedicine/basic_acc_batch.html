@@ -67,6 +67,14 @@
 						utils.innerTplHtml('list_tpl_view', '.mui-tab1', data, insertType);
 				}
 				
+				var deceleration = mui.os.ios?0.003:0.0009;
+				$('.mui-scroll-wrapper').scroll({
+					scrollX: false,
+					bounce: true,
+					indicators: true, //是否显示滚动条
+					deceleration:deceleration
+				});
+				
 				/* 渲染模板   */
 				var checkType, type, auditStatus;// 验收单类型 // 验收状态   1 待验收  2 已验收 ;
 				var acceptList = [];

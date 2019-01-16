@@ -88,7 +88,14 @@
 				/* 渲染模板   */
 				var utils = new Utils();
 				utils.appendModule('#list_tpl');
-
+				var deceleration = mui.os.ios?0.003:0.0009;
+				$('.mui-scroll-wrapper').scroll({
+					bounce: true,
+					indicators: true, //是否显示滚动条
+					deceleration:deceleration
+				});
+				
+				
 				function template(data, insertType) {
 					utils.innerTplHtml('batch_list_tpl_view', '.mui-tab1', data, insertType);
 				}

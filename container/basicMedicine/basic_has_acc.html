@@ -103,6 +103,12 @@
 				var utils = new Utils();
 				utils.appendModule('#acc_list_tpl');
 				
+				$('.mui-scroll-wrapper').scroll({
+					bounce: true,
+					indicators: true, //是否显示滚动条
+					deceleration:deceleration
+				});
+				
 				var page = 1, 
 					totalPage = undefined, 
 					pageSize = 15, 

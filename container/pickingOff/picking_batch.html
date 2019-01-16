@@ -81,7 +81,7 @@
 					}
 				});
 				$('.mui-scroll-wrapper').scroll({
-					bounce: false,
+					bounce: true,
 					indicators: true, //是否显示滚动条
 					deceleration:deceleration
 				});
@@ -264,12 +264,6 @@
 					// 复选框选中
 					$('#slider').on('change','.checkone',function(){
 						selectedRows = [],selecteIndex = [];
-//						let currentCheckbox = $JQ(this).find('.checkone');
-//						if(currentCheckbox.prop('checked')){
-//							currentCheckbox.prop('checked',false)
-//						}else{
-//							currentCheckbox.prop('checked',true)
-//						}
 						var checkList = document.querySelectorAll('.checkone')
 						var checkAll = document.querySelector('#checkall');
 						var checkLen = checkList.length;
@@ -308,7 +302,7 @@
 						submitData.pickingDetail = pickingDetail;
 						submitData.applyNo = params.applyNo;;
 						submitData.pickingOrderNo = params.pickingOrderNo;;
-						console.log(JSON.stringify(submitData))
+						console.log(submitData)
 						
 						var btnArray = ['否', '是'];
 						mui.confirm('确认批量下架选中的药品？', '确认', btnArray, function(e) {

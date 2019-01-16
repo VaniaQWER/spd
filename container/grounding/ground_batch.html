@@ -74,7 +74,7 @@
 				/* 渲染模板   */
 				var checkType, type, auditStatus// 验收单类型 // 验收状态   1 待验收  2 已验收 
 				
-				var deceleration = mui.os.ios?0.003:0.0009;
+				
 				$.init({
 					beforeback:function(){
 						var list = plus.webview.currentWebview().opener();
@@ -82,8 +82,9 @@
 						 return true;
 					}
 				});
+				var deceleration = mui.os.ios?0.003:0.0009;
 				$('.mui-scroll-wrapper').scroll({
-					bounce: false,
+					bounce: true,
 					indicators: true, //是否显示滚动条
 					deceleration:deceleration
 				});

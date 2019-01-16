@@ -71,9 +71,11 @@
 			
 			(function($,$JQ) {
 				//滚动加载
+				var deceleration = mui.os.ios?0.003:0.0009;
 				$('.mui-scroll-wrapper').scroll({
-					deceleration: 0.1,
-					indicators: true //是否显示滚动条
+					bounce: true,
+					indicators: true, //是否显示滚动条
+					deceleration:deceleration
 				});
 				
 				// 模板加载
