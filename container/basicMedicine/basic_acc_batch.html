@@ -68,18 +68,14 @@
 				}
 				
 				/* 渲染模板   */
-				var checkType, type, auditStatus// 验收单类型 // 验收状态   1 待验收  2 已验收 
+				var checkType, type, auditStatus;// 验收单类型 // 验收状态   1 待验收  2 已验收 ;
+				var acceptList = [];
 				var nullDataHtml = '<div class="mui-pull-bottom-tips"><div class="mui-pull-bottom-wrapper">'+
 										'<span class="mui-pull-loading">暂无数据</span></div></div>'
-				var detailData = {
-						unVerfiyList: { list: [] },
-						verifyList: { list: [] }
-					};
 				var page = 1,
 						totalPage = undefined,
 						pageSize = 15,
 						isMore = true;
-				
 				var checkType = undefined,
 					status = undefined, // 验收单类型 // 验收状态   1 待验收  2 已验收
 					params = undefined,
@@ -110,6 +106,7 @@
 						data: postData,
 						success: function(data) {
 							var resData = data.data;
+							acceptList = resData.list;
 							resData.acceptance = true;
 							totalPage = data.totalPage;
 							console.log(resData.list.length <= resData.pageSize && resData.pageNo === resData.totalPage)
@@ -150,6 +147,7 @@
 							},
 							success: function(data) {
 								var resData = data.data;
+								acceptList = acceptList.push(resData.list)
 								resData.acceptance = true;
 								if (resData.pageNo === resData.totalPage) {
 									isMore = false;
@@ -184,7 +182,6 @@
 							params = JSON.parse(self.params); //获得参数
 							distributeCode = params.distributeCode;
 							status = 1;
-							var acceptList = params.list;
 
 							isShowTemprature = params.isShowTemprature;
 							console.log(JSON.stringify(params))
@@ -323,6 +320,7 @@
 								detailList.push(postData);
 							});
 						}else{
+							debugger
 							mui.each(selecteIndex,function(index,item){
 								let postData = {};
 								postData.realReceiveQuantiry = acceptList[item].realReceiveQuantiry;
