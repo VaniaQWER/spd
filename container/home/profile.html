@@ -18,6 +18,7 @@
 			<ul class="mui-table-view">
 				<li class="mui-table-view-cell">
 					账号信息
+					<span class="version" style="float: right;font-size: 14px;"></span>
 				</li>
 			</ul>
 			<ul class="mui-table-view" style='margin-top: 16px;'>
@@ -56,6 +57,12 @@
 			    	}
 				})
 				$.plusReady(function() {
+					
+					plus.runtime.getProperty(plus.runtime.appid, function(info){
+					    console.log(info.version);
+					    document.querySelector('.version').innerHTML = '当前版本V: '+ info.version;
+					});
+					
 					var ul = document.body.querySelector('.mui-table-view-radio');
 					console.log(plus.storage.getItem('currDept'))
 					var deptId = JSON.parse(plus.storage.getItem('currDept')).deptId;
@@ -155,7 +162,7 @@
 			                				mui.toast('切换系统成功',{ type: 'div' });
 			                				_this.className = 'mui-table-view-cell mui-selected theme_font_warning';
 			                			}else{
-			                				mui.toast('切换系统失败')
+			                				mui.toast('切换系统失败',{ div: 'type' });
 			                			}
 			                		},
 			                		error: function(xhr,type,errorThrown){
