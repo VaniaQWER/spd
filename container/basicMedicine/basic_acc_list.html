@@ -76,7 +76,10 @@
                     plus.webview.currentWebview().close();
                 })
             }
-            var auditStatus = undefined,selected = undefined; //验收状态   1 待验收  2 已验收
+            var auditStatus = undefined,
+            	selected = undefined, //验收状态   1 待验收  2 已验收
+            	selectTabs = 1;
+            	
             
             //去搜索页面
 			function toSearchPage (){
@@ -86,6 +89,7 @@
 				params.route = '../basicMedicine/basic_acc_list';
 				params.selected = selected;
 				params.auditStatus = auditStatus;
+				params.selectTabs = selectTabs;
 				params.module = 'basicMedicine';
 				params.location = 'sub_list';
 				common.openwin('../commonPages/searchPage',{ params: JSON.stringify(params) },false)

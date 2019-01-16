@@ -79,7 +79,7 @@
 			
 			var deceleration = mui.os.ios?0.003:0.0009;
 			$('.mui-scroll-wrapper').scroll({
-				bounce: false,
+				bounce: true,
 				indicators: true, //是否显示滚动条
 				deceleration:deceleration
 			});
@@ -165,25 +165,17 @@
 	        	}
 		    });
 		    
-		    var selected = undefined,hasChecked = false, query = {};
+		    var selected = '.mui-tab1',
+		    	hasChecked = false, 
+		    	query = {};
 
-			var pageLeft = 1, pageRight = 1, totalPageLeft, totalPageRight, isMore = true,selectTabs = 1,insertType = true;
-			
-			currSelected();
-			
-			function currSelected(){
-				var item1mobile = document.querySelector('#item1mobile');
-				var item2mobile = document.querySelector('#item2mobile');
-				if(item1mobile.className.indexOf('mui-active')>0){
-					selected = '.mui-tab1';
-					hasChecked = false;
-					selectTabs = 1;
-				}else{
-					selected = '.mui-tab2';
-					hasChecked = true;
-					selectTabs = 2;
-				}
-        	}
+			var pageLeft = 1, 
+				pageRight = 1, 
+				totalPageLeft, 
+				totalPageRight, 
+				isMore = true,
+				selectTabs = 1,
+				insertType = true;
 			// tab 切换事件
 			$('#sliderSegmentedControl').on('tap','.mui-control-item',function(){
 				remindType = this.dataset.remindtype;
@@ -254,7 +246,6 @@
 		            	})
 //					}
 				}else{
-					console.log('sdfadf')
 					var i = selectTabs === 1 ? 0 : 1;
 					document.querySelectorAll('.mui-pull-loading')[i].innerHTML = '没有更多数据';
 					self.endPullUpToRefresh(true);
@@ -286,7 +277,7 @@
             				totalPageRight = total;
             			}
             			page = resData.pageNo;
-            			if(resData.list.length < resData.pageSize && resData.pageNo === resData.totalPage){
+            			if(resData.list.length === 0 || (resData.list.length <= resData.pageSize && resData.pageNo === resData.totalPage)){
             				var i = selectTabs === 1 ? 0 : 1;
             				document.querySelectorAll('.mui-pull-loading')[i].innerHTML = '没有更多数据';
             				isMore = false;
@@ -335,7 +326,6 @@
 				var item2 = document.querySelector('#item2mobile');
 				var item1 = document.querySelector('#item1mobile');
 				document.getElementById('slider').addEventListener('slide', function(e) {
-					currSelected();
 					let index = e.detail.slideNumber;
 					if (index === 1) {
 						url = '/a/pad/drugremind/findPadRemindList';
@@ -357,16 +347,6 @@
 							$('.mui-slider-group .mui-scroll .mui-tab1')[0].innerHTML = '';
 							mui(".mui-slider-group .mui-scroll").pullToRefresh()[index].pullDownLoading();
 						}
-					}
-				});
-				
-				//tab页切的点击事件
-				var sliderSegmentedControl = document.getElementById('sliderSegmentedControl');
-				$('.mui-input-group').on('change', 'input', function() {
-					if (this.checked) {
-						sliderSegmentedControl.className = 'mui-slider-indicator mui-segmented-control mui-segmented-control-inverted mui-segmented-control-' + this.value;
-						//force repaint
-						sliderProgressBar.setAttribute('style', sliderProgressBar.getAttribute('style'));
 					}
 				});
 	            	

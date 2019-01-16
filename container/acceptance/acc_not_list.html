@@ -137,20 +137,13 @@
 					status = undefined;
 				
 				function template(selected, data, insertType){
-					setTimeout(function(){
-						utils.innerTplHtml('list_tpl_view', selected , data, insertType);
-					},500)
+					utils.innerTplHtml('list_tpl_view', selected , data, insertType);
             	}
 				/*
             	 	下拉刷新
             	 * */
             	function pulldownRefresh(){
 					var self = this;
-//					if(selectTabs === 1){
-//						pageLeft = 1
-//					}else{
-//						pageRight = 1;
-//					}
 					pageLeft = 1; pageRight = 1;
 					status = selectTabs === 1 ? '1': '2';
 					var postData = {
@@ -174,6 +167,7 @@
                 		success: function(data){
                 			var resData = data.data;
                 			resData.acceptance = selectTabs === 1 ? true: false;
+                			resData.checkType = checkType;
                 			totalPage = data.totalPage;
                 			if(resData.list.length === 0 || (resData.list.length <= resData.pageSize && resData.pageNo === resData.totalPage)){
                 				var i = selectTabs === 1 ? 0 : 1;
@@ -212,7 +206,9 @@
 	                		},
 	                		success: function(data){
 	                			var resData = data.data;
+//	                			resData.acceptance = selectTabs === 1 && checkType === 1 ? true: false;
 	                			resData.acceptance = status === '1'? true: false;
+	                			resData.checkType = checkType;
 	                			if(resData.list.length <= resData.pageSize && resData.pageNo === resData.totalPage){
 	                				var i = selectTabs === 1 ? 0 : 1;
 		            				isMore = false;
@@ -251,22 +247,45 @@
 						if(index === 1){
 							mui('#slider').slider().gotoItem(1);
 						}
-						mui('.mui-scroll-wrapper').scroll()[index].scrollTo(0,0,100);
-						mui(".mui-scroll").pullToRefresh()[index].pullDownLoading();
+						setTimeout(function(){
+							mui('.mui-scroll-wrapper').scroll()[index].scrollTo(0,0,100);
+							mui(".mui-scroll").pullToRefresh()[index].pullDownLoading();
+						},200)
+						
 					});
 					// 触发刷新 搜索页面搜的值
 					window.addEventListener('sub_search',function(event){
 						console.log('从搜索页面回来')
 						console.log(JSON.stringify(event.detail) );
 						query  = globalQuery = JSON.parse(event.detail.searchParams);
-						$$('.mui-placeholder').hide();
+						console.log(typeof event.detail.selectTabs)
+						let index = event.detail.selectTabs === 1 ? 0 : 1;
 						$$('.mui-input-clear').val(query.hisDrugName);
-						
+						$$('.mui-placeholder').hide();
+
 						setTimeout(function(){
-							mui(".mui-scroll").pullToRefresh()[0].pullDownLoading();
+							mui('.mui-scroll-wrapper').scroll()[index].scrollTo(0,0,100);
+							mui(".mui-scroll").pullToRefresh()[index].pullDownLoading();
 						},300)
 						console.log('刷新了')
-					})
+					});
+					
+					if(plus.storage.getItem('currDept')){
+						type = JSON.parse(plus.storage.getItem('currDept')).deptType;
+						switch(type){
+							case '3':
+								checkType = 1; // 药库
+								break;
+							case '4':
+								checkType = 2; // 药房
+								break;
+							case '5':
+								checkType = 3; // 基数药
+								break;
+							default:
+								break;
+						}
+					}
 					
 					var isUsual = undefined;
 					var self = plus.webview.currentWebview();
@@ -310,22 +329,7 @@
 					});
 					// 第一个tab 默认加载一次数据
 					mui(".mui-scroll").pullToRefresh()[ selectTabs -1 ].pullDownLoading();
-					if(plus.storage.getItem('currDept')){
-						type = JSON.parse(plus.storage.getItem('currDept')).deptType;
-						switch(type){
-							case '3':
-								checkType = 1; // 药库
-								break;
-							case '4':
-								checkType = 2; // 药房
-								break;
-							case '5':
-								checkType = 3; // 基数药
-								break;
-							default:
-								break;
-						}
-					}
+					
 					// 展开编辑
 					$('#slider').on('tap','.edit',function(){
 						this.innerHTML = this.innerHTML === '收起编辑' ? '展开编辑':'收起编辑' ;
@@ -406,6 +410,7 @@
 						let index = this.dataset.index;
 						let postData = {}, detailList = [], submitData = {};
 						var _this_node = document.querySelectorAll('.am-card')[index];
+						console.log(_this_node.dataset)
 						postData.id = _this_node.dataset.id;
 						postData.drugCode = _this_node.dataset.drugcode;
 						postData.isUsual = Number(_this_node.dataset.isusual);
@@ -431,8 +436,8 @@
 							// 送货单验收
 							postData.realReceiveQuantiry = _this_node.dataset.realreceivequantiry;
 							postData.realProductTime = _this_node.dataset.realproducttime;
-							postData.productBatchNo = this_node.dataset.productbatchno;
-							postData.realValidEndDate = this_node.dataset.realvalidenddate;
+							postData.productBatchNo = _this_node.dataset.productbatchno;
+							postData.realValidEndDate = _this_node.dataset.realvalidenddate;
 						}
 						detailList.push(postData);
 						submitData.detailList = detailList;

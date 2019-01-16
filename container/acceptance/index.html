@@ -98,7 +98,7 @@
 				
 				var deceleration = mui.os.ios?0.003:0.0009;
 				$('.mui-scroll-wrapper').scroll({
-					bounce: false,
+					bounce: true,
 					indicators: true, //是否显示滚动条
 					deceleration:deceleration
 				});
@@ -243,8 +243,6 @@
 						setTimeout(function(){
 							mui(".mui-slider-group .mui-scroll").pullToRefresh()[index].pullDownLoading();
 						},300)
-
-						
 					})
 					
 					plus.key.addEventListener('backbutton',function(){

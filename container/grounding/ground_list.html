@@ -17,6 +17,7 @@
 		   	<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left">
 		   		<label class="mui-pull-right theme_back_font">返回</label>
 		   	</a>
+		   	<h1 class="mui-title themes_title">药品信息</h1>
 		</header>
 		<div class="mui-content">
 			<div class="mui-input-row mui-search search_head" onclick="toSearchPage()">
@@ -90,7 +91,7 @@
 				});
 				var deceleration = mui.os.ios?0.003:0.0009;
 				$('.mui-scroll-wrapper').scroll({
-					bounce: false,
+					bounce: true,
 					indicators: true, //是否显示滚动条
 					deceleration:deceleration
 				});
@@ -123,7 +124,7 @@
 					var postData = {
 						distributeCode: distributeCode,
 						upFinishType,upFinishType,
-						pageNo: page,
+						pageNo: 1,
                 		pageSize: pageSize
 					};
 					if(query.hisDrugCode){
@@ -198,7 +199,8 @@
 				$.plusReady(function(){
 					
 					window.addEventListener('pagefresh',function(event){
-						query = JSON.parse(event.detail.params);
+						console.log(event.detail)
+						query = JSON.parse(event.detail.query);
 						console.log(query)
 						$$('.mui-placeholder').show();
 						$$('.mui-input-clear').val('');
@@ -216,12 +218,11 @@
 						mui(".mui-scroll").pullToRefresh().pullDownLoading();
 					})
 					
-					var params, currentSelected = undefined
+					var params = undefined;
 					var self = plus.webview.currentWebview();
 				    params = JSON.parse(self.params);//获得参数
 				    console.log(params)
 				    distributeCode = params.distributecode;
-				    console.log(currentSelected)
 					//循环初始化所有下拉刷新，上拉加载。
 					$.each(document.querySelectorAll('.mui-scroll'), function(index, pullRefreshEl) {
 						
@@ -250,6 +251,7 @@
 						console.log(id)
 						let newData = {};
 						newData.id = id;
+						newData.query = query;
 						newData.upFinishType = upFinishType ;
 						newData.distributeCode = distributeCode;
 						console.log(newData)

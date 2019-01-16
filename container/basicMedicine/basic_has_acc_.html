@@ -67,12 +67,12 @@
 			function toSearchPage (){
 				document.activeElement.blur(); // 隐藏软键盘
 				var params = {};
-				params.id = 'acc_list';
-				params.route = '../acceptance/acc_list';
+				params.id = 'basic_has_acc';
+				params.route = '../basicMedicine/basic_has_acc';
 				params.auditStatus = '2'; // 都是已验收单据
 				params.selectTabs = 2;
 				params.selected = 'right';
-				params.module = 'acceptance';
+				params.module = 'basicMedicine';
 				params.location = 'sub_list';
 				common.openwin('../commonPages/searchPage',{ params: JSON.stringify(params) },false)
 			}
@@ -103,10 +103,12 @@
 				var utils = new Utils();
 				utils.appendModule('#acc_list_tpl');
 				
-				var page = 1, totalPage = undefined, pageSize = 15, isMore = true, query = {};
+				var page = 1, 
+					totalPage = undefined, 
+					pageSize = 15, 
+					isMore = true, 
+					query = {};
 				var _url = '/a/exam/detail', // 分页接口
-					checkUrl = '/a/checkacceptdetail/checkList';
-				    url = '/a/checkaccept/detail';
 				var distributeCode = undefined, status = '2';
 				
 				function template(data, insertType){
@@ -208,7 +210,6 @@
 						console.log('从详情回来')
 						console.log(e.detail.query)
 						query = e.detail.query;
-						
 						setTimeout(function(){
 							console.log('刷新了啊啊啊啊 啊');
 							mui('.mui-scroll-wrapper').scroll().scrollTo(0,0);
@@ -235,10 +236,6 @@
 				    console.log(JSON.stringify(params))
 				    distributeCode = params.distributecode;
 				    isUsual = params.isusual;
-				    // 判断是否是配送单
-				    isPsList = (params.accepttype === '101' || params.accepttype === '102' || params.accepttype === '103' ||params.accepttype === '104' ) ? true: false;
-				    console.log(isPsList)
-				    
 				    //循环初始化所有下拉刷新，上拉加载。
 					$.each(document.querySelectorAll('.mui-scroll'), function(index, pullRefreshEl) {
 						
@@ -259,22 +256,14 @@
 					});
 					// 第一个tab 默认加载一次数据
 					mui(".mui-scroll").pullToRefresh().pullDownLoading();
+					
 					if(plus.storage.getItem('currDept')){
-						type = JSON.parse(plus.storage.getItem('currDept')).deptType;
-						switch(type){
-							case '3':
-								checkType = 1; // 药库
-								break;
-							case '4':
-								checkType = 2; // 药房
-								break;
-							case '5':
-								checkType = 3; // 基数药
-								break;
-							default:
-								break;
-						}
+						checkType = '3';
+					}else{
+						mui.toast('请重新登陆');
+						common.openwin('../login/index')
 					}
+					
 					//绑定点击事件  - 进入详情页
 						
 					$('#slider').on('tap','.moreDetail',function(){
@@ -286,7 +275,7 @@
 						newData.hasAcceptance = false;// 判断 详情页面是否有验收按钮
 						newData.status = status;
 						newData.id = id;
-						newData.isPsList = isPsList; // 是否是配送单
+						newData.isPsList = false; // 是否是配送单
 						newData.query = globalQuery ; 
 						console.log('newData',JSON.stringify(newData))
 						console.log('query',JSON.stringify(globalQuery))
