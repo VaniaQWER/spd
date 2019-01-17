@@ -434,7 +434,8 @@
 										queryType: '3'
 									}
 								}
-								console.log(url)
+								console.log(url);
+								console.log(JSON.stringify(data))
 								contentType = location === 'sub_list' ? 'application/x-www-form-urlencoded':'application/json';
 								if( module === 'acceptance' || module === 'stock'){
 									contentType = 'application/x-www-form-urlencoded'

@@ -111,8 +111,15 @@
 				utils.appendModule('#list_tpl');
 				
 				
-				function template(data, insertType) {
+				function template(data, insertType,render) {
 					utils.innerTplHtml('picking_tpl', '.mui-tab1', data, insertType);
+					if(render){
+						var checkList = document.querySelectorAll('.checkone');
+						console.log(selecteIndex,'selecteIndex')
+						mui.each(selecteIndex, function(index, item) {
+							checkList[item].checked = true;
+						});
+					}
 				}
 				/*
             	 	下拉刷新
@@ -135,6 +142,8 @@
                 		data: postData,
                 		success: function(data){
                 			var resData = data.data;
+                			resData.page = page;
+							resData.pageSize = pageSize;
                 			resData.hasPicked = true;
                 			resData.applyOrderNo = applyOrderNo;
                 			totalPage = data.totalPage;
@@ -174,6 +183,8 @@
 							},
 							success: function(data) {
 								var resData = data.data;
+								resData.page = page;
+								resData.pageSize = pageSize;
 								resData.hasPicked = true;
 								if (resData.pageNo === resData.totalPage) {
 									isMore = false;
@@ -183,7 +194,7 @@
 									self.endPullUpToRefresh(false);
 									self.refresh(true);
 								}
-								return template(resData, true)
+								return template(resData, true,'render')
 
 							},
 							error: function(xhr, type, errorThrown) {
@@ -315,10 +326,12 @@
 									success: function(data){
 										if(data.code === 200){
 											mui.toast('下架成功',{ type: 'div' });
-//											mui('.mui-scroll-wrapper').scroll().scrollTo(0,0,100);
-											mui(".mui-scroll").pullToRefresh().pullDownLoading();
 											$JQ('.total').text(0);
-											document.querySelector('#checkall').checked=false;
+											document.querySelector('#checkall').checked = false;
+											setTimeout(function(){
+												mui('.mui-scroll-wrapper').scroll().scrollTo(0,0);
+												mui(".mui-scroll").pullToRefresh().pullDownLoading();
+											},300)
 										}
 									},
 									error: function(xhr,type,errorThrown){

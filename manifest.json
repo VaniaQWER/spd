@@ -189,7 +189,8 @@
 				"refer": [
 					"container/pickingOff/pickingOffList.html",
 					"container/commonPages/qrcode.html",
-					"container/commonPages/searchPage.html"
+					"container/commonPages/searchPage.html",
+					"container/pickingOff/pickingOffListUn.html"
 				],
 				"priority": 0
 			},
@@ -370,6 +371,13 @@
 				"refer": [
 					"container/grounding/ground_detail.html",
 					"container/grounding/ground_batch.html",
+					"container/commonPages/searchPage.html"
+				],
+				"priority": 0
+			},
+			"container/pickingOff/pickingOffListUn.html": {
+				"resources": [],
+				"refer": [
 					"container/commonPages/searchPage.html"
 				],
 				"priority": 0

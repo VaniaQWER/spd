@@ -64,8 +64,10 @@
 				params.route = '../pickingOff/pickingOffListUn';
 				params.id = 'pickingOffListUn';
 				params.auditStatus = 1;
+				params.selectTabs = 2;
 				params.module = 'pickingOff';
 				params.location = 'sub_list';
+				console.log(params)
 				common.openwin('../commonPages/searchPage',{ params: JSON.stringify(params) },false)
 			}
 			

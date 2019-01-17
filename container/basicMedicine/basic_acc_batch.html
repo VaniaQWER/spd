@@ -63,8 +63,15 @@
 			    	}
 				})
 				
-				function template(data, insertType) {
-						utils.innerTplHtml('list_tpl_view', '.mui-tab1', data, insertType);
+				function template(data, insertType,render) {
+					utils.innerTplHtml('list_tpl_view', '.mui-tab1', data, insertType);
+					if(render){
+						var checkList = document.querySelectorAll('.checkone');
+						console.log(selecteIndex,'selecteIndex')
+						mui.each(selecteIndex, function(index, item) {
+							checkList[item].checked = true;
+						});
+					}
 				}
 				
 				var deceleration = mui.os.ios?0.003:0.0009;
@@ -114,6 +121,8 @@
 						data: postData,
 						success: function(data) {
 							var resData = data.data;
+							resData.page = page;
+							resData.pageSize = pageSize;
 							acceptList = resData.list;
 							resData.acceptance = true;
 							totalPage = data.totalPage;
@@ -155,7 +164,11 @@
 							},
 							success: function(data) {
 								var resData = data.data;
-								acceptList = acceptList.push(resData.list)
+								resData.page = page;
+								resData.pageSize = pageSize;
+								mui.each(resData.list,function(index,item){
+									acceptList.push(item)
+								});
 								resData.acceptance = true;
 								if (resData.list.length === 0 ||resData.pageNo === resData.totalPage) {
 									isMore = false;
@@ -165,7 +178,7 @@
 									self.endPullUpToRefresh(false);
 									self.refresh(true);
 								}
-								return template(resData, true)
+								return template(resData, true, 'rerender')
  
 							},
 							error: function(xhr, type, errorThrown) {
@@ -243,7 +256,8 @@
 					// 复选框选中
 					$('#slider').on('change','.checkone',function(){
 						console.log('change')
-						selectedRows = [],selecteIndex = [];
+						selectedRows = [];
+						selecteIndex = [];
 						var checkList = document.querySelectorAll('.checkone')
 						var checkAll = document.querySelector('#checkall');
 						var checkLen = checkList.length;
@@ -251,8 +265,8 @@
 						mui.each(checkList,function(index,item){
 							if(item.checked){
 								len++;
-								// selectedRows.push(acceptList[index]);
-								selecteIndex.push(this.dataset.index)
+//								selecteIndex.push(this.dataset.index);
+								selecteIndex.push(Number(this.dataset.index));
 							}
 						});
 						checkAll.checked = len === checkLen ? true: false;
@@ -360,18 +374,12 @@
 									success: function(data){
 										if(data.code === 200){
 											mui.toast('验收成功',{ type: 'div' });
-											mui(".mui-scroll").pullToRefresh().pullDownLoading();
 											$JQ('.total').text(0);
 											document.querySelector('#checkall').checked=false;
-// 											var parmas = {};
-// 											parmas.finishUrl = '../basicMedicine/index';
-// 											parmas.keepUrl = 'acc_list';
-// 											parmas.resultType = 'basicMedicine';
-// 											parmas.itemData = params.itemData;
-// 											common.openwin('../result/index',{ parmas: JSON.stringify(parmas) },{
-// 												titleText: '结果',
-// 												autoBackButton: false
-// 											})
+											setTimeout(function(){
+												mui('.mui-scroll-wrapper').scroll().scrollTo(0,0);
+												mui(".mui-scroll").pullToRefresh().pullDownLoading();
+											},300)
 										}
 									},
 									error: function(xhr,type,errorThrown){

@@ -91,10 +91,11 @@
 				params.route = '../pickingOff/pickingOffList';
 				params.id = 'pickingOffList';
 				params.auditStatus = pickingStatus;
-				params.selectTabs = selectTabs;
+				params.selectTabs = pickingStatus === '0' ? 1 : 2;
 				params.selected = pickingStatus === '0' ? 'left': 'right';
 				params.module = 'pickingOff';
 				params.location = 'sub_list';
+				console.log(params,'params')
 				common.openwin('../commonPages/searchPage',{ params: JSON.stringify(params) },false)
 			}
 			
