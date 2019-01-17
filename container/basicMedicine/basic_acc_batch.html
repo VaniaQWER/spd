@@ -233,6 +233,7 @@
 					
 					// 全选 及反选
 					$('.fix_bottom-wraper').on('click','#checkall',function(){
+						selecteIndex = [];
 						var checkList =  document.querySelectorAll('.checkone');
 						 if (document.querySelector('#checkall').checked){
 						 	// 全选

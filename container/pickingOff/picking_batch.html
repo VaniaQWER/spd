@@ -94,7 +94,8 @@
 					selected = '.mui-tab1'; // 默认选中内容区块
 					pickingOrderNo = undefined, 
 					pickingStatus = '0',
-					applyOrderNo = undefined;
+					applyOrderNo = undefined,
+					selecteIndex = [];
 				
 				var _url = '/a/common/pickingorderdetail/detailList',
 					pickUrl = '/a/common/pickingorder/finishPicking',
@@ -216,13 +217,10 @@
 				// 模板加载
 				$.plusReady(function(){
 					var params = undefined, 
-						applyNo = undefined, 
-						selectedRows = [],
-						selecteIndex = [];
+						applyNo = undefined;
+
 					var self = plus.webview.currentWebview();
-				    params = JSON.parse(self.params);//获得参数
-				   
-				    
+				    params = JSON.parse(self.params);//获得参数  
 				    pickingOrderNo = params.pickingOrderNo;
 				    applyOrderNo = params.applyNo;
 				    applyNo = params.applyNo;
@@ -255,6 +253,7 @@
 					
 					// 全选 及反选
 					$('.fix_bottom-wraper').on('click','#checkall',function(){
+						selecteIndex = [];
 						var checkList =  document.querySelectorAll('.checkone');
 						 if (document.querySelector('#checkall').checked){
 						 	// 全选
@@ -262,7 +261,6 @@
 						 		item.checked = true
 						 	});
 						 	document.querySelector('.total').innerText = checkList.length;
-//						 	selectedRows = acceptList;
 						 	mui.each(checkList,function(index,item){
 								selecteIndex.push(index);
 							});
