@@ -44,7 +44,7 @@
 											<div class="am-list-line">
 												<div class="am-input-label am-input-label-4 font-warning">实到数量:</div>
 												<div class="am-input-control">
-													<input pattern="[0-9]*" type="number" value={{ value.realReceiveQuantiry?value.realReceiveQuantiry: '' }} placeholder="请输入" class="realReceiveQuantity flex-item-input" />
+													<input pattern="[0-9]*" type="number" value={{ value.realReceiveQuantiry || value.realReceiveQuantiry === 0 ? value.realReceiveQuantiry: '' }} placeholder="请输入" class="realReceiveQuantity flex-item-input" />
 												</div>
 											</div>
 										</div>

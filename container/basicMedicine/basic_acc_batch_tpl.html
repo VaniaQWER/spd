@@ -107,7 +107,7 @@
 							
 							<div class="am-flexbox am-flexbox-align-center">
 								<div class="am-flexbox-item"> 
-									实到数量：<span class='errorQuantiry'>{{ value.realReceiveQuantiry }}</span>
+									实到数量：<span class='errorQuantiry'>{{ value.realReceiveQuantiry || value.realReceiveQuantiry === 0 ? value.realReceiveQuantiry: '' }}</span>
 								</div>
 								<div class="am-flexbox-item am-last-flexItem">
 								 	生产日期：<span class="errRealProductTime">{{ value.realProductTime }}</span>
