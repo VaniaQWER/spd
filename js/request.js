@@ -6,7 +6,6 @@
 //	var baseUrl = "http://192.168.31.200:8888/medicinal-web" // 测试地址///
 //	var baseUrl = "http://192.168.31.223:8080/medicinal-web" // 测试地址/
 //	var baseUrl = 'http://116.62.143.29:8088/medicinal-web'; // 线上地址2（快）
-
 	var baseUrl = 'http://10.146.8.221:9002/medicinal-web'; // 合肥测试环境
 //	var baseUrl = 'http://10.146.9.50:8080/medicinal-web';// 合肥正式环境
 
@@ -68,13 +67,13 @@
             		plus.nativeUI.closeWaiting();
             	}
                 hideLoading();
-//             	mui.openWindow({
-//                  url: "login/index.html",
-//                  id: "login/index.html",
-//                  extras: {
-//                      mark: "index" //额外的参数，仅仅是个标识，实际开发中不用；
-//                  }
-//              });
+               	mui.openWindow({
+                    url: "login/index.html",
+                    id: "login/index.html",
+                    extras: {
+                        mark: "index" //额外的参数，仅仅是个标识，实际开发中不用；
+                    }
+                });
                 if(options.error){
                 	
                     options.error(a , b , c);

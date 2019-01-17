@@ -71,7 +71,8 @@
 		<script src="../../js/request.js" type="text/javascript" charset="utf-8"></script>
 		
 		<script type="text/javascript">
-			var pickingStatus = undefined;// 拣货状态  0 待拣货  1 已拣货
+			var pickingStatus = undefined, 
+				selectTabs = 1;// 拣货状态  0 待拣货  1 已拣货
 			if(window.plus) {
                 plusready();
             } else {
@@ -90,6 +91,7 @@
 				params.route = '../pickingOff/pickingOffList';
 				params.id = 'pickingOffList';
 				params.auditStatus = pickingStatus;
+				params.selectTabs = selectTabs;
 				params.selected = pickingStatus === '0' ? 'left': 'right';
 				params.module = 'pickingOff';
 				params.location = 'sub_list';
@@ -138,13 +140,6 @@
 				function template(selected, data, insertType){
         			utils.innerTplHtml('picking_tpl',selected, data, insertType);
             	}
-			
-			
-				$('.mui-scroll-wrapper').scroll({
-					deceleration: 0.1,
-					indicators: true //是否显示滚动条
-				});
-
 				/*
             	 	下拉刷新
             	 * */
@@ -254,8 +249,11 @@
 						$$('.mui-input-clear').val('');
 						$$('.mui-placeholder').hide();
 						mui('#slider').slider().gotoItem(index);
-						mui('.mui-scroll-wrapper').scroll()[index].scrollTo(0,0,100);
-						mui(".mui-scroll").pullToRefresh()[index].pullDownLoading();
+						setTimeout(function(){
+							mui('.mui-scroll-wrapper').scroll()[index].scrollTo(0,0,100);
+							mui(".mui-scroll").pullToRefresh()[index].pullDownLoading();
+						},300)
+						
 					});
 
 					

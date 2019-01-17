@@ -30,7 +30,17 @@
 			"container/commonPages/qrcode.html",
 			"container/basicMedicine/index.html"
 		],
-		"resources": []
+		"resources": [
+			"js/utils.js",
+			"css/home.css",
+			"js/mui.pullToRefresh.js",
+			"js/common.js",
+			"js/mui.pullToRefresh.material.js",
+			"js/template-web.js",
+			"js/request.js",
+			"js/mui.js",
+			"tpl/message.html"
+		]
 	},
 	"container/grounding/index.html": {
 		"refer": [

@@ -40,7 +40,7 @@
 					<h1 class="mui-title">新建盘点</h1>
 				</header>
 				<div class="mui-content" style="height: 100%;padding-top: 12px;">
-					<form id='radioForm'>
+					<form id='radioForm' style="padding: 0 12px;">
 						<div class="gird mui-table-view-radio" id="checkBillType">
 							<div class="gird-label">盘点类型：</div>
 							<div class="mui-input-row mui-radio mui-left">
@@ -157,7 +157,10 @@
 				});
 				
 				var url = '/a/checkbill/list', newAddUrl = '/a/checkbill/create', medicineFeautureUrl = '/a/spd/dict/type', medicineData = [];		
-				var page = 1, totalPage = undefined, pageSize = 15, isMore = true
+				var page = 1, 
+					totalPage = undefined, 
+					pageSize = 15, 
+					isMore = true;
 				var utils = new Utils();
 				utils.appendModule('#card_view');
 
@@ -177,7 +180,7 @@
                 			if(data.code === 200){
                 				var resData = data.data;
 	                			totalPage = data.totalPage;
-	                			if(resData.list.length < pageSize){
+	                			if(resData.list.length === 0 || (resData.list.length <= resData.pageSize && resData.pageNo === resData.totalPage)){
 	                				document.querySelector('.mui-pull-loading').innerHTML = '没有更多数据';
 	                				self.endPullDownToRefresh(true);
 	                				isMore = false;
@@ -209,9 +212,17 @@
 		                			pageNo: page
 		                		},
 		                		success: function(data){
+		                			
 		                			var resData = data.data;
-		                			self.endPullUpToRefresh(page >= totalPage);
-									return template(resData, true)
+		                			if(resData.pageNo === resData.totalPage){
+			            				isMore = false;
+			            				self.endPullUpToRefresh(true);
+			            			}else{
+			            				isMore = true;
+			            				self.endPullUpToRefresh(false);
+			            				self.refresh(true);
+			            			}
+									return template(resData,true);
 		                		},
 		                		error: function(xhr,type,errorThrown){
 									console.log(xhr.responseText)
@@ -343,7 +354,7 @@
 								var div = document.createElement('div');
 						 		div.className = 'mui-input-row dateRow';
 						 		div.innerHTML ='<label class="font-warning" style="padding:11px 5px;width:24%">起始时间：</label>'+
-						 		'<input class="mui-input checkInputDate" type="date"/>'
+						 		'<input class="mui-input checkInputDate" data-options="{}"  readonly="readonly" type="input"/>'
 						 		document.querySelector('#checkBill').insertAdjacentElement('afterend',div);
 							}else{
 								if(document.querySelector('.dateRow')){
@@ -368,6 +379,28 @@
 						if(positionName){
 							fetchSelect(positionName,'#ulList_end','end')
 						}
+					});
+					
+					$('#radioForm').on('tap','.checkInputDate',function(){
+						var _self = this;
+						console.log(_self,'self')
+						if(_self.picker) {
+							_self.picker.show(function (rs) {
+								_self.value = rs.text;
+								_self.picker.dispose();
+								_self.picker = null;
+							});
+						} else{
+							var optionsJson = this.getAttribute('data-options') || '{}';
+							var options = JSON.parse(optionsJson);
+							var id = this.getAttribute('id');
+							_self.picker = new $.DtPicker(options);
+							_self.picker.show(function(rs) {
+								_self.value = rs.text;
+								_self.picker.dispose();
+								_self.picker = null;
+							});
+						}
 					})
 					
 					function fetchSelect(name,target,key){
@@ -376,11 +409,13 @@
 							data: { positionName: name },
 							type:"post",
 							success: function(data){
-									if(data.code === 200){
-										let selectList = data.data;
-										createSelect(selectList,target,key);
-									}
-								
+								if(data.code === 200){
+									let selectList = data.data;
+									createSelect(selectList,target,key);
+								}else{
+									mui.toast('暂无数据',{ type: 'div' })
+								}
+							
 							},
 							error: function(xhr,type,errorThrown){
 								console.log(xhr.responseText)

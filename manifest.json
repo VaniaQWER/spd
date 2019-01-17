@@ -1,9 +1,9 @@
 {
     "@platforms" : [ "android", "iPhone", "iPad" ],
     "id" : "H569465D3", /*应用的标识，创建应用时自动生成，勿手动修改*/
-    "name" : "spd", /*应用名称，程序桌面图标名称*/
+    "name" : "spd-药品物流管理系统", /*应用名称，程序桌面图标名称*/
     "version" : {
-        "name" : "1.15detail_search", /*应用版本名称*/
+        "name" : "1.0.2beta", /*应用版本名称*/
         "code" : "83"
     },
     "description" : "", /*应用描述信息*/
@@ -139,7 +139,17 @@
 				"priority": 0
 			},
 			"container/home/index.html": {
-				"resources": [],
+				"resources": [
+					"js/utils.js",
+					"css/home.css",
+					"js/mui.pullToRefresh.js",
+					"js/common.js",
+					"js/mui.pullToRefresh.material.js",
+					"js/template-web.js",
+					"js/request.js",
+					"js/mui.js",
+					"tpl/message.html"
+				],
 				"refer": [
 					"container/pickingOff/index.html",
 					"container/home/tips.html",
@@ -372,34 +382,26 @@
 				"container/acceptance/detail_tpl.html",
 				"container/grounding/list_tpl.html",
 				"tpl/list.html",
-				"js/common.js",
 				"tpl/tips.html",
 				"container/pickingOff/list_tpl.html",
 				"images/icon_query.png",
-				"js/mui.js",
 				"tpl/check_card.html",
 				"tpl/pickOff_card_index.html",
 				"tpl/acceptance_card.html",
-				"js/mui.pullToRefresh.material.js",
 				"fonts/mui.ttf",
 				"images/icon_check_before_acceptance.png",
 				"container/stockQuery/details_view.html",
 				"assest/success.svg",
 				"css/mui.css",
 				"images/icon_inventory.png",
-				"css/home.css",
 				"container/check/detail_tpl.html",
 				"index.html",
 				"images/icon_grounding.png",
 				"css/themes.css",
 				"css/index_view.css",
-				"js/template-web.js",
-				"tpl/message.html",
 				"container/grounding/detail_tpl.html",
 				"container/Result/success_tpl.html",
-				"js/utils.js",
 				"js/mui.min.js",
-				"js/mui.pullToRefresh.js",
 				"images/icon_lower_frame.png",
 				"container/pickingOff/detail_tpl.html",
 				"tpl/stockQuery_card.html",
