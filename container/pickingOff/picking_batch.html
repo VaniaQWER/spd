@@ -125,6 +125,10 @@
             	 	下拉刷新
             	 * */
 			function pulldownRefresh(){
+					document.querySelector('.total').innerText = 0;
+					document.querySelector('#checkall').checked = false;
+					selecteIndex = [];
+				
 					var self = this;
 					page = 1;
 					var postData = {
@@ -170,6 +174,7 @@
 				 *  上拉加载更多
 				 * */
 				function pullupRefresh() {
+					document.querySelector('#checkall').checked = false;
 					var self = this;
 					if (isMore) {
 						page++;

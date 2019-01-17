@@ -111,6 +111,7 @@
 				function pulldownRefresh() {
 					// 重置 勾选项
 					document.querySelector('.total').innerText = 0;
+					document.querySelector('#checkall').checked = false;
 					selecteIndex = [];
 					
 					var self = this;
@@ -155,6 +156,7 @@
 				 *  上拉加载更多
 				 * */
 				function pullupRefresh() {
+					document.querySelector('#checkall').checked = false;
 					var self = this;
 					console.log(isMore, 'isMore');
 					if (isMore) {
