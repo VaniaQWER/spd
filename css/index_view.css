@@ -129,7 +129,7 @@ input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appear
 	position: relative;
 }
 .home-card-title {
-	border-left: 6px solid #EC971F;
+	border-left: 6px solid #238962;
 	font-size: 18px;
 	padding-left: 13px;
 	margin-bottom: 6px;
@@ -228,7 +228,7 @@ input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appear
 	align-items: center;
 }
 .detail-header-flex .am-action a{
-	color: #f2a11c !important;
+	color: #238962 !important;
 }
 .am-flexbox {
     text-align: left;
@@ -384,7 +384,7 @@ input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appear
 	margin-left: 8px;
 }
 .before-ground{
-	background-color: #F2A11C;
+	background-color: #238962;
 }
 .hasGround{
 	background-color: limegreen;
@@ -452,10 +452,10 @@ input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appear
 	align-items: center;
     flex: 1 1;
     height: 100%;
-    border-top: solid 1px #F2A11C;
+    border-top: solid 1px #238962;
 }
 .fix-bottom-extra{
-	background: #F2A11C;
+	background: #238962;
     display: flex;
     text-align: center;
     width: 120px;
@@ -484,4 +484,12 @@ input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appear
 }
 .moreCondition .mui-table-view-cell::after{
 	background-color: #fff;
+}
+/*
+ hover 样式
+ * */
+.mui-btn.mui-active:enabled, .mui-btn:enabled:active, button.mui-active:enabled, button:enabled:active, input[type=button].mui-active:enabled, input[type=button]:enabled:active, input[type=reset].mui-active:enabled, input[type=reset]:enabled:active, input[type=submit].mui-active:enabled, input[type=submit]:enabled:active{
+	color: #fff;
+    background-color: #3f9672;
+    border-color: #3f9672;
 }

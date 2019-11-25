@@ -25,7 +25,7 @@ body {
 .am-title{
 	text-align: center;
 	font-size: 26px;
-	color: #F2A11C;
+	color: #238962;
 	padding: 100px 0;
 }
 #login-form{
@@ -35,7 +35,7 @@ body {
 	display: flex;
 	width: 100%;
 	height: 60px;
-	border: solid 1px goldenrod;
+	border: solid 1px #238962;
 	border-radius: 60px;
 	align-items: center;
 	justify-content: center;
@@ -57,4 +57,11 @@ body {
 	border-radius: 40px;
 	margin-top: 36px;
 }
-
+.btn{
+	background-color: #238962;
+}
+.mui-btn.mui-active:enabled, .mui-btn:enabled:active, button.mui-active:enabled, button:enabled:active, input[type=button].mui-active:enabled, input[type=button]:enabled:active, input[type=reset].mui-active:enabled, input[type=reset]:enabled:active, input[type=submit].mui-active:enabled, input[type=submit]:enabled:active{
+	color: #fff;
+    background-color: #3f9672;
+    border-color: #3f9672;
+}

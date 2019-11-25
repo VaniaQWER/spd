@@ -4,7 +4,7 @@ body {
 }
 /* 背景屎黄色 */
 .themes_bg_color {
-	background: #f2a11c;
+	background: #238962;
 }
 .themes_bg_color a{
 	color: #FFFFFF !important;
@@ -28,16 +28,16 @@ body {
 }
 /* 单选框 复选框 选中样式 颜色 */
 .mui-checkbox input[type=checkbox]:checked:before, .mui-radio input[type=radio]:checked:before{
-	color: #f2a11c;
+	color: #238962;
 }
 
 /*返回文字样式*/
 .theme_back a{
-	/*color: #f2a11c !important;*/
+	/*color: #238962 !important;*/
 	color: #FFFFFF !important;
 }
 .theme_back_font,.theme_next_font{
-	/*color: #f2a11c ;*/
+	/*color: #238962 ;*/
 	color: #FFFFFF;
 	margin-top: 7px;
     font-size: 14px;
@@ -53,10 +53,10 @@ body {
 /*tab页切里面的文字颜色*/
 /*tab被选中的当前横线颜色*/
 .themes_tab .mui-segmented-control.mui-segmented-control-inverted~.mui-slider-progress-bar{
-	background-color: #f2a11c !important;
+	background-color: #238962 !important;
 }
 .themes_font_color_tab.mui-active{
-	color: #f2a11c !important;
+	color: #238962 !important;
 }
 /*tab 页切内容高度 */
 
@@ -201,7 +201,7 @@ html,body{
     font-weight: normal;
     font-size: 18px;
     background: #fff;
-    border-left: 6px solid #EC971F;
+    border-left: 6px solid #238962;
 }
 #check_scroll1 {
 	top: 86px;

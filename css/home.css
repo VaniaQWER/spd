@@ -14,8 +14,14 @@
 .home-card-content .home-card-item{
 	position: relative;
 }
+.home-card-item-img{
+  padding: 0 4px;
+}
+.home-card-item-img img{
+  width: 100%;
+}
 .home-card-title {
-	border-left: 6px solid #EC971F;
+	border-left: 6px solid #238962;
 	font-size: 18px;
 	padding-left: 13px;
 	margin-bottom: 6px;
@@ -62,8 +68,8 @@
 .badge{
 	position: absolute;
 	top: 0;
-	right: -14px;
+	right: -10px;
 }
 .mui-segmented-control.mui-segmented-control-inverted .mui-control-item.mui-active{
-	border-bottom: 2px solid #f2a11c;
+	border-bottom: 2px solid #238962;
 }

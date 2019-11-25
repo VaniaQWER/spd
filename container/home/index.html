@@ -357,7 +357,19 @@
 	            		var currDept = JSON.parse(plus.storage.getItem('currDept'));
 	            		if(currDept.deptType === '3' || currDept.deptType === '4'){
 	            			for(var i=0; i<5; i++){
-	            				var div = document.createElement('div');
+//	            				var div = document.createElement('div');
+//	            				var subDiv = document.createElement('div');
+//	            				div.className = 'home-card-item';
+//	            				subDiv.className = 'home-card-item-img';
+//	            				div.setAttribute('data-src', itemDesc[i].url);
+//	            				div.appendChild(subDiv);
+//	            				var addHtml = '<img src=' + itemDesc[i].src + ' />'+
+//	            				'<div class="home-card-text">'+ itemDesc[i].text +'</div>';
+//	            				subDiv.innerHTML = addHtml;
+//	            				if(i < 3){
+//	            					subDiv.innerHTML = '<span class="mui-badge mui-badge-success badge">'+ nums[i+1] +'</span>'+ addHtml 
+//	            				}
+								var div = document.createElement('div');
 	            				div.className = 'home-card-item';
 	            				div.setAttribute('data-src', itemDesc[i].url);
 	            				var addHtml = '<img width="65" height="65" src=' + itemDesc[i].src + ' />'+
@@ -375,7 +387,7 @@
 	            				var addHtml;
 	            				if(i === 0){
 	            					div.setAttribute('data-src', basicMediclist[0].url);
-	            					addHtml = '<span class="mui-badge mui-badge-warning badge">'+ nums[1] +'</span>' + '<img width="65" height="65" src=' + itemDesc[0].src + ' />'+
+	            					addHtml = '<span class="mui-badge mui-badge-success badge">'+ nums[1] +'</span>' + '<img width="65" height="65" src=' + itemDesc[0].src + ' />'+
 	            					'<div class="home-card-text">'+ basicMediclist[0].text +'</div>';
 	            				}else{
 	            					div.setAttribute('data-src', basicMediclist[1].url);
